@@ -1,0 +1,703 @@
+/* Notification System - Popup/Modal Design */
+
+/* Notification Bell Button - Enhanced */
+.notification-bell {
+    position: relative;
+    display: flex !important; /* ROOT CAUSE FIX: Use flex to match nav-link styling and ensure visibility */
+    align-items: center !important; /* ROOT CAUSE FIX: Center content vertically */
+    cursor: pointer;
+    padding: 0.875rem 0.875rem !important; /* ROOT CAUSE FIX: Match nav-link padding exactly */
+    border-radius: 12px; /* ROOT CAUSE FIX: Match nav-link border-radius */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible !important; /* ROOT CAUSE FIX: Ensure badge is not cut off */
+    width: 100%; /* ROOT CAUSE FIX: Full width to match nav-link */
+    text-decoration: none !important; /* ROOT CAUSE FIX: Remove underline */
+    color: white !important; /* ROOT CAUSE FIX: Match nav-link text color */
+    opacity: 0.85; /* ROOT CAUSE FIX: Match nav-link opacity */
+    font-weight: 600; /* ROOT CAUSE FIX: Match nav-link font-weight */
+    margin: 0 !important; /* ROOT CAUSE FIX: Remove margin to prevent outer box appearance */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* ROOT CAUSE FIX: Match nav-link box-shadow */
+    z-index: 1; /* ROOT CAUSE FIX: Ensure it's above other elements */
+    /* ROOT CAUSE FIX: Ensure no outer container background */
+    background: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+}
+
+.notification-bell:hover {
+    background: rgba(255, 255, 255, 0.15) !important; /* ROOT CAUSE FIX: Match nav-link hover background */
+    opacity: 1 !important; /* ROOT CAUSE FIX: Match nav-link hover opacity */
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* ROOT CAUSE FIX: Match nav-link hover box-shadow */
+}
+
+/* FIXED: Remove black tap highlight and dark artifacts on notification bell click */
+.notification-bell {
+    -webkit-tap-highlight-color: transparent !important;
+    -moz-tap-highlight-color: transparent !important;
+    tap-highlight-color: transparent !important;
+    outline: none !important;
+}
+
+.notification-bell:active,
+.notification-bell:focus,
+.notification-bell:focus-visible {
+    background: rgba(255, 255, 255, 0.2) !important; /* Light background instead of black */
+    outline: none !important;
+    border: none !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+.notification-bell i {
+    font-size: 1.3rem;
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    margin-right: 10px; /* ROOT CAUSE FIX: Add spacing between icon and text, matching nav-link */
+    width: 22px; /* ROOT CAUSE FIX: Match nav-link icon width */
+    text-align: center; /* ROOT CAUSE FIX: Center icon */
+}
+
+.notification-bell:hover i {
+    transform: scale(1.15) rotate(15deg);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* ROOT CAUSE FIX: Ensure notification bell text span is visible and styled like nav-link (only when sidebar is expanded) */
+.notification-bell span:not(.notification-badge) {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* ROOT CAUSE FIX: Hide notification text when sidebar is collapsed */
+.sidebar.collapsed .notification-bell span:not(.notification-badge) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Bell shake animation when new notification arrives */
+.notification-bell.has-new i {
+    animation: bellShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes bellShake {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+    20%, 40%, 60%, 80% { transform: rotate(10deg); }
+}
+
+.notification-badge {
+    position: absolute;
+    top: -4px; /* ROOT CAUSE FIX: Move slightly outside to ensure visibility */
+    right: -4px; /* ROOT CAUSE FIX: Move slightly outside to ensure visibility */
+    background: linear-gradient(135deg, #ff3b30 0%, #e74a3b 100%);
+    color: white !important; /* ROOT CAUSE FIX: Ensure text color is white */
+    border-radius: 50%; /* ROOT CAUSE FIX: Make it perfectly circular for better centering */
+    font-size: 0.75rem !important; /* ROOT CAUSE FIX: Increase font size for better visibility */
+    font-weight: 900 !important;
+    min-width: 20px; /* ROOT CAUSE FIX: Increase minimum size for better visibility */
+    min-height: 20px;
+    width: 20px; /* ROOT CAUSE FIX: Increase width for better visibility */
+    height: 20px;
+    padding: 0; /* ROOT CAUSE FIX: No padding, flexbox handles centering */
+    box-sizing: border-box;
+    /* ROOT CAUSE FIX: Use flexbox for perfect centering */
+    display: none; /* Default hidden, JavaScript will change to flex when count > 0 */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(231, 74, 59, 0.7), 0 0 0 2px rgba(255, 255, 255, 1);
+    animation: bellPulse 2s ease-in-out infinite;
+    border: none;
+    line-height: 1; /* ROOT CAUSE FIX: Set to 1 to prevent line-height offset */
+    z-index: 1000 !important; /* ROOT CAUSE FIX: Increase z-index to ensure it's on top */
+    transform-origin: center;
+    visibility: hidden !important; /* ROOT CAUSE FIX: Hidden by default */
+    opacity: 0 !important; /* ROOT CAUSE FIX: Transparent by default */
+    pointer-events: none;
+    /* ROOT CAUSE FIX: Ensure text doesn't wrap and is perfectly centered */
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* ROOT CAUSE FIX: When badge has "9+" text (multi-digit), expand width while maintaining centering */
+.notification-badge[data-count="9+"] {
+    width: auto !important;
+    min-width: 24px !important; /* ROOT CAUSE FIX: Increase for "9+" text */
+    padding: 0 4px !important; /* ROOT CAUSE FIX: Increase padding for "9+" text */
+    height: 20px !important; /* ROOT CAUSE FIX: Maintain height */
+}
+
+/* ROOT CAUSE FIX: When badge is shown (via JavaScript setting display: flex), ensure flexbox centering */
+.notification-badge[style*="display: flex"],
+.notification-badge[style*="display:flex"],
+.notification-badge[style*="display: flex"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ROOT CAUSE FIX: Ensure badge centering on all pages, including dashboard (only when shown) */
+#notificationBadge.notification-badge:not([style*="display: none"]):not(:empty),
+.notification-bell .notification-badge:not([style*="display: none"]):not(:empty) {
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ROOT CAUSE FIX: Hide badge when it's empty or has display: none */
+#notificationBadge.notification-badge:empty,
+#notificationBadge.notification-badge[style*="display: none"],
+.notification-bell .notification-badge:empty,
+.notification-bell .notification-badge[style*="display: none"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+@keyframes bellPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 3px 10px rgba(231, 74, 59, 0.7), 0 0 0 2px rgba(255, 255, 255, 1);
+    }
+    50% { 
+        transform: scale(1.15);
+        box-shadow: 0 5px 15px rgba(231, 74, 59, 0.9), 0 0 0 3px rgba(255, 255, 255, 1), 0 0 15px rgba(231, 74, 59, 0.5);
+    }
+}
+
+/* Badge pop animation when count increases */
+.notification-badge.badge-pop {
+    animation: badgePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), bellPulse 2s ease-in-out 0.4s infinite;
+}
+
+@keyframes badgePop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Overlay - Enhanced */
+.notification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Notification Panel - Popup/Modal Design */
+.notification-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.notification-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Panel Header - Enhanced Design */
+.notification-header {
+    padding: 2rem 2rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.notification-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="white" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="white" opacity="0.1"/><circle cx="50" cy="90" r="2.5" fill="white" opacity="0.1"/></svg>');
+    background-size: 100px 100px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.notification-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.notification-header h3 i {
+    font-size: 1.4rem;
+    animation: bellRing 3s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    10% { transform: rotate(15deg); }
+    20% { transform: rotate(-15deg); }
+    30% { transform: rotate(10deg); }
+    40% { transform: rotate(-10deg); }
+    50% { transform: rotate(0deg); }
+}
+
+.notification-header .close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.notification-header .close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Panel Actions - Enhanced Design */
+.notification-actions-bar {
+    padding: 1.2rem 1.5rem;
+    background: linear-gradient(180deg, #f8f9fc 0%, #ffffff 100%);
+    border-bottom: 2px solid #e3e6f0;
+    display: flex;
+    gap: 12px;
+}
+
+.notification-actions-bar button {
+    flex: 1;
+    padding: 0.7rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.notification-actions-bar button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.notification-actions-bar button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.notification-actions-bar .btn-mark-all {
+    background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+    color: white;
+}
+
+.notification-actions-bar .btn-clear-all {
+    background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+    color: white;
+}
+
+.notification-actions-bar button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.notification-actions-bar button:active {
+    transform: translateY(-1px);
+}
+
+/* Notification List - Enhanced */
+.notification-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 100%);
+}
+
+
+/* notification-list scrollbar: browser default */
+
+
+/* Notification Item - Enhanced Design */
+.notification-item {
+    display: flex;
+    gap: 15px;
+    padding: 1.3rem;
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 18px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.notification-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification-item:hover::before {
+    transform: scaleY(1);
+}
+
+.notification-item::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.03) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.notification-item:hover::after {
+    opacity: 1;
+}
+
+.notification-item.unread {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+}
+
+.notification-item.unread::before {
+    transform: scaleY(1);
+}
+
+.notification-item:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: #667eea;
+}
+
+/* Notification Icon - Enhanced */
+.notification-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification-item:hover .notification-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Notification Content - Enhanced */
+.notification-content {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.notification-title {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notification-item.unread .notification-title::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+    animation: unreadPulse 2s infinite;
+}
+
+@keyframes unreadPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(102, 126, 234, 0.08);
+    border-radius: 8px;
+}
+
+.notification-time::before {
+    content: '🕐';
+    font-size: 0.85rem;
+}
+
+/* Notification Actions - Enhanced */
+.notification-item .notification-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.notification-item .notification-actions button {
+    background: rgba(0, 0, 0, 0.03);
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #999;
+    font-size: 1rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-item .notification-actions .btn-mark-read {
+    border-color: rgba(28, 200, 138, 0.2);
+}
+
+.notification-item .notification-actions .btn-mark-read:hover {
+    background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+    color: white;
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow: 0 4px 12px rgba(28, 200, 138, 0.3);
+    border-color: #1cc88a;
+}
+
+.notification-item .notification-actions .btn-delete {
+    border-color: rgba(231, 74, 59, 0.2);
+}
+
+.notification-item .notification-actions .btn-delete:hover {
+    background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+    color: white;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 4px 12px rgba(231, 74, 59, 0.3);
+    border-color: #e74a3b;
+}
+
+/* Dark Theme Support - Enhanced */
+body.dark-theme .notification-panel {
+    background: #161b22;
+    color: #e6edf3;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+body.dark-theme .notification-actions-bar {
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+    border-bottom-color: #30363d;
+}
+
+body.dark-theme .notification-list {
+    background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+}
+
+body.dark-theme .notification-item {
+    background: #1c2128;
+    border-color: #30363d;
+}
+
+body.dark-theme .notification-item.unread {
+    background: linear-gradient(135deg, rgba(88, 166, 255, 0.08) 0%, rgba(102, 126, 234, 0.08) 100%);
+    border-color: #58a6ff;
+    box-shadow: 0 4px 15px rgba(88, 166, 255, 0.2);
+}
+
+body.dark-theme .notification-title {
+    color: #e6edf3;
+}
+
+body.dark-theme .notification-message {
+    color: #8b949e;
+}
+
+body.dark-theme .notification-time {
+    background: rgba(88, 166, 255, 0.15);
+    color: #8b949e;
+}
+
+
+/* dark theme notification-list scrollbar: browser default */
+
+
+body.dark-theme .notification-item .notification-actions button {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+
+/* Animation for new notifications - Enhanced */
+@keyframes slideInFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.notification-item {
+    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Empty state - Enhanced */
+.notification-list .text-center {
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.notification-list .text-center i {
+    opacity: 0.2;
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #667eea;
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.notification-list .text-center p {
+    font-size: 1.1rem;
+    color: #999;
+    font-weight: 600;
+}
+
+/* Panel fade-in animation */
+@keyframes panelFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Support — SplitWise</title>
+  <meta name="description" content="Contact SplitWise Support. Create a support ticket and get help within 24–48 hours.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+/* ══════════════════════════════════════════════════
+   ROOT / TOKENS  —  matches frontend.html exactly
+══════════════════════════════════════════════════ */
+:root {
+  --primary:   #667eea;
+  --secondary: #764ba2;
+  --success:   #1cc88a;
+  --warning:   #f6c23e;
+  --danger:    #e74a3b;
+  --dark:      #2c3e50;
+  --text:      #2c3e50;
+  --light-bg:  #f8f9fc;
+  --card-bg:   #ffffff;
+  --border:    #e4e7f0;
+  --grad:      linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --shadow:    0 10px 30px rgba(0,0,0,0.10);
+  --shadow-lg: 0 20px 60px rgba(102,126,234,0.18);
+  --radius:    16px;
+  --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{background:#f8f9fc;scroll-behavior:smooth;overscroll-behavior-x: none;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--light-bg);
+  color:var(--text);
+  overflow-x:hidden;
+  overscroll-behavior-x: none;
+  min-height:100vh;
+}
+
+/* ══════════════════════════════════════════════════
+   NAVBAR  — same pattern as main site
+══════════════════════════════════════════════════ */
+.navbar{
+  background:var(--grad);
+  box-shadow:var(--shadow);
+  padding:.85rem 0;
+  backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:1030;
+  transition:var(--transition);
+}
+.navbar-brand{
+  color:#fff!important;font-weight:900;font-size:1.4rem;
+  display:flex;align-items:center;gap:.5rem;
+  text-decoration:none;transition:var(--transition);
+}
+.navbar-brand:hover{transform:scale(1.04);}
+.brand-icon{
+  width:38px;height:38px;background:rgba(255,255,255,0.2);
+  border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;
+  transition:var(--transition);
+}
+.navbar-brand:hover .brand-icon{transform:rotate(12deg);}
+.nav-back-btn{
+  color:rgba(255,255,255,0.88)!important;
+  font-weight:700;font-size:.9rem;
+  display:flex;align-items:center;gap:6px;
+  text-decoration:none;padding:.4rem .9rem;
+  border-radius:20px;border:1.5px solid rgba(255,255,255,0.25);
+  transition:var(--transition);
+}
+.nav-back-btn:hover{
+  color:#fff!important;
+  background:rgba(255,255,255,0.15);
+  border-color:rgba(255,255,255,0.5);
+  transform:translateX(-2px);
+}
+
+/* ══════════════════════════════════════════════════
+   HERO SECTION
+══════════════════════════════════════════════════ */
+.hero{
+  background:var(--grad);
+  padding:64px 20px 100px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+/* floating orbs */
+.hero::before,.hero::after{
+  content:'';position:absolute;border-radius:50%;
+  pointer-events:none;animation:float 7s ease-in-out infinite;
+}
+.hero::before{
+  width:320px;height:320px;
+  background:rgba(255,255,255,0.06);
+  top:-80px;right:-80px;
+  animation-duration:9s;
+}
+.hero::after{
+  width:200px;height:200px;
+  background:rgba(255,255,255,0.05);
+  bottom:20px;left:-60px;
+  animation-duration:6s;animation-delay:-3s;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) scale(1);}
+  50%{transform:translateY(-18px) scale(1.04);}
+}
+
+/* Particles */
+.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.particle{
+  position:absolute;width:4px;height:4px;
+  background:rgba(255,255,255,0.35);border-radius:50%;
+  animation:particle-float linear infinite;
+}
+@keyframes particle-float{
+  0%{transform:translateY(100%) rotate(0deg);opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:.5;}
+  100%{transform:translateY(-120vh) rotate(720deg);opacity:0;}
+}
+
+/* Hero icon */
+.hero-badge{
+  display:flex;align-items:center;justify-content:center;
+  width:80px;height:80px;background:rgba(255,255,255,0.18);
+  border-radius:22px;font-size:38px;margin:0 auto 22px;
+  backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,0.3);
+  animation:badge-in .6s cubic-bezier(0.34,1.56,0.64,1) both;
+  box-shadow:0 8px 32px rgba(0,0,0,0.12);
+}
+@keyframes badge-in{from{opacity:0;transform:scale(.6) translateY(20px);}to{opacity:1;transform:none;}}
+
+.hero h1{
+  font-size:clamp(24px,5vw,40px);font-weight:900;color:#fff;
+  letter-spacing:-0.5px;margin-bottom:12px;text-align:center;width:100%;
+  animation:fade-up .5s .15s both;
+}
+.hero p{
+  font-size:clamp(14px,2vw,16px);color:rgba(255,255,255,.82);
+  max-width:500px;margin:0 auto 28px;line-height:1.75;text-align:center;
+  animation:fade-up .5s .25s both;
+}
+/* Breadcrumb pills */
+.hero-pills{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  flex-wrap:wrap;animation:fade-up .5s .35s both;
+}
+.hero-pill{
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
+  color:rgba(255,255,255,.9);padding:5px 14px;border-radius:20px;
+  font-size:12.5px;font-weight:700;backdrop-filter:blur(6px);
+  display:flex;align-items:center;gap:5px;
+}
+
+/* wave separator */
+.hero-wave{
+  position:absolute;bottom:0;left:0;width:100%;overflow:hidden;line-height:0;
+}
+.hero-wave svg{display:block;width:100%;height:56px;}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+
+/* ══════════════════════════════════════════════════
+   PAGE LAYOUT
+══════════════════════════════════════════════════ */
+.page-content{
+  max-width:1060px;margin:0 auto;
+  padding:40px 16px 80px;
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:28px;
+  align-items:start;
+  box-sizing:border-box;
+  width:100%;
+}
+@media(max-width:768px){
+  .page-content{grid-template-columns:1fr;}
+  .sidebar-col{order:-1;}
+}
+
+/* ══════════════════════════════════════════════════
+   CARD COMPONENT
+══════════════════════════════════════════════════ */
+.sw-card{
+  background:var(--card-bg);border-radius:20px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);overflow:hidden;
+  animation:fade-up .5s .1s both;
+  transition:box-shadow .3s;
+}
+.sw-card:hover{box-shadow:var(--shadow-lg);}
+
+.card-head{
+  padding:20px 28px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;
+}
+.ch-icon{
+  width:44px;height:44px;border-radius:13px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(102,126,234,.13),rgba(118,75,162,.13));
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.ch-title{font-size:16px;font-weight:900;color:var(--text);margin:0;}
+.ch-sub{font-size:12px;color:#8892a4;margin:2px 0 0;}
+.card-body-pad{padding:28px;}
+
+/* ══════════════════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════════════════ */
+.form-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+}
+@media(max-width:540px){.form-row{grid-template-columns:1fr;}}
+.form-group{margin-bottom:18px;}
+.form-label{
+  display:block;font-size:12.5px;font-weight:800;
+  color:var(--text);margin-bottom:7px;letter-spacing:.3px;
+}
+.form-label .req{color:#ef4444;margin-left:2px;}
+.req-note{font-size:12px;color:#8892a4;margin-bottom:20px;font-weight:600;}
+.sw-input,.sw-select,.sw-textarea{
+  width:100%;padding:12px 16px;
+  border:1.5px solid var(--border);border-radius:12px;
+  font-size:14px;font-family:'Nunito',sans-serif;font-weight:600;
+  color:var(--text);background:#f8f9fc;
+  transition:var(--transition);outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.sw-input:focus,.sw-select:focus,.sw-textarea:focus{
+  border-color:var(--primary);
+  background:#fff;
+  box-shadow:0 0 0 3.5px rgba(102,126,234,.14);
+}
+.sw-input::placeholder,.sw-textarea::placeholder{color:#b5bece;font-weight:500;}
+.sw-textarea{resize:vertical;min-height:140px;line-height:1.75;}
+.sw-select{cursor:pointer;}
+.char-wrap{display:flex;justify-content:flex-end;margin-top:5px;}
+.char-count{font-size:11.5px;color:#8892a4;font-weight:700;}
+
+/* Input icon wrapper */
+.input-icon-wrap{position:relative;}
+.input-icon-wrap .sw-input{padding-left:44px;}
+.input-icon-wrap .ii{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:#b5bece;font-size:15px;pointer-events:none;
+  transition:color .2s;
+}
+.input-icon-wrap:focus-within .ii{color:var(--primary);}
+
+/* ── Subject pills (alternative to dropdown) ── */
+.subject-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+@media(max-width:640px){.subject-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:380px){.subject-grid{grid-template-columns:1fr 1fr;}}
+.subject-pill input[type=radio]{display:none;}
+.subject-pill label{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 12px;border:1.5px solid var(--border);
+  border-radius:10px;font-size:13px;font-weight:700;
+  color:#8892a4;cursor:pointer;transition:var(--transition);
+  background:#f8f9fc;white-space:nowrap;text-align:center;
+  width:100%;
+}
+.subject-pill input:checked+label{
+  border-color:var(--primary);background:linear-gradient(135deg,rgba(102,126,234,.1),rgba(118,75,162,.08));
+  color:var(--primary);
+  box-shadow:0 0 0 3px rgba(102,126,234,.12);
+}
+.subject-pill label:hover{border-color:var(--primary);color:var(--primary);background:#f0f1ff;}
+
+/* ── Submit button ── */
+.btn-submit{
+  width:100%;padding:15px;
+  background:var(--grad);
+  color:#fff;border:none;border-radius:14px;
+  font-size:15px;font-weight:900;font-family:'Nunito',sans-serif;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:var(--transition);
+  box-shadow:0 6px 22px rgba(102,126,234,.38);
+  margin-top:8px;
+  position:relative;overflow:hidden;
+}
+.btn-submit::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0);
+  transition:background .25s;
+}
+.btn-submit:hover::before{background:rgba(255,255,255,0.08);}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(102,126,234,.45);}
+.btn-submit:active{transform:translateY(0);}
+.btn-submit:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+.spinner-ring{
+  width:20px;height:20px;
+  border:2.5px solid rgba(255,255,255,.35);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .65s linear infinite;display:none;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════════════════════════════════════════════════
+   SUCCESS STATE
+══════════════════════════════════════════════════ */
+#successCard{display:none;padding:48px 32px;text-align:center;}
+#successCard.visible{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.success-icon-wrap{
+  width:80px;height:80px;
+  background:linear-gradient(135deg,#10b981,#059669);
+  border-radius:22px;display:inline-flex;align-items:center;
+  justify-content:center;font-size:38px;
+  box-shadow:0 10px 30px rgba(16,185,129,0.35);
+  margin-bottom:20px;animation:badge-in .5s both;
+}
+#successCard h2{font-size:22px;font-weight:900;color:var(--text);margin-bottom:10px;}
+#successCard .sub{font-size:14.5px;color:#8892a4;line-height:1.75;margin-bottom:24px;}
+.ticket-id-card{
+  display:inline-block;
+  background:linear-gradient(135deg,rgba(102,126,234,.08),rgba(118,75,162,.08));
+  border:1.5px solid #ddd9ff;border-radius:16px;
+  padding:18px 32px;margin-bottom:24px;
+}
+.ticket-id-card .t-label{
+  font-size:10px;font-weight:900;color:var(--primary);
+  text-transform:uppercase;letter-spacing:2.5px;margin-bottom:6px;
+}
+.ticket-id-card .t-id{
+  font-size:28px;font-weight:900;color:var(--secondary);
+  font-family:'Courier New',monospace;letter-spacing:5px;
+}
+.btn-home{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 28px;background:var(--grad);
+  color:#fff;text-decoration:none;border-radius:12px;
+  font-weight:900;font-size:14px;
+  box-shadow:0 5px 18px rgba(102,126,234,.35);
+  transition:var(--transition);
+}
+.btn-home:hover{color:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.42);}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar-col .sw-card{animation-delay:.2s;}
+.info-row{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:16px 0;border-bottom:1px solid var(--border);
+}
+.info-row:first-child{padding-top:0;}
+.info-row:last-child{border-bottom:none;padding-bottom:0;}
+.ir-icon{
+  width:40px;height:40px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.ir-title{font-size:13px;font-weight:900;color:var(--text);margin-bottom:3px;}
+.ir-text{font-size:12px;color:#8892a4;line-height:1.65;}
+.support-email-link{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,rgba(102,126,234,.09),rgba(118,75,162,.09));
+  border:1px solid #ddd9ff;border-radius:9px;
+  padding:7px 13px;font-size:12.5px;font-weight:800;color:var(--primary);
+  text-decoration:none;margin-top:10px;
+  transition:var(--transition);word-break:break-all;
+}
+.support-email-link:hover{
+  color:var(--secondary);background:linear-gradient(135deg,rgba(102,126,234,.15),rgba(118,75,162,.13));
+  transform:translateX(2px);
+}
+
+/* SLA badge */
+.sla-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#10b981,#059669);
+  color:#fff;border-radius:8px;padding:4px 10px;
+  font-size:11.5px;font-weight:800;
+}
+
+/* ══════════════════════════════════════════════════
+   TOAST NOTIFICATION
+══════════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  padding:12px 22px;border-radius:14px;
+  font-size:13.5px;font-weight:800;z-index:9999;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+  transition:transform .3s cubic-bezier(0.34,1.2,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;color:#fff;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{background:linear-gradient(135deg,#10b981,#059669);}
+#toast.error  {background:linear-gradient(135deg,#ef4444,#dc2626);}
+#toast.warning{background:linear-gradient(135deg,#f59e0b,#d97706);}
+#toast.info   {background:linear-gradient(135deg,#667eea,#764ba2);}
+
+/* ══════════════════════════════════════════════════
+   FOCUS VISIBLE
+══════════════════════════════════════════════════ */
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;}
+
+/* ══════════════════════════════════════════════════
+   MOBILE TWEAKS
+══════════════════════════════════════════════════ */
+@media(max-width:480px){
+  .hero{padding:44px 16px 80px;}
+  .card-body-pad{padding:20px 18px;}
+  .subject-grid{grid-template-columns:1fr 1fr;}
+  .btn-submit{font-size:14px;padding:13px;}
+  .ticket-id-card .t-id{font-size:21px;letter-spacing:3px;}
+}
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+  NAVBAR
+════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="container-fluid px-4" style="display:flex;align-items:center;justify-content:space-between;">
+    <a href="frontend.html" class="navbar-brand">
+      <div class="brand-icon">
+        <i class="fas fa-wallet" style="color:#fff;font-size:18px;"></i>
+      </div>
+      <span>SplitWise</span>
+    </a>
+    <a href="frontend.html" class="nav-back-btn">
+      <i class="fas fa-arrow-left fa-sm"></i>
+      <span>Back to Home</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════
+  HERO
+════════════════════════════════════ -->
+<section class="hero">
+  <div class="particles" id="particles"></div>
+
+  <div class="hero-badge">🎫</div>
+  <h1>Create a Support Ticket</h1>
+  <p>Describe your issue and our team will get back to you within 24–48 hours. You'll receive an instant confirmation email with your ticket ID.</p>
+
+  <div class="hero-pills">
+    <div class="hero-pill"><i class="fas fa-bolt fa-xs"></i> Fast Response</div>
+    <div class="hero-pill"><i class="fas fa-lock fa-xs"></i> Secure</div>
+    <div class="hero-pill"><i class="fas fa-ticket fa-xs"></i> Ticket Tracking</div>
+  </div>
+
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,28 C240,56 480,0 720,28 C960,56 1200,0 1440,28 L1440,56 L0,56 Z" fill="#f8f9fc"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+  MAIN CONTENT
+════════════════════════════════════ -->
+<div class="page-content">
+
+  <!-- ── FORM CARD ── -->
+  <div>
+    <div class="sw-card">
+      <div class="card-head">
+        <div class="ch-icon">📝</div>
+        <div>
+          <p class="ch-title">Tell us what's going on</p>
+          <p class="ch-sub">We'll create a ticket and reply to your email</p>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="card-body-pad" id="formSection">
+        <p class="req-note"><span style="color:#ef4444;">*</span> All fields are required</p>
+        <form id="ticketForm" novalidate autocomplete="on">
+
+          <!-- Name + Email -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="ct-name">Full Name <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-user ii"></i>
+                <input id="ct-name" class="sw-input" type="text"
+                  placeholder="Your full name" required autocomplete="name">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ct-email">Email Address <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-envelope ii"></i>
+                <input id="ct-email" class="sw-input" type="email"
+                  placeholder="you@example.com" required autocomplete="email">
+              </div>
+            </div>
+          </div>
+
+          <!-- Subject pills -->
+          <div class="form-group">
+            <label class="form-label">Subject <span class="req">*</span></label>
+            <div class="subject-grid" id="subjectGrid">
+              <div class="subject-pill"><input type="radio" name="subject" id="s1" value="Account & Login Issues"><label for="s1"><i class="fas fa-user-shield fa-xs"></i> Account & Login</label></div>
+              <div class="subject-pill"><input type="radio" name="subject" id="s2" value="Billing & Payments"><label for="s2"><i class="fas fa-credit-card fa-xs"></i> Billing</label></div>
+              <div class="subject-pill"><input type="radio" name="subject" id="s3" value="Group & Expense Management"><label for="s3"><i class="fas fa-users fa-xs"></i> Groups & Expenses</label></div>
+              <div class="subject-pill"><input type="radio" name="subject" id="s4" value="Technical Bug / Error"><label for="s4"><i class="fas fa-bug fa-xs"></i> Technical Bug</label></div>
+              <div class="subject-pill"><input type="radio" name="subject" id="s5" value="Feature Request"><label for="s5"><i class="fas fa-lightbulb fa-xs"></i> Feature Request</label></div>
+              <div class="subject-pill"><input type="radio" name="subject" id="s6" value="Other"><label for="s6"><i class="fas fa-ellipsis fa-xs"></i> Other</label></div>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group" style="margin-bottom:22px;">
+            <label class="form-label" for="ct-message">Message <span class="req">*</span></label>
+            <textarea id="ct-message" class="sw-textarea"
+              placeholder="Describe your issue in detail — the more context you give, the faster we can help you."
+              maxlength="2000" required></textarea>
+            <div class="char-wrap">
+              <span class="char-count"><span id="charCount">0</span>&nbsp;/&nbsp;2000</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span id="btnText"><i class="fas fa-paper-plane"></i>&nbsp; Send Message &amp; Create Ticket</span>
+            <span class="spinner-ring" id="spinner"></span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div id="successCard">
+        <div class="success-icon-wrap">✅</div>
+        <h2>Ticket Created!</h2>
+        <p class="sub" id="successMsg">
+          We've received your message and sent a confirmation to your email.
+          Our team will respond within 24–48 hours.
+        </p>
+        <div class="ticket-id-card">
+          <div class="t-label">Your Ticket ID</div>
+          <div class="t-id" id="ticketIdDisplay">SW-—</div>
+        </div>
+        <p style="font-size:12.5px;color:#b0b8cc;margin-bottom:24px;">
+          Save this ID for any follow-up communication.
+        </p>
+        <a href="frontend.html" class="btn-home">
+          <i class="fas fa-home"></i> Back to SplitWise
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar-col">
+
+    <!-- Info card -->
+    <div class="sw-card" style="margin-bottom:22px;">
+      <div class="card-head">
+        <div class="ch-icon">ℹ️</div>
+        <div>
+          <p class="ch-title">What to Expect</p>
+          <p class="ch-sub">Support information</p>
+        </div>
+      </div>
+      <div class="card-body-pad">
+        <div class="info-row">
+          <div class="ir-icon" style="background:#eef0ff;">⚡</div>
+          <div>
+            <div class="ir-title">Response Time</div>
+            <div class="ir-text">
+              We reply within <span class="sla-badge">24–48 hrs</span>
+              on business days.
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="ir-icon" style="background:#f0fdf4;">📧</div>
+          <div>
+            <div class="ir-title">Instant Confirmation</div>
+            <div class="ir-text">You'll get a ticket ID in your email the moment you submit.</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="ir-icon" style="background:#fff8e1;">🎫</div>
+          <div>
+            <div class="ir-title">One Ticket at a Time</div>
+            <div class="ir-text">New tickets open after the current one is resolved.</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="ir-icon" style="background:#fdf2f8;">🔒</div>
+          <div>
+            <div class="ir-title">Private & Secure</div>
+            <div class="ir-text">Handled under our Privacy Policy. Your data stays safe.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direct email card -->
+    <div class="sw-card">
+      <div class="card-head">
+        <div class="ch-icon">📬</div>
+        <div>
+          <p class="ch-title">Direct Email</p>
+          <p class="ch-sub">For urgent matters</p>
+        </div>
+      </div>
+      <div class="card-body-pad">
+        <p style="font-size:13px;color:#8892a4;line-height:1.7;margin-bottom:4px;">
+          Prefer emailing us directly? Use the form above for fastest response — it creates a trackable ticket instantly.
+        </p>
+        <a href="mailto:support@splitwise.space" class="support-email-link">
+          <i class="fas fa-envelope fa-xs"></i>
+          support@splitwise.space
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ── Particles ─────────────────────────────────────── */
+(function () {
+  const c = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 5 + 2;
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      animation-duration:${Math.random()*12+8}s;
+      animation-delay:${Math.random()*10}s;
+      opacity:${Math.random()*.5+.1};
+    `;
+    c.appendChild(p);
+  }
+})();
+
+/* ── Toast ───────────────────────────────────────── */
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.className = ''; }, 4200);
+}
+
+/* ── Char counter ────────────────────────────────── */
+document.getElementById('ct-message').addEventListener('input', function () {
+  document.getElementById('charCount').textContent = this.value.length;
+});
+
+/* ── Pre-fill from URL params ────────────────────── */
+const params = new URLSearchParams(location.search);
+if (params.get('email'))   document.getElementById('ct-email').value   = decodeURIComponent(params.get('email'));
+if (params.get('subject')) {
+  const match = [...document.querySelectorAll('.subject-pill input')].find(
+    r => r.value.toLowerCase().includes(params.get('subject').toLowerCase())
+  );
+  if (match) match.checked = true;
+}
+
+/* ── Config ──────────────────────────────────────── */
+const API = window.API_BASE || 'https://api.splitwise.space/api';
+
+/* ── Subject pill deselect toggle ───────────────── */
+document.querySelectorAll('.subject-pill label').forEach(label => {
+  label.addEventListener('click', function (e) {
+    const radio = document.getElementById(this.htmlFor);
+    if (radio && radio.checked) {
+      e.preventDefault();
+      radio.checked = false;
+    }
+  });
+});
+
+/* ── Form submit ─────────────────────────────────── */
+document.getElementById('ticketForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const name    = document.getElementById('ct-name').value.trim();
+  const email   = document.getElementById('ct-email').value.trim();
+  const subjectEl = document.querySelector('input[name="subject"]:checked');
+  const subject = subjectEl ? subjectEl.value : '';
+  const message = document.getElementById('ct-message').value.trim();
+
+  if (!name)    { toast('Please enter your name.', 'error');    document.getElementById('ct-name').focus();    return; }
+  if (!email)   { toast('Please enter your email.', 'error');   document.getElementById('ct-email').focus();   return; }
+  if (!subject) { toast('Please select a topic.', 'warning');   return; }
+  if (message.length < 10) { toast('Message too short. Please add more details.', 'error'); return; }
+
+  // Loading state
+  const btn  = document.getElementById('submitBtn');
+  const btxt = document.getElementById('btnText');
+  const spin = document.getElementById('spinner');
+  btn.disabled = true;
+  btxt.style.display = 'none';
+  spin.style.display = 'block';
+
+  try {
+    const res  = await fetch(`${API}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message }),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && data.success) {
+      const ticketId = data.data?.ticketId || '—';
+      const isDup    = !!data.data?.duplicate;
+
+      document.getElementById('ticketIdDisplay').textContent = ticketId;
+      if (isDup) {
+        document.getElementById('successCard').querySelector('h2').textContent = 'You have an open ticket!';
+        document.getElementById('successMsg').textContent =
+          'You already have an active support ticket. We\'ve sent a reminder to your email with your ticket details.';
+      }
+      // Flip to success
+      document.getElementById('formSection').style.display = 'none';
+      const sc = document.getElementById('successCard');
+      sc.style.display = '';
+      sc.classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } else {
+      toast(data.error || 'Something went wrong. Please try again.', 'error');
+      btn.disabled = false; btxt.style.display = ''; spin.style.display = 'none';
+    }
+  } catch {
+    toast('Network error. Please check your connection.', 'error');
+    btn.disabled = false; btxt.style.display = ''; spin.style.display = 'none';
+  }
+});
+
+/* ── Auto-focus first field ─────────────────── */
+window.addEventListener('load', () => {
+  const n = document.getElementById('ct-name');
+  if (n && !n.value) setTimeout(() => n.focus(), 400);
+});
+</script>
+</body>
+</html>

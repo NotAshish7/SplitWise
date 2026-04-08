@@ -1,0 +1,1061 @@
+/* ================================================================
+   SPLITWISE — GLOBAL DESIGN SYSTEM (v2 — Conflict-Free)
+   Only applies styles that DO NOT conflict with inline styles
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   1. DESIGN TOKENS
+   ---------------------------------------------------------------- */
+:root {
+  --sw-primary:        #6C63FF;
+  --sw-primary-dark:   #5A52D5;
+  --sw-secondary:      #00D4AA;
+  --sw-accent:         #FF6B6B;
+  --sw-warning:        #FFB347;
+  --sw-info:           #4ECDC4;
+
+  --sw-gradient-primary:  linear-gradient(135deg, #6C63FF 0%, #9D78E8 50%, #00D4AA 100%);
+  --sw-gradient-btn:      linear-gradient(135deg, #6C63FF 0%, #8B85FF 100%);
+  --sw-gradient-success:  linear-gradient(135deg, #00D4AA 0%, #00B893 100%);
+  --sw-gradient-danger:   linear-gradient(135deg, #FF6B6B 0%, #E05555 100%);
+  --sw-gradient-warning:  linear-gradient(135deg, #FFB347 0%, #FF9500 100%);
+
+  --sw-radius-sm:  8px;
+  --sw-radius-md:  14px;
+  --sw-radius-lg:  20px;
+  --sw-radius-xl:  28px;
+  --sw-radius-pill: 999px;
+
+  --sw-shadow-sm:   0 2px 12px rgba(108, 99, 255, 0.08);
+  --sw-shadow-md:   0 8px 32px rgba(108, 99, 255, 0.12);
+  --sw-shadow-lg:   0 16px 48px rgba(108, 99, 255, 0.18);
+  --sw-shadow-xl:   0 24px 64px rgba(108, 99, 255, 0.22);
+
+  --sw-font: 'Inter', 'Nunito', 'Segoe UI', system-ui, sans-serif;
+
+  --sw-transition:        all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --sw-transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --skeleton-base:      #EDE9FF;
+  --skeleton-mid:       #F7F5FF;
+  --skeleton-highlight: #D5CFFF;
+}
+
+body.dark-theme {
+  --skeleton-base:      #1A1733;
+  --skeleton-mid:       #231E42;
+  --skeleton-highlight: #2D2760;
+}
+
+/* ----------------------------------------------------------------
+   2. GLOBAL BASE — Safe overrides only
+   ---------------------------------------------------------------- */
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+/* Font family — does not affect color or size */
+body,
+h1, h2, h3, h4, h5, h6,
+p, span, label, a, button,
+.form-control, .form-select, .btn,
+td, th, li { font-family: var(--sw-font) !important; }
+
+/* Selection color */
+::selection { background: rgba(108, 99, 255, 0.25); }
+
+/* ----------------------------------------------------------------
+   3. SCROLL-REVEAL SYSTEM
+   ---------------------------------------------------------------- */
+.sw-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.sw-reveal.sw-visible { opacity: 1; transform: translateY(0); }
+
+.sw-reveal-left  { opacity:0; transform:translateX(-24px); transition:opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1); }
+.sw-reveal-right { opacity:0; transform:translateX(24px);  transition:opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1); }
+.sw-reveal-left.sw-visible, .sw-reveal-right.sw-visible { opacity:1; transform:translateX(0); }
+
+.sw-delay-1 { transition-delay:0.1s!important; }
+.sw-delay-2 { transition-delay:0.2s!important; }
+.sw-delay-3 { transition-delay:0.3s!important; }
+.sw-delay-4 { transition-delay:0.4s!important; }
+.sw-delay-5 { transition-delay:0.5s!important; }
+
+/* ----------------------------------------------------------------
+   4. KEYFRAMES
+   ---------------------------------------------------------------- */
+@keyframes sw-fadeUp   { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes sw-fadeIn   { from{opacity:0} to{opacity:1} }
+@keyframes sw-scaleIn  { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+@keyframes sw-float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes sw-shimmer-premium { 0%{background-position:-400% 0} 100%{background-position:400% 0} }
+@keyframes sw-dot-bounce      { 0%,80%,100%{transform:scale(0.8);opacity:.5} 40%{transform:scale(1.2);opacity:1} }
+@keyframes sw-ripple-anim     { to{transform:scale(2.5);opacity:0} }
+@keyframes sw-pulse-glow      { 0%,100%{box-shadow:0 0 0 0 rgba(108,99,255,.4)} 50%{box-shadow:0 0 0 12px rgba(108,99,255,0)} }
+
+/* ----------------------------------------------------------------
+   5. PAGE ENTRANCE
+   ---------------------------------------------------------------- */
+.main-content { animation: sw-fadeUp 0.45s cubic-bezier(0.4,0,0.2,1) both; }
+
+/* ----------------------------------------------------------------
+   6. CARDS — Transition & hover only (NO background/color override)
+   ---------------------------------------------------------------- */
+.card,
+.stats-card,
+.stat-card,
+.action-card,
+.group-card,
+.chart-container {
+  border-radius: var(--sw-radius-lg) !important;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.35s cubic-bezier(0.34,1.56,0.64,1),
+              filter 0.3s ease !important;
+  will-change: transform, box-shadow;
+}
+
+/* ── White/border stat cards hover ("I'll Get Back" style) ───── */
+.card:not([style*="background"]):hover,
+.stats-card:not([style*="background"]):hover,
+.stat-card:not([style*="background"]):hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 16px 48px rgba(108,99,255,0.20),
+              0 4px 16px rgba(108,99,255,0.12) !important;
+}
+
+/* ── Gradient tile cards hover — same smooth popup ───────────── */
+.card[style*="background"]:hover,
+.stats-card[style*="background"]:hover,
+.stat-card[style*="background"]:hover {
+  transform: translateY(-10px) scale(1.03) !important;
+  filter: brightness(1.08) saturate(1.1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.28),
+              0 8px 24px rgba(0,0,0,0.18) !important;
+}
+
+/* ── Chart container hover ───────────────────────────────────── */
+.chart-container:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 40px rgba(108,99,255,0.16) !important;
+}
+
+/* ── Action/Quick-action cards hover ─────────────────────────── */
+.action-card:hover {
+  transform: translateY(-10px) scale(1.03) !important;
+  box-shadow: 0 18px 50px rgba(108,99,255,0.22) !important;
+}
+
+/* Animate cards on page load */
+.stats-card, .stat-card, .action-card { animation: sw-fadeUp 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+.col-md-3:nth-child(1) .stats-card, .col-md-3:nth-child(1) .stat-card { animation-delay:0.05s; }
+.col-md-3:nth-child(2) .stats-card, .col-md-3:nth-child(2) .stat-card { animation-delay:0.1s; }
+.col-md-3:nth-child(3) .stats-card, .col-md-3:nth-child(3) .stat-card { animation-delay:0.15s; }
+.col-md-3:nth-child(4) .stats-card, .col-md-3:nth-child(4) .stat-card { animation-delay:0.2s; }
+
+/* ----------------------------------------------------------------
+   DASHBOARD TILES — Root-cause hover: smooth pop-up (zoom in/out)
+   All 10 dashboard tiles use .sw-tile for consistent animated hover
+   ---------------------------------------------------------------- */
+.sw-tile {
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.3s ease !important;
+  will-change: transform, box-shadow;
+  cursor: pointer;
+}
+
+/* Gradient tiles (Row 1: Personal/Group Monthly/Overall) */
+.stats-card.sw-tile[style*="background"]:hover,
+.sw-tile[style*="background"]:hover {
+  transform: translateY(-12px) scale(1.04) !important;
+  filter: brightness(1.08) saturate(1.1);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.30),
+              0 10px 24px rgba(0,0,0,0.18) !important;
+}
+
+/* White/border tiles (Row 2: I'll Get Back, I Have to Pay, Net Balance) */
+.stats-card.sw-tile:not([style*="background"]):hover,
+.sw-tile:not([style*="background"]):hover {
+  transform: translateY(-12px) scale(1.03) !important;
+  box-shadow: 0 20px 52px rgba(108,99,255,0.22),
+              0 6px 18px rgba(108,99,255,0.14) !important;
+}
+
+/* Action tiles (Row 3: Add Expense, Create Group, Export Report) */
+.action-card.sw-tile:hover {
+  transform: translateY(-12px) scale(1.03) !important;
+  box-shadow: 0 20px 52px rgba(108,99,255,0.22),
+              0 6px 18px rgba(108,99,255,0.14) !important;
+}
+
+/* Ensure parent containers don't clip the lift effect */
+.main-content .row:has(.sw-tile),
+.main-content .quick-actions {
+  overflow: visible !important;
+}
+.main-content .row:has(.sw-tile) > [class*="col-"],
+.main-content .quick-actions > .sw-tile {
+  overflow: visible !important;
+}
+
+/* ----------------------------------------------------------------
+   7. BUTTONS — Enhance without breaking existing colors
+   ---------------------------------------------------------------- */
+.btn {
+  border-radius: var(--sw-radius-md) !important;
+  transition: var(--sw-transition-spring) !important;
+  position: relative;
+  overflow: hidden;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+.btn:active { transform: scale(0.97) !important; }
+
+/* Enhance primary only when not override */
+.btn-primary:hover { transform: translateY(-2px) !important; filter: brightness(1.08); }
+.btn-success:hover { transform: translateY(-2px) !important; filter: brightness(1.08); }
+.btn-danger:hover  { transform: translateY(-2px) !important; filter: brightness(1.08); }
+
+.btn-outline-primary:hover {
+  background: var(--sw-gradient-btn) !important;
+  color: white !important;
+  border-color: transparent !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ----------------------------------------------------------------
+   8. FORM CONTROLS
+   ---------------------------------------------------------------- */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--sw-primary) !important;
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.15) !important;
+  outline: none !important;
+}
+.form-control { border-radius: var(--sw-radius-md) !important; }
+.form-select  { border-radius: var(--sw-radius-md) !important; }
+.form-label   { font-weight: 600 !important; font-size: 0.9rem !important; }
+
+/* ----------------------------------------------------------------
+   9. TABLE HEADER GRADIENT (safe — only affects thead)
+   ---------------------------------------------------------------- */
+.table thead th {
+  background: var(--sw-gradient-primary) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  padding: 0.9rem 1.1rem !important;
+  border: none !important;
+}
+.table thead th:first-child { border-radius: 10px 0 0 0; }
+.table thead th:last-child  { border-radius: 0 10px 0 0; }
+
+.table tbody tr { transition: var(--sw-transition) !important; }
+.table tbody tr:hover {
+  background-color: rgba(108,99,255,0.04) !important;
+  transform: scale(1.001);
+}
+
+/* ----------------------------------------------------------------
+   10. BADGES
+   ---------------------------------------------------------------- */
+.badge {
+  font-weight: 700 !important;
+  border-radius: var(--sw-radius-pill) !important;
+  padding: 0.4em 0.85em !important;
+  font-size: 0.78rem !important;
+}
+
+/* ----------------------------------------------------------------
+   11. MODAL UPGRADES — Safe (gradient header only)
+   ---------------------------------------------------------------- */
+.modal-content {
+  border-radius: var(--sw-radius-xl) !important;
+  border: none !important;
+  overflow: hidden;
+  box-shadow: var(--sw-shadow-xl) !important;
+}
+.modal-header {
+  background: var(--sw-gradient-primary) !important;
+  color: white !important;
+  border: none !important;
+  padding: 1.5rem 2rem !important;
+}
+.modal-header .modal-title { color: white !important; font-weight: 700 !important; }
+.modal-header .btn-close    { filter: brightness(0) invert(1) !important; opacity: 0.85 !important; }
+.modal-header .btn-close:hover { opacity: 1 !important; transform: rotate(90deg); transition: var(--sw-transition); }
+.modal-body   { padding: 2rem !important; }
+.modal-footer { padding: 1.25rem 2rem !important; border-top: 1px solid rgba(0,0,0,0.08) !important; }
+
+.modal.fade .modal-dialog { transform: scale(0.93) translateY(-15px) !important; transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease !important; }
+.modal.show .modal-dialog { transform: scale(1) translateY(0) !important; }
+
+/* ----------------------------------------------------------------
+   12. PROGRESS BAR
+   ---------------------------------------------------------------- */
+.progress { border-radius: var(--sw-radius-pill) !important; height: 8px !important; overflow: visible !important; }
+.progress-bar {
+  border-radius: var(--sw-radius-pill) !important;
+  background: var(--sw-gradient-primary) !important;
+  box-shadow: 0 2px 8px rgba(108,99,255,.35) !important;
+}
+
+/* ----------------------------------------------------------------
+   13. DROPDOWN UPGRADE
+   ---------------------------------------------------------------- */
+.dropdown-menu {
+  border-radius: var(--sw-radius-lg) !important;
+  box-shadow: var(--sw-shadow-lg) !important;
+  padding: 0.5rem !important;
+  animation: sw-scaleIn 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+.dropdown-item {
+  border-radius: var(--sw-radius-sm) !important;
+  font-weight: 500 !important;
+  transition: var(--sw-transition) !important;
+  padding: 0.55rem 1rem !important;
+}
+
+/* ----------------------------------------------------------------
+   14. ENHANCED SKELETON (Brand purple tones)
+   ---------------------------------------------------------------- */
+.skeleton,
+.skeleton-text,
+.skeleton-title,
+.skeleton-subtitle,
+.skeleton-amount,
+.skeleton-button,
+.skeleton-avatar,
+.skeleton-circle {
+  background: linear-gradient(90deg,
+    var(--skeleton-base)      0%,
+    var(--skeleton-mid)       30%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-mid)       70%,
+    var(--skeleton-base)      100%
+  ) !important;
+  background-size: 400% 100% !important;
+  animation: sw-shimmer-premium 2s ease-in-out infinite !important;
+}
+
+/* ----------------------------------------------------------------
+   15. LOADER DOT ANIMATION
+   ---------------------------------------------------------------- */
+.sw-loader { display:inline-flex; gap:6px; align-items:center; }
+.sw-loader span { width:8px;height:8px;border-radius:50%;background:var(--sw-primary);animation:sw-dot-bounce 1.2s ease-in-out infinite; }
+.sw-loader span:nth-child(2) { animation-delay:.2s; background: var(--sw-secondary); }
+.sw-loader span:nth-child(3) { animation-delay:.4s; background: var(--sw-accent); }
+
+/* ----------------------------------------------------------------
+   16. NAV TABS
+   ---------------------------------------------------------------- */
+.nav-tabs .nav-link {
+  font-weight: 600 !important;
+  border: none !important;
+  position: relative;
+  color: #666 !important;
+  transition: var(--sw-transition) !important;
+  border-radius: var(--sw-radius-md) var(--sw-radius-md) 0 0 !important;
+}
+.nav-tabs .nav-link::after {
+  content:''; position:absolute; bottom:-2px; left:0; right:0;
+  height:3px; background:var(--sw-gradient-primary);
+  transform:scaleX(0); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  border-radius:2px;
+}
+.nav-tabs .nav-link:hover::after,
+.nav-tabs .nav-link.active::after { transform:scaleX(1); }
+.nav-tabs .nav-link.active { color: var(--sw-primary) !important; background: rgba(108,99,255,0.07) !important; }
+
+/* ----------------------------------------------------------------
+   17. ALERT UPGRADE
+   ---------------------------------------------------------------- */
+.alert { border-radius: var(--sw-radius-lg) !important; }
+.alert-success { border-left: 3px solid #00D4AA !important; }
+.alert-danger  { border-left: 3px solid #FF6B6B !important; }
+.alert-warning { border-left: 3px solid #FFB347 !important; }
+.alert-info    { border-left: 3px solid #4ECDC4 !important; }
+
+/* ----------------------------------------------------------------
+   18. UTILITY CLASSES
+   ---------------------------------------------------------------- */
+.text-gradient {
+  background: var(--sw-gradient-primary);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.sw-glass {
+  background: rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+.sw-pulse { animation: sw-pulse-glow 2s ease-in-out infinite !important; }
+.sw-float { animation: sw-float 4s ease-in-out infinite !important; }
+
+/* ----------------------------------------------------------------
+   19. FOCUS ACCESSIBILITY
+   ---------------------------------------------------------------- */
+:focus-visible { outline: 2px solid var(--sw-primary) !important; outline-offset: 3px !important; }
+
+/* ----------------------------------------------------------------
+   20. REDUCED MOTION SUPPORT
+   ---------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .sw-reveal, .sw-reveal-left, .sw-reveal-right { opacity:1 !important; transform:none !important; }
+}
+
+/* ================================================================
+   21. NAV THEME SYNC
+   Override all legacy page color tokens to match the navigation
+   panel's exact design language:
+     Primary  → #6C63FF  (nav --tn-accent)
+     Secondary→ #00D4AA  (nav --tn-accent2)
+     Dark bg  → #1a1545  (nav background start)
+   ================================================================ */
+
+/* ── Override legacy CSS variable tokens ────────────────────── */
+:root {
+  --primary-color:   #6C63FF !important;
+  --secondary-color: #2d2760 !important;
+  --navbar-bg:       linear-gradient(135deg,#1a1545 0%,#2d2760 60%,#1e1b47 100%) !important;
+  --primary:         #6C63FF !important;
+  --sw-primary:      #6C63FF !important;
+  --sw-secondary:    #00D4AA !important;
+  --sw-primary-dark: #5A52D5 !important;
+}
+
+/* ── Body & page background ─────────────────────────────────── */
+body {
+  background: #f4f3ff !important;
+  min-height: 100vh;
+}
+
+/* ── Stat / summary cards ────────────────────────────────────── */
+.stats-card,
+.stat-card {
+  border-top: 3px solid #6C63FF !important;
+  border-radius: 16px !important;
+}
+.stats-card .icon-box,
+.stat-card .icon-box,
+.stats-card .stat-icon,
+.stat-card .stat-icon {
+  background: linear-gradient(135deg, #6C63FF, #00D4AA) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+}
+.stats-card .icon-box i,
+.stat-card .icon-box i,
+.stats-card .stat-icon i,
+.stat-card .stat-icon i {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* ── Action links / quick-action cards ──────────────────────── */
+.action-card,
+.quick-action-card {
+  border: 1.5px solid rgba(108,99,255,0.15) !important;
+  border-radius: 16px !important;
+}
+.action-card:hover,
+.quick-action-card:hover {
+  border-color: rgba(108,99,255,0.35) !important;
+  box-shadow: 0 8px 32px rgba(108,99,255,0.16) !important;
+}
+
+/* ── Primary buttons ─────────────────────────────────────────── */
+.btn-primary,
+button[type="submit"].btn,
+.btn.btn-primary {
+  background: linear-gradient(135deg, #6C63FF 0%, #8B85FF 100%) !important;
+  border-color: #6C63FF !important;
+  color: #fff !important;
+  box-shadow: 0 4px 15px rgba(108,99,255,0.30) !important;
+}
+.btn-primary:hover,
+button[type="submit"].btn:hover {
+  background: linear-gradient(135deg, #5A52D5 0%, #6C63FF 100%) !important;
+  box-shadow: 0 6px 22px rgba(108,99,255,0.42) !important;
+}
+
+/* ── Outline primary buttons ─────────────────────────────────── */
+.btn-outline-primary {
+  color: #6C63FF !important;
+  border-color: #6C63FF !important;
+}
+.btn-outline-primary:hover {
+  background: linear-gradient(135deg, #6C63FF, #8B85FF) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* ── Success/teal buttons match secondary accent ─────────────── */
+.btn-success {
+  background: linear-gradient(135deg, #00D4AA 0%, #00B893 100%) !important;
+  border-color: #00D4AA !important;
+  box-shadow: 0 4px 15px rgba(0,212,170,0.25) !important;
+}
+
+/* ── Section / page headings ─────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  color: #1a1233 !important;
+}
+h1 i, h2 i, h3 i {
+  background: linear-gradient(135deg, #6C63FF, #00D4AA) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ── Gradient tile cards: restore white text ─────────────────── */
+/* Targets both .stats-card and .card with inline gradient bg    */
+[style*="color: white"] h1,
+[style*="color: white"] h2,
+[style*="color: white"] h3,
+[style*="color: white"] h4,
+[style*="color: white"] h5,
+[style*="color: white"] h6,
+[style*="color: white"] small,
+[style*="color: white"] p,
+[style*="color: white"] span,
+[style*="color: white"] .card-title {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+[style*="color: white"] h1 i,
+[style*="color: white"] h2 i,
+[style*="color: white"] h3 i {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.7) !important;
+  background-clip: unset !important;
+  color: rgba(255,255,255,0.7) !important;
+}
+
+/* ── Section header bars (e.g. "Recent Expenses" headers) ─────── */
+.section-header,
+.card-header,
+.card-title,
+.chart-title {
+  color: #1a1233 !important;
+}
+.card-header {
+  background: linear-gradient(135deg, rgba(108,99,255,0.07) 0%, rgba(0,212,170,0.05) 100%) !important;
+  border-bottom: 2px solid rgba(108,99,255,0.12) !important;
+}
+
+/* ── Table th row (already set above, reinforce gradient) ─────── */
+.table thead th {
+  background: linear-gradient(135deg, #6C63FF 0%, #5A52D5 50%, #00D4AA 100%) !important;
+}
+
+/* ── Nav tabs active ─────────────────────────────────────────── */
+.nav-tabs .nav-link.active {
+  color: #6C63FF !important;
+  border-bottom: 2px solid #6C63FF !important;
+}
+
+/* ── Badges / pills ──────────────────────────────────────────── */
+.badge.bg-primary {
+  background: linear-gradient(135deg, #6C63FF, #8B85FF) !important;
+}
+.badge.bg-success {
+  background: linear-gradient(135deg, #00D4AA, #00B893) !important;
+}
+
+/* ── Progress bars ───────────────────────────────────────────── */
+.progress-bar {
+  background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%) !important;
+}
+
+/* ── Chart containers ────────────────────────────────────────── */
+.chart-container,
+.chart-card {
+  border: 1.5px solid rgba(108,99,255,0.10) !important;
+  border-radius: 16px !important;
+}
+
+/* ── Group balance positive / negative ───────────────────────── */
+.text-success,
+.balance-positive { color: #00B893 !important; }
+.text-danger,
+.balance-negative { color: #E05555 !important; }
+
+/* ── Links ───────────────────────────────────────────────────── */
+a:not(.btn):not(.nav-link):not(.sw-tn-brand):not(.sw-tn-links a) {
+  color: #6C63FF;
+  transition: color 0.2s ease;
+}
+a:not(.btn):not(.nav-link):not(.sw-tn-brand):not(.sw-tn-links a):hover {
+  color: #5A52D5;
+}
+
+/* ── Page title bar headings ─────────────────────────────────── */
+.sw-page-titlebar-left h2 {
+  color: #1a1233 !important;
+}
+.sw-page-titlebar {
+  border-bottom-color: rgba(108,99,255,0.14) !important;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+footer {
+  border-top: 2px solid rgba(108,99,255,0.10) !important;
+  color: #555 !important;
+}
+
+/* ── Empty state illustrations / icons ──────────────────────── */
+.empty-state i,
+.no-data i,
+.empty-icon {
+  background: linear-gradient(135deg, #6C63FF, #00D4AA) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ── Scrollbar — using browser default ───────────────────── */
+/* Custom scrollbar removed; native OS scrollbar is shown */
+
+/* ================================================================
+   22. FILTER BUTTONS (btn-check) & SEARCH BAR FIX
+   ================================================================
+
+   Problem: design-system.css global rules (h1–h6 color, [style*="color:white"] text)
+   bleed into Bootstrap btn-check label buttons making text invisible on active state.
+   This section explicitly fixes all btn-outline filter button states.
+   ================================================================ */
+
+/* ── Base: all btn-outline filter labels ────────────────────── */
+label.btn,
+.btn-group label.btn {
+  color: #6C63FF !important;
+  font-weight: 600 !important;
+  border-radius: 50px !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* Outline variants: borders match theme */
+label.btn.btn-outline-primary  { border-color: #6C63FF !important; color: #6C63FF !important; background: transparent !important; }
+label.btn.btn-outline-success  { border-color: #00D4AA !important; color: #00b893 !important; background: transparent !important; }
+label.btn.btn-outline-warning  { border-color: #F4A261 !important; color: #e08c3a !important; background: transparent !important; }
+label.btn.btn-outline-info     { border-color: #36b9cc !important; color: #258391 !important; background: transparent !important; }
+label.btn.btn-outline-danger   { border-color: #e74a3b !important; color: #d63031 !important; background: transparent !important; }
+
+/* ── CHECKED / ACTIVE state: white text on solid fill ────────── */
+.btn-check:checked + label.btn,
+.btn-check:checked + label.btn-outline-primary,
+.btn-check:checked + label.btn-outline-success,
+.btn-check:checked + label.btn-outline-warning,
+.btn-check:checked + label.btn-outline-info,
+.btn-check:checked + label.btn-outline-danger,
+.btn-check:focus + label.btn,
+.btn-group .btn-check:checked + label.btn {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: linear-gradient(135deg, #6C63FF 0%, #5A52D5 100%) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.35) !important;
+}
+
+/* ── Hover: outline buttons ─────────────────────────────────── */
+label.btn.btn-outline-primary:hover,
+label.btn.btn-outline-success:hover,
+label.btn.btn-outline-warning:hover,
+label.btn.btn-outline-info:hover {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: linear-gradient(135deg, #6C63FF, #00D4AA) !important;
+  border-color: transparent !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(108,99,255,0.28) !important;
+}
+
+/* ── Icons INSIDE filter buttons always inherit btn color ────── */
+label.btn i,
+label.btn .fas,
+label.btn .far,
+label.btn .fab {
+  -webkit-text-fill-color: inherit !important;
+  background: none !important;
+  color: inherit !important;
+}
+
+/* ── Prevent global heading rule from darkening btn text ─────── */
+label.btn *,
+.btn-group label * {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* ================================================================
+   23. SEARCH BAR — Unified professional design
+   Single cohesive component: icon inside input, no visual disconnect
+   ================================================================ */
+
+/* Unified search bar wrapper - icon and input as one unit */
+.sw-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 320px;
+  height: 44px;
+  background: #fff;
+  border: 1.5px solid rgba(108, 99, 255, 0.2);
+  border-radius: 14px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(108, 99, 255, 0.06);
+}
+
+.sw-search-bar:hover {
+  border-color: rgba(108, 99, 255, 0.35);
+  box-shadow: 0 4px 20px rgba(108, 99, 255, 0.1);
+}
+
+.sw-search-bar:focus-within {
+  border-color: #6C63FF;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.18);
+}
+
+.sw-search-bar .sw-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6C63FF;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sw-search-bar .sw-search-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 1rem 0 2.75rem;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.95rem;
+  color: #1a1233;
+  outline: none;
+  border-radius: 14px;
+}
+
+.sw-search-bar .sw-search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Responsive: full width on small screens */
+@media (max-width: 768px) {
+  .sw-search-bar {
+    max-width: 100%;
+  }
+}
+
+/* Legacy input-group search (when sw-search-bar not used) */
+.input-group .input-group-text,
+.search-bar .input-group-text {
+  background: linear-gradient(135deg, #6C63FF 0%, #5A52D5 100%) !important;
+  color: #fff !important;
+  border: 1.5px solid rgba(108, 99, 255, 0.3) !important;
+  border-right: none !important;
+  border-radius: 14px 0 0 14px !important;
+  padding: 0.65rem 1rem !important;
+  font-size: 1rem !important;
+  height: 44px;
+  align-items: center;
+}
+
+.input-group .form-control[type="search"],
+.input-group .form-control[placeholder*="search" i],
+.input-group .form-control[placeholder*="Search" i],
+.input-group .form-control[id*="search" i] {
+  border: 1.5px solid rgba(108,99,255,0.25) !important;
+  border-left: none !important;
+  border-radius: 0 14px 14px 0 !important;
+  background: #fff !important;
+  color: #1a1233 !important;
+  padding: 0.65rem 1.1rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.25s ease !important;
+  box-shadow: none !important;
+  height: 44px;
+}
+
+.input-group .form-control[placeholder*="search" i]:focus,
+.input-group .form-control[placeholder*="Search" i]:focus,
+.input-group .form-control[id*="search" i]:focus {
+  border-color: #6C63FF !important;
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.18) !important;
+  outline: none !important;
+}
+
+/* Standalone search inputs (no input-group wrapper) */
+input[placeholder*="Search" i]:not(.btn):not([type="radio"]),
+input[placeholder*="search" i]:not(.btn):not([type="radio"]) {
+  border: 1.5px solid rgba(108,99,255,0.2) !important;
+  border-radius: 14px !important;
+  padding: 0.6rem 1rem 0.6rem 2.6rem !important;
+  background: #fff !important;
+  color: #1a1233 !important;
+  transition: all 0.25s ease !important;
+}
+input[placeholder*="Search" i]:focus,
+input[placeholder*="search" i]:focus {
+  border-color: #6C63FF !important;
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.16) !important;
+  outline: none !important;
+}
+
+/* ================================================================
+   24. NOTIFICATION POSITION — Bottom-right on ALL pages
+   ================================================================
+   Override every per-page inline style that puts notifications at
+   top-right (where they overlap the topnav). Move them to the
+   bottom-right corner so they never cover the navigation.
+   ================================================================ */
+#notification-container,
+.notification-container {
+  position: fixed !important;
+  /* Bottom-right — safe zone away from top nav */
+  bottom: 24px !important;
+  right: 20px !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;   /* Newest on top of stack */
+  gap: 10px !important;
+  max-width: 360px !important;
+  pointer-events: none !important;
+}
+
+/* Adjust for mobile — keep 12px edges */
+@media (max-width: 768px) {
+  #notification-container,
+  .notification-container {
+    bottom: 16px !important;
+    right: 12px !important;
+    left: 12px !important;
+    max-width: none !important;
+  }
+}
+
+/* Premium notification card style */
+.notification {
+  pointer-events: auto !important;
+  background: #fff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08) !important;
+  padding: 0.85rem 1.1rem !important;
+  border-left: 4px solid #6C63FF !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  font-size: 0.93rem !important;
+  font-weight: 500 !important;
+  color: #1a1233 !important;
+  /* Enter from right */
+  transform: translateX(120%) !important;
+  opacity: 0 !important;
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.3s ease !important;
+}
+
+.notification.show {
+  transform: translateX(0) !important;
+  opacity: 1 !important;
+}
+
+/* Success/error/warning variants */
+.notification.success { border-left-color: #00D4AA !important; }
+.notification.error   { border-left-color: #e74a3b !important; }
+.notification.warning { border-left-color: #f6c23e !important; }
+.notification.info    { border-left-color: #6C63FF !important; }
+
+/* Icon color inside notification */
+.notification i.fa-check-circle  { color: #00D4AA !important; }
+.notification i.fa-times-circle  { color: #e74a3b !important; }
+.notification i.fa-exclamation-triangle { color: #f6c23e !important; }
+.notification i.fa-info-circle   { color: #6C63FF !important; }
+.notification h6 { color: #1a1233 !important; font-weight: 600 !important; }
+.notification small { color: #6b7280 !important; }
+
+/* ================================================================
+   25. HERO / DARK-SECTION TEXT PROTECTION
+   ================================================================
+   The global h1–h6 { color: #1a1233 !important } rule makes text
+   inside dark gradient hero sections invisible. This overrides it
+   for any section with color:white in its own style attribute,
+   and for any element inside .hero-section or .hero-content.
+   ================================================================ */
+
+/* Landing page hero/dark sections */
+.hero-section,
+.hero-section *,
+[class*="hero"] h1,
+[class*="hero"] h2,
+[class*="hero"] h3,
+[class*="hero"] h4,
+[class*="hero"] h5,
+[class*="hero"] h6,
+[class*="hero"] p,
+[class*="hero"] span,
+[class*="hero"] a {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Any section/div with a dark inline background should keep white text */
+section[style*="background: linear-gradient"] h1,
+section[style*="background: linear-gradient"] h2,
+section[style*="background: linear-gradient"] h3,
+section[style*="background: linear-gradient"] h4,
+section[style*="background: linear-gradient"] p,
+div[style*="background: linear-gradient"] > h1,
+div[style*="background: linear-gradient"] > h2,
+div[style*="background: linear-gradient"] > h3,
+div[style*="background: linear-gradient"] > p {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Navbar links on landing page should always stay white */
+.navbar .nav-link,
+.navbar .navbar-brand,
+.navbar a {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* Footer text on landing page */
+.footer .hover-link,
+.footer a {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Feature card icons (the gradient icon on landing page) — keep gradient */
+.feature-icon {
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
+
+/* ================================================================
+   26. MODAL HEADER TEXT — Always white over gradient backgrounds
+   ================================================================
+   The global h1-h6 { color: #1a1233 !important } overrides even
+   inline color:white on modal headers. These rules win because they
+   have higher specificity (element + class vs element alone).
+   ================================================================ */
+.modal-header h1, .modal-header h2, .modal-header h3,
+.modal-header h4, .modal-header h5, .modal-header h6,
+.modal-header p,  .modal-header small, .modal-header span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+/* Icons inside modal headers: reset gradient paint and use white */
+.modal-header h1 i, .modal-header h2 i, .modal-header h3 i,
+.modal-header h4 i, .modal-header h5 i, .modal-header h6 i,
+.modal-header i,   .modal-header .fas, .modal-header .far,
+.modal-header .fab {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.85) !important;
+  color: rgba(255,255,255,0.85) !important;
+}
+
+
+/* ================================================================
+   27. MOBILE & TABLET MODAL � Non-Edge-to-Edge, Rounded, Animated
+   Desktop layout is completely untouched.
+   ================================================================ */
+
+/* Mobile (up to 767px) */
+@media (max-width: 767.98px) {
+  .modal-dialog:not(.modal-dialog-fullscreen):not(.modal-fullscreen) {
+    margin: 1.25rem auto !important;
+    max-width: calc(100vw - 2.5rem) !important;
+    width: auto !important;
+  }
+  .modal-content {
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    border: none !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 12px 40px rgba(0,0,0,0.18) !important;
+  }
+  .modal-header { padding: 1rem 1.25rem !important; }
+  .modal-body   { padding: 1.1rem 1.25rem !important; }
+  .modal-footer { padding: 0.85rem 1.25rem !important; gap: 0.5rem !important; }
+  .modal-header .btn-close {
+    padding: 0.55rem !important; min-width: 40px; min-height: 40px; border-radius: 8px !important;
+  }
+  .modal-footer .btn {
+    min-height: 44px !important; padding: 0.6rem 1.2rem !important;
+    border-radius: 10px !important; font-size: 0.92rem !important;
+  }
+  .modal-dialog-scrollable .modal-content { max-height: calc(100dvh - 3rem) !important; }
+  .modal-dialog-centered { min-height: calc(100% - 2.5rem) !important; }
+  .modal-backdrop.show { opacity: 0.62 !important; }
+}
+
+/* Tablet (576px - 991px) */
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .modal-dialog:not(.modal-dialog-fullscreen):not(.modal-fullscreen):not(.modal-xl):not(.modal-lg) {
+    margin: 1.75rem auto !important;
+    max-width: min(540px, calc(100vw - 4rem)) !important;
+  }
+  .modal-dialog.modal-lg, .modal-dialog.modal-xl {
+    margin: 1.5rem auto !important;
+    max-width: calc(100vw - 3rem) !important;
+  }
+  .modal-content {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    border: none !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.15) !important;
+  }
+  .modal-backdrop.show { opacity: 0.58 !important; }
+}
+
+/* Smooth fade + scale entry animation (mobile + tablet) */
+@media (max-width: 991.98px) {
+  .modal.fade .modal-dialog {
+    transform: scale(0.93) translateY(12px) !important;
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.34,1.4,0.64,1), opacity 0.22s ease !important;
+  }
+  .modal.show .modal-dialog {
+    transform: scale(1) translateY(0) !important;
+    opacity: 1 !important;
+  }
+}
+/* ================================================================
+   28. SAFE-AREA / SYSTEM NAV BAR � Global (mobile + tablet)
+   ================================================================ */
+@media (max-width: 991.98px) {
+  /* Ensure body bottom accounts for iOS home indicator */
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Main content areas � avoid system bar overlap */
+  .main-content, main, #main, .page-content, .content-area {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* Fixed bottom navbars � push above safe area */
+  .bottom-nav, .mobile-nav, [class*="bottom-bar"],
+  .navbar.fixed-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+}

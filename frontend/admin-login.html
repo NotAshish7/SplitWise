@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Portal — SplitWise</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ─────────────────────────────────────────────
+       ADMIN LOGIN — Red/Crimson Split-Screen Theme
+       Left: deep crimson→amber gradient
+       Right: white card on warm light bg
+    ───────────────────────────────────────────── */
+    :root {
+      --a-primary: #e53e3e;
+      --a-dark: #c53030;
+      --a-amber: #d97706;
+      --a-grad: linear-gradient(135deg, #c53030 0%, #744210 100%);
+      --a-grad2: linear-gradient(135deg, #e53e3e 0%, #f6ad55 100%);
+      --right-bg: #fff5f5;
+      --card-bg: #ffffff;
+      --text-dark: #1a0a0a;
+      --text-muted: #6b4c4c;
+      --border: #f3d5d5;
+      --input-h: 48px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    html {
+      font-family: 'Inter', sans-serif;
+      background: var(--a-grad);
+      overscroll-behavior-x: none;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: var(--a-grad);
+      overscroll-behavior-x: none;
+    }
+
+    /* ── WRAPPER ── */
+    .auth-wrapper {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* ── LEFT PANEL ── */
+    .auth-left {
+      flex: 0 0 46%;
+      /* Layered: top-right sheen + bottom-left shadow + base crimson gradient */
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, transparent 42%),
+        linear-gradient(340deg, rgba(60, 0, 0, 0.32) 0%, transparent 42%),
+        linear-gradient(135deg, #c53030 0%, #744210 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 3rem 2.5rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    /* Multi-layer depth shading for premium look */
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.22) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -80px;
+      right: -80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle at center, rgba(60, 0, 0, 0.6) 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -90px;
+      left: -90px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Internal dual-spotlight shade */
+    .left-shade {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 28% 18%, rgba(255, 200, 150, 0.14) 0%, transparent 42%),
+        radial-gradient(ellipse at 72% 82%, rgba(0, 0, 0, 0.3) 0%, transparent 42%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .left-mesh {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255, 255, 255, 0.05) 60px, rgba(255, 255, 255, 0.05) 61px),
+        repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255, 255, 255, 0.05) 60px, rgba(255, 255, 255, 0.05) 61px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .float-shape {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes floatAnim {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1)
+      }
+
+      50% {
+        transform: translateY(-20px) scale(1.05)
+      }
+    }
+
+    .auth-left-inner {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      color: white;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    /* Brand logo */
+    .brand-logo {
+      width: 82px;
+      height: 82px;
+      /* Solid crimson-amber gradient matching theme */
+      background: linear-gradient(135deg, #e53e3e 0%, #c05621 100%);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 0 0 8px rgba(229, 62, 62, 0.18), 0 16px 40px rgba(0, 0, 0, 0.4);
+      animation: popIn 0.7s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-logo:hover {
+      transform: scale(1.08) rotate(-3deg);
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.6)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .brand-logo i {
+      font-size: 2.3rem;
+      color: white;
+    }
+
+    /* Rainbow animated brand name */
+    .brand-name {
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.45rem;
+      line-height: 1.1;
+      background: linear-gradient(90deg, #fff 0%, #ffd6d6 15%, #ffd9a0 30%, #fff 50%, #ffd6d6 70%, #ffd9a0 85%, #fff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: rainbowShift 4s linear infinite, fadeInUp 0.7s 0.4s both;
+    }
+
+    @keyframes rainbowShift {
+      0% {
+        background-position: 0% center
+      }
+
+      100% {
+        background-position: 200% center
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .brand-tagline {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      animation: fadeInUp 0.7s 0.5s both;
+    }
+
+    /* Restricted badge */
+    .restricted-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50px;
+      padding: 5px 14px;
+      margin-bottom: 1.4rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      animation: fadeInUp 0.7s 0.55s both;
+    }
+
+    /* Feature list */
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.4rem;
+      text-align: left;
+      animation: fadeInUp 0.7s 0.6s both;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 14px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      font-size: 0.87rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(6px);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .feature-list li:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateX(4px);
+    }
+
+    .feat-icon {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88rem;
+      color: white;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .auth-right {
+      flex: 1;
+      background: var(--right-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .auth-right-inner {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 2rem 2rem 1.75rem;
+      box-shadow: 0 8px 40px rgba(197, 48, 48, 0.12), 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(229, 62, 62, 0.1);
+      animation: fadeIn 0.5s ease both;
+    }
+
+    /* Back to Panel */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #9b2c2c;
+      background: #fff;
+      border-radius: 50px;
+      padding: 7px 18px;
+      margin-bottom: 1.25rem;
+      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(229,62,62,0.15);
+      transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    .back-link:hover {
+      background: #fff5f5;
+      color: #e53e3e;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(229,62,62,0.22);
+    }
+
+    /* Form header */
+    .form-header {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .form-header p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    /* Panel switching */
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+      animation: fadeIn 0.35s;
+    }
+
+    /* Field */
+    .fi-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .fi {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .fi i.pre {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #b91c1c;
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    input.f {
+      width: 100%;
+      height: var(--input-h);
+      padding: 11px 14px 11px 38px;
+      background: #fef7f7;
+      border: 2px solid var(--border);
+      border-radius: 11px;
+      color: var(--text-dark);
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input.f::placeholder {
+      color: #c4a0a0;
+    }
+
+    input.f:focus {
+      border-color: var(--a-primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.12);
+    }
+
+    input.f:-webkit-autofill,
+    input.f:-webkit-autofill:hover,
+    input.f:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 40px #fff5f5 inset !important;
+      -webkit-text-fill-color: var(--text-dark) !important;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    input[type='password']::-ms-reveal,
+    input[type='password']::-ms-clear,
+    input[type='password']::-webkit-contacts-auto-fill-button,
+    input[type='password']::-webkit-credentials-auto-fill-button {
+      display: none !important;
+    }
+
+    .eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #c4a0a0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .eye:hover {
+      color: var(--a-primary);
+    }
+
+    /* Pw strength bar */
+    .pw-bar {
+      height: 3px;
+      border-radius: 2px;
+      background: #fde8e8;
+      margin-top: -8px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .pw-bar-fill {
+      height: 100%;
+      width: 0;
+      transition: 0.3s;
+      border-radius: 2px;
+    }
+
+    .rule {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 3px 0;
+    }
+
+    .rule.ok {
+      color: #059669;
+    }
+
+    .rule i {
+      font-size: 0.7rem;
+      width: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      height: var(--input-h);
+      border: none;
+      background: var(--a-grad2);
+      color: white;
+      border-radius: 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(229, 62, 62, 0.25);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 22px rgba(229, 62, 62, 0.38);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      width: 100%;
+      height: 42px;
+      border: 2px solid var(--border);
+      border-radius: 11px;
+      background: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--a-primary);
+      color: var(--a-primary);
+      background: rgba(229, 62, 62, 0.04);
+    }
+
+    .link {
+      color: #c05621;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .link:hover {
+      color: var(--a-primary);
+    }
+
+    /* Error / info boxes */
+    .err {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-left: 4px solid #e53e3e;
+      border-radius: 9px;
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      color: #c53030;
+      margin-bottom: 12px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .err.show {
+      display: flex;
+    }
+
+    .ok-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #10b981;
+      border-radius: 9px;
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      color: #047857;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .ok-box.show {
+      display: block;
+    }
+
+    .setup-warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 0.82rem;
+      color: #92400e;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .setup-warn strong {
+      color: #b45309;
+    }
+
+    /* Cred card (success panel) */
+    .cred-card {
+      background: #fef7f7;
+      border: 1.5px solid rgba(229, 62, 62, 0.18);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 14px 0;
+    }
+
+    .cred-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #fde8e8;
+      font-size: 0.84rem;
+    }
+
+    .cred-row:last-child {
+      border: 0;
+    }
+
+    .cred-row .lbl {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .cred-row .val {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      color: #c53030;
+      font-size: 0.84rem;
+    }
+
+    .footer-row {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .footer-row a:not(.help-link) {
+      color: var(--a-primary);
+      font-weight: 700;
+    }
+
+    .help-link {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+      transition: color 0.2s;
+    }
+
+    .help-link:hover {
+      color: var(--a-primary);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 992px) {
+
+      html,
+      body {
+        height: auto;
+        overflow-y: auto;
+        overscroll-behavior-x: none;
+        background: var(--a-grad);
+      }
+
+      .auth-wrapper {
+        flex-direction: column;
+        min-height: 100svh;
+        min-height: 100dvh;
+        height: auto;
+      }
+
+      .auth-left {
+        display: none;
+      }
+
+      .auth-right {
+        flex: 1 0 auto;
+        background:
+          linear-gradient(160deg, rgba(255, 255, 255, 0.13) 0%, transparent 40%),
+          linear-gradient(340deg, rgba(60, 0, 0, 0.3) 0%, transparent 40%),
+          linear-gradient(135deg, #c53030 0%, #744210 100%);
+        padding: 2rem 1rem;
+        align-items: center;
+        justify-content: center;
+        min-height: 100svh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .auth-right-inner {
+        margin: 0 auto;
+        height: auto;
+        overflow: visible;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-right {
+        padding: 1rem 0.75rem;
+      }
+
+      .auth-right-inner {
+        padding: 1.5rem 1.25rem 1.25rem;
+        border-radius: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- LEFT PANEL -->
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <div class="left-mesh"></div>
+      <div class="left-shade"></div>
+      <!-- Floating shapes -->
+      <div class="float-shape"
+        style="width:180px;height:180px;top:3%;left:2%;background:radial-gradient(circle,rgba(255,255,255,0.15) 0%,transparent 70%);animation:floatAnim 8s ease-in-out infinite;">
+      </div>
+      <div class="float-shape"
+        style="width:110px;height:110px;top:62%;left:4%;background:radial-gradient(circle,rgba(197,48,48,0.3) 0%,transparent 70%);animation:floatAnim 10s 1.5s ease-in-out infinite;">
+      </div>
+      <div class="float-shape"
+        style="width:130px;height:130px;top:15%;right:4%;background:radial-gradient(circle,rgba(255,255,255,0.12) 0%,transparent 70%);animation:floatAnim 9s 2s ease-in-out infinite;">
+      </div>
+      <div class="float-shape"
+        style="width:75px;height:75px;top:80%;right:8%;background:radial-gradient(circle,rgba(246,173,85,0.2) 0%,transparent 70%);animation:floatAnim 7s 0.5s ease-in-out infinite;">
+      </div>
+
+      <div class="auth-left-inner">
+        <div class="brand-logo"><i class="fas fa-shield-halved"></i></div>
+        <h1 class="brand-name">SplitWise</h1>
+        <p class="brand-tagline">Secure administration portal<br>for authorized personnel only</p>
+        <div class="restricted-badge"><i class="fas fa-lock"></i> Restricted Access</div>
+        <ul class="feature-list">
+          <li>
+            <div class="feat-icon"><i class="fas fa-users-cog"></i></div> Manage agents &amp; permissions
+          </li>
+          <li>
+            <div class="feat-icon"><i class="fas fa-ticket"></i></div> Oversee all support tickets
+          </li>
+          <li>
+            <div class="feat-icon"><i class="fas fa-chart-bar"></i></div> View analytics &amp; reports
+          </li>
+          <li>
+            <div class="feat-icon"><i class="fas fa-server"></i></div> System configuration &amp; settings
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+      <div class="auth-right-inner">
+        <!-- Back to Panel -->
+        <a class="back-link" id="backBtn" href="support-portal.html" onclick="handleBack(event)">
+          <i class="fas fa-home" style="font-size:12px"></i> Back to Panel
+        </a>
+
+        <!-- ── PANEL A: Login ── -->
+        <div class="panel active" id="panelLogin">
+          <div class="form-header">
+            <h2>Admin Sign In</h2>
+            <p>Restricted access — authorised personnel only</p>
+          </div>
+          <div id="eL" class="err"><i class="fas fa-circle-xmark"></i><span id="eLm"></span></div>
+          <!-- Dummy trap fields -->
+          <input type="text" style="display:none" tabindex="-1">
+          <input type="password" style="display:none" tabindex="-1">
+          <label class="fi-label">Admin Token</label>
+          <div class="fi">
+            <i class="pre fas fa-id-badge"></i>
+            <input class="f" id="loginToken" type="text" placeholder="Enter your admin token" autocomplete="off"
+              readonly>
+          </div>
+          <label class="fi-label">Password</label>
+          <div class="fi">
+            <i class="pre fas fa-lock"></i>
+            <input class="f" id="loginPw" type="password" placeholder="Enter your password" autocomplete="new-password">
+            <button class="eye" type="button" id="loginPwEye" onclick="toggleEye('loginPw','loginPwEye')"><i
+                class="fas fa-eye"></i></button>
+          </div>
+          <button class="btn" id="loginBtn" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Sign In to
+            Dashboard</button>
+          <div style="text-align:center;margin-top:12px">
+            <button class="link" onclick="show('panelForgot')"><i class="fas fa-key"></i> Forgot password? Receive OTP
+              by email</button>
+          </div>
+          <div style="text-align:center;margin-top:8px">
+            <button class="link" onclick="show('panelSetup')" style="font-size:0.78rem;color:#9b6e6e"><i
+                class="fas fa-sparkles" style="font-size:10px"></i> First time? Initialize admin account →</button>
+          </div>
+        </div>
+
+        <!-- ── PANEL B: Forgot Step 1 ── -->
+        <div class="panel" id="panelForgot">
+          <div class="form-header">
+            <h2>Reset Password</h2>
+            <p>Enter your <strong style="color:#c05621">master key</strong> to receive an OTP on your registered email
+            </p>
+          </div>
+          <div id="eF" class="err"><i class="fas fa-circle-xmark"></i><span id="eFm"></span></div>
+          <div id="okF" class="ok-box"></div>
+          <input type="text" style="display:none" tabindex="-1">
+          <input type="password" style="display:none" tabindex="-1">
+          <label class="fi-label">Master Key</label>
+          <div class="fi">
+            <i class="pre fas fa-key"></i>
+            <input class="f" id="masterKey" type="text" placeholder="Enter Master Key" autocomplete="off" readonly>
+            <button class="eye" type="button" id="mkEye" onclick="toggleVisKey()"><i
+                class="fas fa-eye-slash"></i></button>
+          </div>
+          <button class="btn" id="sendOtpBtn" onclick="doSendAdminOtp()"><i class="fas fa-paper-plane"></i> Send OTP to
+            Email</button>
+          <button class="btn-ghost" onclick="show('panelLogin')"><i class="fas fa-arrow-left"></i> Back to
+            Login</button>
+        </div>
+
+        <!-- ── PANEL B2: OTP Verification ── -->
+        <div class="panel" id="panelOtp">
+          <div class="form-header">
+            <h2>Enter OTP</h2>
+            <p id="otpSubMsg">A 6-digit OTP was sent to your registered email. It expires in <strong id="otpTimer"
+                style="color:#c05621">2:00</strong>.</p>
+          </div>
+          <div id="eO" class="err"><i class="fas fa-circle-xmark"></i><span id="eOm"></span></div>
+          <input type="text" style="display:none" tabindex="-1">
+          <input type="password" style="display:none" tabindex="-1">
+          <label class="fi-label">6-Digit OTP</label>
+          <div class="fi">
+            <i class="pre fas fa-shield-halved"></i>
+            <input class="f" id="otpInput" type="text" maxlength="6" placeholder="e.g. 483920"
+              autocomplete="one-time-code" readonly inputmode="numeric">
+          </div>
+          <label class="fi-label">New Password</label>
+          <div class="fi">
+            <i class="pre fas fa-lock"></i>
+            <input class="f" id="newPw" type="password" placeholder="Min 8 characters" autocomplete="new-password"
+              readonly oninput="checkPw(this.value)">
+            <button class="eye" type="button" id="newPwEye" onclick="toggleEye('newPw','newPwEye')"><i
+                class="fas fa-eye"></i></button>
+          </div>
+          <div class="pw-bar">
+            <div class="pw-bar-fill" id="pwBar"></div>
+          </div>
+          <div class="fi">
+            <i class="pre fas fa-lock"></i>
+            <input class="f" id="newPw2" type="password" placeholder="Confirm new password" autocomplete="new-password"
+              readonly>
+            <button class="eye" type="button" id="newPw2Eye" onclick="toggleEye('newPw2','newPw2Eye')"><i
+                class="fas fa-eye"></i></button>
+          </div>
+          <div style="margin-bottom:14px">
+            <div class="rule" id="r1"><i class="fas fa-xmark"></i> At least 8 characters</div>
+            <div class="rule" id="r2"><i class="fas fa-xmark"></i> Contains a number or symbol</div>
+          </div>
+          <button class="btn" id="verifyOtpBtn" onclick="doVerifyAdminOtp()"><i class="fas fa-check-circle"></i> Verify
+            OTP &amp; Reset</button>
+          <button class="btn-ghost" onclick="show('panelForgot')"><i class="fas fa-arrow-left"></i> Request New
+            OTP</button>
+        </div>
+
+        <!-- ── PANEL C: Reset Success ── -->
+        <div class="panel" id="panelDone">
+          <div style="text-align:center;padding:10px 0">
+            <div style="font-size:48px;margin-bottom:14px">✅</div>
+            <h2 style="color:var(--text-dark);margin-bottom:8px">Password Reset!</h2>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">Your admin password has been
+              updated. Login with your new credentials.</p>
+            <div class="cred-card">
+              <div class="cred-row"><span class="lbl">Token</span><span class="val" id="doneToken">ADMIN-001</span>
+              </div>
+              <div class="cred-row"><span class="lbl">Password</span><span class="val" id="donePw"
+                  style="color:#059669">••••••••</span></div>
+            </div>
+            <button class="btn" onclick="show('panelLogin')" style="margin-bottom:8px"><i
+                class="fas fa-arrow-right-to-bracket"></i> Go to Login</button>
+          </div>
+        </div>
+
+        <!-- ── PANEL D: First-Time Setup ── -->
+        <div class="panel" id="panelSetup">
+          <div class="form-header">
+            <h2>Initialize Admin</h2>
+            <p>Create a new admin account using the master key</p>
+          </div>
+          <div class="setup-warn"><i class="fas fa-triangle-exclamation"></i> <strong>One-time setup only.</strong>
+            After creating your admin account, always use the login form with token ID.</div>
+          <div id="eS" class="err"><i class="fas fa-circle-xmark"></i><span id="eSm"></span></div>
+          <div id="okS" class="ok-box"></div>
+
+          <!-- Step S1 -->
+          <div id="setupS1">
+            <input type="text" style="display:none" tabindex="-1">
+            <input type="password" style="display:none" tabindex="-1">
+            <label class="fi-label">Master Key</label>
+            <div class="fi">
+              <i class="pre fas fa-key"></i>
+              <input class="f" id="setupKey" type="text" placeholder="Enter master key" autocomplete="off" readonly>
+              <button class="eye" type="button" id="setupKeyEye" onclick="toggleSetupKey()"><i
+                  class="fas fa-eye-slash"></i></button>
+            </div>
+            <button class="btn" id="setupVerifyBtn" onclick="doSetupVerify()"><i class="fas fa-arrow-right"></i>
+              Continue</button>
+          </div>
+
+          <!-- Step S2 -->
+          <div id="setupS2" style="display:none">
+            <input type="text" style="display:none" tabindex="-1">
+            <input type="password" style="display:none" tabindex="-1">
+            <label class="fi-label">Full Name</label>
+            <div class="fi">
+              <i class="pre fas fa-user"></i>
+              <input class="f" id="setupName" type="text" placeholder="e.g. Ashish" autocomplete="off" readonly>
+            </div>
+            <label class="fi-label">Email (for OTP recovery)</label>
+            <div class="fi">
+              <i class="pre fas fa-envelope"></i>
+              <input class="f" id="setupEmail" type="email" placeholder="your@email.com" autocomplete="off" readonly>
+            </div>
+            <label class="fi-label">Password</label>
+            <div class="fi">
+              <i class="pre fas fa-lock"></i>
+              <input class="f" id="setupPw" type="password" placeholder="Min 8 characters" autocomplete="new-password"
+                readonly oninput="checkSetupPw(this.value)">
+              <button class="eye" type="button" id="setupPwEye" onclick="toggleEye('setupPw','setupPwEye')"><i
+                  class="fas fa-eye"></i></button>
+            </div>
+            <div class="pw-bar">
+              <div class="pw-bar-fill" id="setupPwBar"></div>
+            </div>
+            <div class="fi">
+              <i class="pre fas fa-lock"></i>
+              <input class="f" id="setupPw2" type="password" placeholder="Confirm password" autocomplete="new-password"
+                readonly>
+              <button class="eye" type="button" id="setupPw2Eye" onclick="toggleEye('setupPw2','setupPw2Eye')"><i
+                  class="fas fa-eye"></i></button>
+            </div>
+            <div style="margin-bottom:14px">
+              <div class="rule" id="rs1"><i class="fas fa-xmark"></i> At least 8 characters</div>
+              <div class="rule" id="rs2"><i class="fas fa-xmark"></i> Contains a number or symbol</div>
+            </div>
+            <button class="btn" id="setupCreateBtn" onclick="doSetupCreate()"><i class="fas fa-shield-halved"></i>
+              Create Admin Account</button>
+          </div>
+
+          <!-- Step S3: Success -->
+          <div id="setupS3" style="display:none;text-align:center;padding:10px 0">
+            <div style="font-size:46px;margin-bottom:12px">🎉</div>
+            <h2 style="color:var(--text-dark);margin-bottom:8px">Admin Created!</h2>
+            <p style="color:var(--text-muted);font-size:0.84rem;margin-bottom:14px">Your admin account is ready. Save
+              these credentials!</p>
+            <div class="cred-card">
+              <div class="cred-row"><span class="lbl">Token</span><span class="val" id="setupDoneToken">ADMIN-001</span>
+              </div>
+              <div class="cred-row"><span class="lbl">Password</span><span class="val" id="setupDonePw"
+                  style="color:#059669">••••••••</span></div>
+              <div class="cred-row"><span class="lbl">Role</span><span class="val" style="color:#059669">🛡️
+                  Admin</span></div>
+            </div>
+            <button class="btn" onclick="show('panelLogin')"><i class="fas fa-arrow-right-to-bracket"></i> Go to
+              Login</button>
+          </div>
+
+          <button class="btn-ghost" onclick="show('panelLogin')" style="margin-top:10px"><i
+              class="fas fa-arrow-left"></i> Back to Login</button>
+        </div>
+
+      </div><!-- /auth-right-inner -->
+    </div><!-- /auth-right -->
+  </div><!-- /auth-wrapper -->
+
+  <script>
+    const API = (() => { const h = window.location.hostname; if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:4000/api'; if (h.includes('splitwise.space')) return 'https://api.splitwise.space/api'; return `${window.location.protocol}//${h.replace('5500', '4000')}/api`; })();
+    let keyMasked = true, setupKeyMasked = true, newPwVal = '', setupMasterKey = '', setupAdminPw = '';
+
+    const stored = sessionStorage.getItem('support_jwt');
+    if (stored) window.location.href = 'admin-dashboard.html';
+
+    function handleBack(e) {
+      e.preventDefault();
+      const jwt = sessionStorage.getItem('support_jwt');
+      window.location.href = jwt ? 'admin-dashboard.html' : 'frontend.html';
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const lt = document.getElementById('loginToken'), lp = document.getElementById('loginPw');
+        lt.removeAttribute('readonly'); lp.removeAttribute('readonly');
+      }, 200);
+    });
+
+    function show(id) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'panelForgot') {
+        setTimeout(() => {
+          const mk = document.getElementById('masterKey');
+          mk.removeAttribute('readonly'); mk.value = '';
+          mk.style.webkitTextSecurity = 'disc'; keyMasked = true;
+          document.getElementById('mkEye').querySelector('i').className = 'fas fa-eye-slash';
+        }, 80);
+      }
+      if (id === 'panelOtp') {
+        setTimeout(() => {
+          ['otpInput', 'newPw', 'newPw2'].forEach(i => {
+            const el = document.getElementById(i); if (el) { el.removeAttribute('readonly'); el.value = ''; }
+          });
+        }, 80);
+      }
+      if (id === 'panelSetup') {
+        document.getElementById('setupS1').style.display = '';
+        document.getElementById('setupS2').style.display = 'none';
+        document.getElementById('setupS3').style.display = 'none';
+        setTimeout(() => {
+          const sk = document.getElementById('setupKey');
+          sk.removeAttribute('readonly'); sk.value = '';
+          sk.style.webkitTextSecurity = 'disc'; setupKeyMasked = true;
+          document.getElementById('setupKeyEye').querySelector('i').className = 'fas fa-eye-slash';
+        }, 80);
+      }
+    }
+
+    function toggleEye(inputId, btnId) {
+      const inp = document.getElementById(inputId), show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      document.getElementById(btnId).querySelector('i').className = `fas fa-eye${show ? '-slash' : ''}`;
+    }
+    function toggleVisKey() {
+      keyMasked = !keyMasked;
+      const inp = document.getElementById('masterKey'), i = document.getElementById('mkEye').querySelector('i');
+      inp.style.webkitTextSecurity = keyMasked ? 'disc' : 'none';
+      i.className = keyMasked ? 'fas fa-eye-slash' : 'fas fa-eye';
+    }
+    function toggleSetupKey() {
+      setupKeyMasked = !setupKeyMasked;
+      const inp = document.getElementById('setupKey'), i = document.getElementById('setupKeyEye').querySelector('i');
+      inp.style.webkitTextSecurity = setupKeyMasked ? 'disc' : 'none';
+      i.className = setupKeyMasked ? 'fas fa-eye-slash' : 'fas fa-eye';
+    }
+
+    function checkPw(pw) {
+      const bar = document.getElementById('pwBar'), r1 = document.getElementById('r1'), r2 = document.getElementById('r2');
+      const hasLen = pw.length >= 8, hasExtra = /[0-9!@#$%^&*]/.test(pw);
+      r1.className = 'rule' + (hasLen ? ' ok' : ''); r1.querySelector('i').className = `fas fa-${hasLen ? 'check' : 'xmark'}`;
+      r2.className = 'rule' + (hasExtra ? ' ok' : ''); r2.querySelector('i').className = `fas fa-${hasExtra ? 'check' : 'xmark'}`;
+      const score = (hasLen ? 1 : 0) + (hasExtra ? 1 : 0) + (pw.length >= 12 ? 1 : 0);
+      bar.style.width = `${score * 33.4}%`; bar.style.background = ['', '#ef4444', '#f59e0b', '#10b981'][score] || '#ef4444';
+    }
+    function checkSetupPw(pw) {
+      const bar = document.getElementById('setupPwBar'), r1 = document.getElementById('rs1'), r2 = document.getElementById('rs2');
+      const hasLen = pw.length >= 8, hasExtra = /[0-9!@#$%^&*]/.test(pw);
+      r1.className = 'rule' + (hasLen ? ' ok' : ''); r1.querySelector('i').className = `fas fa-${hasLen ? 'check' : 'xmark'}`;
+      r2.className = 'rule' + (hasExtra ? ' ok' : ''); r2.querySelector('i').className = `fas fa-${hasExtra ? 'check' : 'xmark'}`;
+      const score = (hasLen ? 1 : 0) + (hasExtra ? 1 : 0) + (pw.length >= 12 ? 1 : 0);
+      bar.style.width = `${score * 33.4}%`; bar.style.background = ['', '#ef4444', '#f59e0b', '#10b981'][score] || '#ef4444';
+    }
+
+    function errL(msg) { const e = document.getElementById('eL'); e.querySelector('span').textContent = msg; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 4000); }
+    function errF(msg) { const e = document.getElementById('eF'); e.querySelector('span').textContent = msg; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 4000); }
+    function errO(msg) { const e = document.getElementById('eO'); e.querySelector('span').textContent = msg; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 4000); }
+    function okF(msg) { const e = document.getElementById('okF'); e.textContent = msg; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 3500); }
+    function errS(msg) { const e = document.getElementById('eS'); e.querySelector('span').textContent = msg; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 4000); }
+    function okS(msg) { const e = document.getElementById('okS'); e.textContent = msg; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 3500); }
+
+    async function doLogin() {
+      const tok = document.getElementById('loginToken').value.trim().toUpperCase() || 'ADMIN-001';
+      const pw = document.getElementById('loginPw').value;
+      if (!pw) { errL('Please enter your password'); return; }
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+      try {
+        const r = await fetch(`${API}/support/auth/login`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: tok, password: pw }),
+        });
+        const d = await r.json();
+        if (!d.success) { errL(d.error || 'Invalid credentials'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Sign In to Dashboard'; return; }
+        sessionStorage.setItem('support_jwt', d.data.token);
+        window.location.href = 'admin-dashboard.html';
+      } catch { errL('Cannot connect to server. Is backend running?'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Sign In to Dashboard'; }
+    }
+
+    let otpTimerInterval = null;
+    function startOtpCountdown(secs = 120) {
+      clearInterval(otpTimerInterval);
+      const el = document.getElementById('otpTimer');
+      let remaining = secs; el.textContent = '2:00';
+      otpTimerInterval = setInterval(() => {
+        remaining--;
+        const m = Math.floor(remaining / 60), s = remaining % 60;
+        el.textContent = `${m}:${String(s).padStart(2, '0')}`;
+        if (remaining <= 0) { clearInterval(otpTimerInterval); el.textContent = 'EXPIRED'; el.style.color = '#ef4444'; }
+      }, 1000);
+    }
+
+    async function doSendAdminOtp() {
+      const mk = document.getElementById('masterKey').value.trim();
+      if (!mk) { errF('Please enter your master key'); return; }
+      const btn = document.getElementById('sendOtpBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending OTP…';
+      try {
+        const r = await fetch(`${API}/support/admin/request-admin-otp`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${mk}` },
+          body: JSON.stringify({}),
+        });
+        const d = await r.json();
+        if (!d.success) { errF(d.error || 'Failed. Check your master key.'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP to Email'; return; }
+        sessionStorage.setItem('_adminMk', mk);
+        show('panelOtp');
+        document.getElementById('otpSubMsg').innerHTML = `OTP sent to <strong style="color:#c05621">${d.data.email}</strong>. Expires in <strong id="otpTimer" style="color:#c05621">2:00</strong>.`;
+        startOtpCountdown(120);
+      } catch { errF('Server error — is backend running?'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP to Email'; }
+    }
+
+    async function doVerifyAdminOtp() {
+      const mk = sessionStorage.getItem('_adminMk') || '';
+      const otp = document.getElementById('otpInput').value.trim();
+      const np = document.getElementById('newPw').value;
+      const np2 = document.getElementById('newPw2').value;
+      if (!otp) { errO('Please enter the 6-digit OTP'); return; }
+      if (np.length < 8) { errO('Password must be at least 8 characters'); return; }
+      if (np !== np2) { errO('Passwords do not match'); return; }
+      const btn = document.getElementById('verifyOtpBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying…';
+      try {
+        const r = await fetch(`${API}/support/admin/verify-admin-otp-reset`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${mk}` },
+          body: JSON.stringify({ otp, newPassword: np }),
+        });
+        const d = await r.json();
+        if (!d.success) { errO(d.error || 'Invalid or expired OTP'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP & Reset'; return; }
+        clearInterval(otpTimerInterval); sessionStorage.removeItem('_adminMk');
+        show('panelDone');
+      } catch { errO('Server error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP & Reset'; }
+    }
+
+    async function doSetupVerify() {
+      const key = document.getElementById('setupKey').value.trim();
+      if (!key) { errS('Please enter the master key'); return; }
+      const btn = document.getElementById('setupVerifyBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying…';
+      try {
+        const r = await fetch(`${API}/support/admin/tokens`, { headers: { Authorization: `Bearer ${key}` } });
+        if (r.status === 401 || r.status === 503) { errS('Invalid key'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue'; return; }
+        const d = await r.json();
+        if (d.success && d.data?.some(a => a.role === 'admin')) { errS('An admin account already exists. Use the login form instead.'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue'; return; }
+        setupMasterKey = key;
+        document.getElementById('setupS1').style.display = 'none';
+        document.getElementById('setupS2').style.display = '';
+        setTimeout(() => {
+          ['setupName', 'setupEmail', 'setupPw', 'setupPw2'].forEach(id => { const el = document.getElementById(id); if (el) { el.removeAttribute('readonly'); el.value = ''; } });
+          document.getElementById('setupName').focus();
+        }, 50);
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue';
+      } catch { errS('Cannot connect to server. Is the backend running?'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue'; }
+    }
+
+    async function doSetupCreate() {
+      const name = document.getElementById('setupName').value.trim();
+      const email = document.getElementById('setupEmail').value.trim();
+      const pw = document.getElementById('setupPw').value;
+      const pw2 = document.getElementById('setupPw2').value;
+      if (!name) { errS('Please enter your name'); return; }
+      if (pw.length < 8) { errS('Password must be at least 8 characters'); return; }
+      if (pw !== pw2) { errS('Passwords do not match'); return; }
+      const btn = document.getElementById('setupCreateBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating account…';
+      try {
+        const r = await fetch(`${API}/support/admin/setup-admin`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${setupMasterKey}` },
+          body: JSON.stringify({ name, email, password: pw }),
+        });
+        const d = await r.json();
+        if (!d.success) { errS(d.error || 'Failed to create account'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-shield-halved"></i> Create Admin Account'; return; }
+        setupAdminPw = pw;
+        document.getElementById('setupDoneToken').textContent = d.data.accessToken || 'ADMIN-001';
+        document.getElementById('setupS2').style.display = 'none';
+        document.getElementById('setupS3').style.display = '';
+      } catch { errS('Server error — is backend running?'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-shield-halved"></i> Create Admin Account'; }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if (document.getElementById('panelLogin').classList.contains('active')) doLogin();
+      else if (document.getElementById('panelForgot').classList.contains('active')) doSendAdminOtp();
+      else if (document.getElementById('panelOtp').classList.contains('active')) doVerifyAdminOtp();
+      else if (document.getElementById('panelSetup').classList.contains('active')) {
+        if (document.getElementById('setupS1').style.display !== 'none') doSetupVerify();
+        else if (document.getElementById('setupS2').style.display !== 'none') doSetupCreate();
+      }
+    });
+  </script>
+
+  <!-- Block bottom overscroll -->
+  <script>
+    (function(){var s=0;document.addEventListener('touchstart',function(e){s=e.touches[0].clientY;},{passive:true});document.addEventListener('touchmove',function(e){var el=document.scrollingElement||document.documentElement;if(el.scrollTop+el.clientHeight>=el.scrollHeight-2&&e.touches[0].clientY<s){e.preventDefault();}},{passive:false});})();
+  </script>
+</body>
+
+</html>

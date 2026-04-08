@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Sign Up - SplitWise</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="css/auth-split.css">
+  <link rel="stylesheet" href="css/design-system.css">
+  <style>
+    /* â”€â”€ Override design-system.css body background on auth pages â”€â”€ */
+    html, body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      background-color: #764ba2 !important;
+      overscroll-behavior-x: none !important; /* block horizontal bounce only */
+    }
+    /* Mobile: document scrolls naturally */
+  </style>
+</head>
+
+<body class="signup-page">
+  <div id="notification-container" class="notification-container"></div>
+
+  <div class="auth-wrapper">
+
+    <!-- ===== LEFT PANEL ===== -->
+    <div class="auth-left">
+      <!-- Mesh texture -->
+      <div class="left-mesh"></div>
+      <!-- Centre vignette for depth -->
+      <div class="left-shade"></div>
+
+      <!-- Floating glow shapes -->
+      <div class="float-shape" style="width:140px;height:140px;top:5%;left:3%;background:radial-gradient(circle,rgba(167,139,250,0.18) 0%,transparent 70%);animation:floatAnim 7s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:90px;height:90px;top:62%;left:4%;background:radial-gradient(circle,rgba(99,102,241,0.2) 0%,transparent 70%);animation:floatAnim 9s 1s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:110px;height:110px;top:16%;right:4%;background:radial-gradient(circle,rgba(192,132,252,0.15) 0%,transparent 70%);animation:floatAnim 8s 2s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:60px;height:60px;top:80%;right:8%;background:radial-gradient(circle,rgba(167,139,250,0.18) 0%,transparent 70%);animation:floatAnim 6s 0.5s ease-in-out infinite;"></div>
+
+
+      <div class="auth-left-inner">
+        <div class="brand-logo">
+          <i class="fas fa-user-plus"></i>
+        </div>
+
+        <h1 class="brand-name">SplitWise</h1>
+        <p class="brand-tagline">Join thousands managing their<br>finances the smart way</p>
+
+        <ul class="steps-list">
+          <li>
+            <div class="step-num">1</div>
+            <span>Create your free account in seconds</span>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <span>Add expenses and invite friends to groups</span>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <span>Track who owes what and settle up easily</span>
+          </li>
+          <li>
+            <div class="step-num">4</div>
+            <span>Export detailed PDF reports anytime</span>
+          </li>
+        </ul>
+
+        <div class="trust-badges">
+          <div class="trust-badge">
+            <span class="badge-val">100%</span>
+            <span>Free Forever</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure &amp; Private</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-mobile-alt"></i>
+            <span>Mobile Friendly</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-file-pdf"></i>
+            <span>PDF Exports</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL ===== -->
+    <div class="auth-right">
+      <div class="auth-right-inner">
+
+        <div style="margin-bottom:0.75rem">
+          <a href="frontend.html" style="display:inline-flex;align-items:center;gap:6px;color:#764ba2;font-size:0.84rem;font-weight:700;text-decoration:none;padding:7px 18px;background:#fff;border-radius:50px;box-shadow:0 2px 10px rgba(118,75,162,0.15);transition:all .22s cubic-bezier(0.4,0,0.2,1)" onmouseover="this.style.background='#f3ebfe';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(118,75,162,0.22)'" onmouseout="this.style.background='#fff';this.style.transform='translateY(0)';this.style.boxShadow='0 2px 10px rgba(118,75,162,0.15)'">
+            <i class="fas fa-home" style="font-size:12px"></i> Back to Website
+          </a>
+        </div>
+        <div class="form-header">
+          <h2>Create Account &#x2728;</h2>
+          <p>Join SplitWise today — it's free!</p>
+        </div>
+
+        <form id="signupForm" autocomplete="off">
+          <!-- Name Row -->
+          <div class="field-row">
+            <div class="field-group" style="margin-bottom:0">
+              <label class="field-label" for="firstName">First Name</label>
+              <input type="text" class="field-input" id="firstName" placeholder="First Name" required>
+            </div>
+            <div class="field-group" style="margin-bottom:0">
+              <label class="field-label" for="lastName">Last Name</label>
+              <input type="text" class="field-input" id="lastName" placeholder="Last Name (optional)">
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="field-group">
+            <label class="field-label" for="email"><i class="fas fa-envelope me-1"></i> Email Address</label>
+            <input type="email" class="field-input" id="email" placeholder="Enter your email" required>
+          </div>
+
+          <!-- Password -->
+          <div class="field-group">
+            <label class="field-label" for="password"><i class="fas fa-lock me-1"></i> Password</label>
+            <input type="password" class="field-input with-icon" id="password" placeholder="Create a strong password"
+              required>
+            <button type="button" class="field-icon-btn" id="togglePassword" tabindex="-1">
+              <i class="fas fa-eye" id="passwordToggleIcon"></i>
+            </button>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="field-group">
+            <label class="field-label" for="confirmPassword"><i class="fas fa-lock me-1"></i> Confirm Password</label>
+            <input type="password" class="field-input with-icon" id="confirmPassword"
+              placeholder="Confirm your password" required>
+            <button type="button" class="field-icon-btn" id="toggleConfirmPassword" tabindex="-1">
+              <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
+            </button>
+          </div>
+
+          <!-- Password Requirements -->
+          <div class="pw-req" id="pwReq">
+            <div class="pw-req-title">Password Requirements</div>
+            <div class="pw-req-grid">
+              <div class="pw-req-item"><i id="reqLen" class="fas fa-times"
+                  style="color:#dc3545;font-size:0.75rem"></i>8+ characters</div>
+              <div class="pw-req-item"><i id="reqUpper" class="fas fa-times"
+                  style="color:#dc3545;font-size:0.75rem"></i>Uppercase letter</div>
+              <div class="pw-req-item"><i id="reqNum" class="fas fa-times"
+                  style="color:#dc3545;font-size:0.75rem"></i>Number</div>
+              <div class="pw-req-item"><i id="reqSpecial" class="fas fa-times"
+                  style="color:#dc3545;font-size:0.75rem"></i>Special character</div>
+              <div class="pw-req-item"><i id="reqMatch" class="fas fa-times"
+                  style="color:#dc3545;font-size:0.75rem"></i>Passwords match</div>
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div class="terms-row">
+            <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+            <label for="acceptTerms">
+              I agree to the <a href="#" id="showTerms">Terms and Conditions</a>
+            </label>
+          </div>
+
+          <!-- Create Button -->
+          <button type="submit" class="btn-main" id="createBtn" disabled>
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+
+          <!-- Social Divider -->
+          <div class="or-divider"><span>or sign up with</span></div>
+
+          <!-- Social Buttons -->
+          <div class="social-row">
+            <button type="button" id="googleBtn" class="btn-social google">
+              <i class="fab fa-google"></i> Google
+            </button>
+            <button type="button" id="facebookBtn" class="btn-social facebook">
+              <i class="fab fa-facebook-f"></i> Facebook
+            </button>
+          </div>
+
+          <!-- Footer Links -->
+          <div class="auth-footer">
+            <span>Already have an account? <a href="login.html">Login</a></span>
+            <a href="#" class="help-link" id="needHelp" data-bs-toggle="modal" data-bs-target="#needHelpModal">
+              <i class="fas fa-headset me-1"></i>Need Help?
+            </a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NEED HELP MODAL ===== -->
+  <div class="modal fade modal-styled" id="needHelpModal" tabindex="-1" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <div class="help-icon"><i class="fas fa-headset"></i></div>
+            Need Help?
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="help-text">We're here to assist you! Reach out through any of the following channels:</p>
+          <a href="mailto:support@splitwise.space" class="contact-item" id="emailContactItem">
+            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+            <div class="contact-details">
+              <div class="contact-label">Email Address</div>
+              <div class="contact-value">support@splitwise.space</div>
+            </div>
+            <div class="copy-icon" title="Click to copy"><i class="fas fa-copy"></i></div>
+          </a>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+            style="border-radius:12px;padding:0.6rem 2rem;background:var(--primary-gradient);border:none;font-family:'Nunito',sans-serif;font-weight:700;">
+            <i class="fas fa-check me-2"></i>Got it
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EMAIL VERIFICATION MODAL ===== -->
+  <div class="modal fade" id="emailVerificationModal" tabindex="-1" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:460px">
+      <div class="modal-content" style="position:relative">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.1);border-radius:50%;width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;opacity:0.8;cursor:pointer;font-size:1.3rem;padding:0">
+          <span aria-hidden="true" style="font-size:1.3rem;color:#666;font-weight:300;">&times;</span>
+        </button>
+        <div class="modal-body" style="padding:2.5rem">
+          <div class="text-center mb-4">
+            <i class="fas fa-envelope-circle-check" style="font-size:3rem;color:#4e73df;"></i>
+            <h2 class="mt-3" style="font-size:1.75rem;font-weight:800;color:#333;">Verify Your Email</h2>
+            <p class="text-muted" id="modalMessageText" style="font-size:0.95rem;">We've sent a verification code to
+              your email address</p>
+          </div>
+
+          <div class="mb-3" style="position:relative;">
+            <label for="otp"
+              style="display:block;margin-bottom:0.5rem;font-size:0.9rem;font-weight:700;color:#495057;text-align:center;">
+              <i class="fas fa-hashtag me-2" style="color:#667eea;"></i>Enter 6-digit OTP
+            </label>
+            <input type="tel" class="form-control" id="otp" placeholder="000000" maxlength="6" inputmode="numeric"
+              pattern="[0-9]{6}" autocomplete="one-time-code" spellcheck="false" autocorrect="off" autocapitalize="off"
+              disabled />
+          </div>
+
+          <div class="text-center mb-4">
+            <small class="text-muted">Code sent to: <strong id="verificationEmail"
+                style="color:#667eea;"></strong></small>
+          </div>
+
+          <button type="button" class="btn w-100 mb-3" id="verifyBtn"
+            style="height:52px;background:var(--primary-gradient);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;">
+            <i class="fas fa-check-circle me-2"></i>Verify Email
+          </button>
+
+          <div class="text-center">
+            <p class="text-muted mb-2" style="font-size:0.85rem;">Didn't receive the code?</p>
+            <button type="button" class="btn btn-link p-0" id="resendOtpBtn"
+              style="text-decoration:none;color:#667eea;font-size:0.88rem;font-weight:700;cursor:pointer;">
+              <i class="fas fa-redo me-1"></i><span id="resendOtpText">Resend OTP</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  <!-- ===== TERMS MODAL ===== -->
+  <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="signupTermsModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content" style="border:none;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.25);">
+        <!-- Gradient Header -->
+        <div class="modal-header" style="background:var(--primary-gradient,linear-gradient(135deg,#667eea 0%,#764ba2 100%));border:none;padding:1.75rem 2rem;">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+              <i class="fas fa-file-contract" style="color:white;"></i>
+            </div>
+            <div>
+              <h5 class="modal-title mb-0" id="signupTermsModalLabel" style="color:white;font-weight:800;font-size:1.2rem;font-family:'Nunito',sans-serif;">Terms &amp; Conditions</h5>
+              <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;font-weight:400 !important;">Last updated: March 2026 &nbsp;&middot;&nbsp; Please read before signing up</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1);opacity:0.9;"></button>
+        </div>
+
+        <!-- Intro Banner -->
+        <div style="background:linear-gradient(135deg,rgba(102,126,234,0.08),rgba(118,75,162,0.08));padding:1rem 1.75rem;border-bottom:1px solid #e9ecef;">
+          <p style="margin:0;color:#5a6a88;font-size:0.88rem;line-height:1.6;">By creating a SplitWise account, you confirm you have read and agree to these Terms. You must accept to continue registration.</p>
+        </div>
+
+        <!-- Scrollable Body -->
+        <div class="modal-body" style="padding:1.25rem 1.75rem;background:#f8f9fc;">
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0.85rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><span style="color:#667eea;margin-right:0.4rem;">1.</span>Acceptance</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">By using SplitWise, you confirm you are at least 13 years old and legally capable of entering into these Terms.</p>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0.85rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><span style="color:#764ba2;margin-right:0.4rem;">2.</span>Account Security</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">You are responsible for keeping your credentials confidential and for all activities under your account. Notify us at <strong>support@splitwise.space</strong> of any unauthorised access.</p>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0.85rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><span style="color:#667eea;margin-right:0.4rem;">3.</span>Permitted Use</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">Use SplitWise only to track and manage personal and group expenses for lawful purposes. Do not use the platform for fraud, illegal activity, or to harm others.</p>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0.85rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><span style="color:#764ba2;margin-right:0.4rem;">4.</span>Data Privacy</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">We collect your name, email, and usage data to provide the service. We <strong>never</strong> sell your data. Your password is securely hashed. For full details see our Privacy Policy.</p>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0.85rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><span style="color:#667eea;margin-right:0.4rem;">5.</span>Intellectual Property</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">All content, design, and code within SplitWise are the property of SplitWise and its licensors. You may not reproduce or distribute without written consent.</p>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0.85rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><span style="color:#764ba2;margin-right:0.4rem;">6.</span>Disclaimer &amp; Liability</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">SplitWise is provided "as is" without warranties. We are not liable for indirect, incidental, or consequential damages arising from your use of the platform.</p>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:0;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;"><i class="fas fa-envelope me-2" style="color:#667eea;"></i>Contact</h6>
+            <p style="color:#6c757d;margin:0;font-size:0.87rem;line-height:1.65;">Questions? Email <a href="mailto:support@splitwise.space" style="color:#667eea;font-weight:700;">support@splitwise.space</a></p>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer" style="border:none;background:white;padding:1.1rem 1.75rem;justify-content:space-between;">
+          <span style="color:#adb5bd;font-size:0.78rem;"><i class="fas fa-shield-alt me-1"></i>SplitWise &copy; 2026</span>
+          <div style="display:flex;gap:0.65rem;">
+            <button type="button" class="btn btn-danger" id="rejectTerms"
+              style="border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;padding:0.5rem 1.2rem;"><i class="fas fa-times me-1"></i>Decline</button>
+            <button type="button" class="btn btn-success" id="acceptTermsBtn"
+              style="border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;background:linear-gradient(135deg,#667eea,#764ba2);border:none;padding:0.5rem 1.4rem;"><i class="fas fa-check me-1"></i>Accept</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api-client.js"></script>
+  <script>
+    const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+
+    function notify(title, message) {
+      const c = document.getElementById('notification-container');
+      const n = document.createElement('div');
+      n.className = 'notification';
+      n.innerHTML = `<i class="fas fa-info-circle"></i><div><strong style="display:block;color:#2c3e50">${title}</strong><small class="text-muted">${message}</small></div>`;
+      c.appendChild(n);
+      requestAnimationFrame(() => n.classList.add('show'));
+      setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 400); }, 3000);
+    }
+
+    async function post(path, body) {
+      const res = await fetch(API_BASE + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    }
+
+    // Password toggles
+    function setupToggle(inputId, btnId, iconId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      const icon = document.getElementById(iconId);
+      if (!input || !btn || !icon) return;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+        else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+      });
+    }
+    setupToggle('password', 'togglePassword', 'passwordToggleIcon');
+    setupToggle('confirmPassword', 'toggleConfirmPassword', 'confirmPasswordToggleIcon');
+
+    // Password validation
+    let emailCache = '';
+    const createBtn = document.getElementById('createBtn');
+    const pw = document.getElementById('password');
+    const cpw = document.getElementById('confirmPassword');
+
+    function validatePw() {
+      const v = pw.value;
+      const checks = {
+        len: v.length >= 8, upper: /[A-Z]/.test(v), num: /\d/.test(v),
+        special: /[^A-Za-z0-9]/.test(v), match: v.length > 0 && v === cpw.value
+      };
+      const ids = ['reqLen', 'reqUpper', 'reqNum', 'reqSpecial', 'reqMatch'];
+      const vals = [checks.len, checks.upper, checks.num, checks.special, checks.match];
+      ids.forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.className = `fas ${vals[i] ? 'fa-check' : 'fa-times'}`;
+        el.style.color = vals[i] ? '#28a745' : '#dc3545';
+      });
+      createBtn.disabled = !(checks.len && checks.upper && checks.num && checks.special && checks.match);
+    }
+    pw.addEventListener('input', validatePw);
+    cpw.addEventListener('input', validatePw);
+
+    // Signup Form
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!document.getElementById('acceptTerms').checked) {
+        notify('Terms Required', 'Please accept the Terms and Conditions to continue');
+        return;
+      }
+      const name = `${document.getElementById('firstName').value.trim()} ${document.getElementById('lastName').value.trim()}`.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const verificationModalElement = document.getElementById('emailVerificationModal');
+      let verificationModal = bootstrap.Modal.getInstance(verificationModalElement);
+      if (!verificationModal) { verificationModal = new bootstrap.Modal(verificationModalElement, { backdrop: true, keyboard: true }); }
+
+      document.getElementById('verificationEmail').textContent = email;
+      emailCache = email;
+      const otpReset = document.getElementById('otp');
+      if (otpReset) { otpReset.value = ''; otpReset.placeholder = '000000'; }
+
+      const verifyBtn = document.getElementById('verifyBtn');
+      const originalVerifyBtnHTML = verifyBtn.innerHTML;
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending OTP...';
+
+      const modalMessage = document.getElementById('modalMessageText');
+      const originalMessage = modalMessage ? modalMessage.textContent : "We've sent a verification code to your email address";
+      if (modalMessage) {
+        modalMessage.innerHTML = '<i class="fas fa-spinner fa-spin me-2" style="color:#667eea;"></i>Sending verification code to your email...';
+        modalMessage.style.color = '#667eea';
+      }
+
+      verificationModal.show();
+
+      (async () => {
+        try {
+          await post('/auth/signup', { name, email, password });
+          if (modalMessage) { modalMessage.innerHTML = originalMessage; modalMessage.style.color = ''; }
+          verifyBtn.disabled = false;
+          verifyBtn.innerHTML = originalVerifyBtnHTML;
+          const otpInput = document.getElementById('otp');
+          if (otpInput) {
+            otpInput.disabled = false; otpInput.style.color = '#2c3e50';
+            otpInput.style.background = '#ffffff'; otpInput.style.cursor = 'text'; otpInput.style.opacity = '1';
+            setTimeout(() => otpInput.focus(), 100);
+          }
+          if (resendCooldownInterval) clearInterval(resendCooldownInterval);
+          resendCooldown = 30;
+          updateResendButton();
+          resendCooldownInterval = setInterval(() => { resendCooldown--; updateResendButton(); }, 1000);
+          notify('OTP Sent', 'Check your email for the verification code');
+        } catch (err) {
+          verificationModal.hide();
+          if (modalMessage) { modalMessage.innerHTML = originalMessage; modalMessage.style.color = ''; }
+          verifyBtn.disabled = false; verifyBtn.innerHTML = originalVerifyBtnHTML;
+          const otpInput = document.getElementById('otp');
+          if (otpInput) { otpInput.disabled = true; otpInput.value = ''; otpInput.placeholder = '000000'; otpInput.style.color = '#6c757d'; otpInput.style.background = '#f8f9fa'; otpInput.style.cursor = 'not-allowed'; }
+          const errorMsg = err.message || 'Please try again';
+          if (errorMsg.includes('already registered') || errorMsg.includes('already exists')) { notify('Email Already Registered', errorMsg); }
+          else { notify('Registration Failed', errorMsg); }
+        }
+      })();
+    });
+
+    document.getElementById('verifyBtn').addEventListener('click', async () => {
+      const code = document.getElementById('otp').value.trim();
+      if (!code) return notify('Enter OTP', 'Please enter the code sent to your email');
+      const verifyBtn = document.getElementById('verifyBtn');
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying...';
+      try {
+        await post('/auth/verify-email', { email: emailCache, code });
+        localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('isLoggedIn');
+        notify('Email Verified', 'Account created successfully! Please login to continue.');
+        const verificationModal = bootstrap.Modal.getInstance(document.getElementById('emailVerificationModal'));
+        verificationModal.hide();
+        setTimeout(() => { location.href = 'login.html'; }, 1500);
+      } catch (err) {
+        notify('Invalid OTP', err.message || 'Please try again');
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Verify Email';
+      }
+    });
+
+    // Resend OTP
+    let resendCooldown = 0;
+    let resendCooldownInterval = null;
+    const resendOtpBtn = document.getElementById('resendOtpBtn');
+    const resendOtpText = document.getElementById('resendOtpText');
+
+    function updateResendButton() {
+      if (resendCooldown > 0) {
+        resendOtpBtn.disabled = true; resendOtpBtn.style.color = '#999'; resendOtpBtn.style.cursor = 'not-allowed';
+        resendOtpText.textContent = `Resend OTP (${resendCooldown}s)`;
+      } else {
+        resendOtpBtn.disabled = false; resendOtpBtn.style.color = '#667eea'; resendOtpBtn.style.cursor = 'pointer';
+        resendOtpText.textContent = 'Resend OTP';
+        if (resendCooldownInterval) { clearInterval(resendCooldownInterval); resendCooldownInterval = null; }
+      }
+    }
+
+    const emailVerificationModal = document.getElementById('emailVerificationModal');
+    emailVerificationModal.addEventListener('hidden.bs.modal', function () {
+      if (resendCooldownInterval) { clearInterval(resendCooldownInterval); resendCooldownInterval = null; }
+      resendCooldown = 0;
+      resendOtpBtn.disabled = false; resendOtpBtn.style.color = '#667eea'; resendOtpBtn.style.cursor = 'pointer';
+      resendOtpText.textContent = 'Resend OTP';
+    });
+
+    resendOtpBtn.addEventListener('click', async () => {
+      if (!emailCache) { notify('Error', 'Email not found. Please sign up again.'); return; }
+      if (resendCooldown > 0) { notify('Please Wait', `You can resend OTP in ${resendCooldown} seconds`); return; }
+      resendOtpBtn.disabled = true; resendOtpText.textContent = 'Sending...';
+      try {
+        await post('/auth/resend-otp', { email: emailCache });
+        notify('OTP Resent', 'Check your email for the new verification code');
+        resendCooldown = 30; updateResendButton();
+        resendCooldownInterval = setInterval(() => { resendCooldown--; updateResendButton(); }, 1000);
+      } catch (err) {
+        notify('Failed to Resend', err.message || 'Please try again');
+        resendOtpText.textContent = 'Resend OTP'; resendOtpBtn.disabled = false;
+        resendOtpBtn.style.color = '#667eea'; resendOtpBtn.style.cursor = 'pointer';
+      }
+    });
+
+    // OTP Input Handler
+    const otpInput = document.getElementById('otp');
+    if (otpInput) {
+      otpInput.addEventListener('keydown', function (e) {
+        if ([8, 9, 27, 13, 46, 35, 36, 37, 38, 39, 40].includes(e.keyCode) ||
+          (e.ctrlKey && [65, 67, 86, 88].includes(e.keyCode))) return;
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) { e.preventDefault(); }
+      });
+      otpInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && this.value.length === 6) document.getElementById('verifyBtn').click();
+      });
+      otpInput.addEventListener('input', function (e) {
+        let value = this.value.replace(/[^0-9]/g, '');
+        if (value.length > 6) value = value.substring(0, 6);
+        this.value = value;
+        this.placeholder = value.length === 0 ? '000000' : (value.length < 6 ? '0'.repeat(6 - value.length) : '');
+      });
+      otpInput.addEventListener('paste', function (e) {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text');
+        const digits = pasted.replace(/[^0-9]/g, '').substring(0, 6);
+        this.value = digits;
+        this.placeholder = digits.length < 6 ? '0'.repeat(6 - digits.length) : '';
+        this.dispatchEvent(new Event('input', { bubbles: true }));
+        this.focus();
+      });
+      emailVerificationModal.addEventListener('hidden.bs.modal', function () {
+        otpInput.value = ''; otpInput.placeholder = '000000';
+        otpInput.disabled = true; otpInput.style.color = '#6c757d';
+        otpInput.style.background = '#f8f9fa'; otpInput.style.cursor = 'not-allowed'; otpInput.style.opacity = '0.7';
+      });
+    }
+
+    // OAuth
+    let oauthPopup = null;
+    let oauthPollInterval = null;
+    let oauthPollTimeout = null;
+
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (window.innerWidth <= 768) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    }
+
+    document.getElementById('googleBtn').addEventListener('click', async () => {
+      try {
+        notify('Google Sign Up', 'Opening Google account selector...');
+        const response = await fetch(API_BASE + '/oauth/google/url');
+        const data = await response.json();
+        if (!data.success || !data.data.url) throw new Error('Failed to get Google OAuth URL');
+        localStorage.setItem('oauth_return_url', window.location.href);
+        localStorage.setItem('oauth_provider', 'google');
+        window.location.href = data.data.url;
+      } catch (err) { notify('Google Sign Up Failed', err.message || 'Please try again'); }
+    });
+
+    document.getElementById('facebookBtn').addEventListener('click', async () => {
+      try {
+        notify('Facebook Sign Up', 'Opening Facebook login...');
+        const response = await fetch(API_BASE + '/oauth/facebook/url');
+        const data = await response.json();
+        if (!data.success || !data.data.url) throw new Error('Failed to get Facebook OAuth URL');
+        localStorage.setItem('oauth_return_url', window.location.href);
+        localStorage.setItem('oauth_provider', 'facebook');
+        window.location.href = data.data.url;
+      } catch (err) { notify('Facebook Sign Up Failed', err.message || 'Please try again'); }
+    });
+
+    function checkOAuthCallback() {
+      const cb = localStorage.getItem('oauth_callback');
+      if (cb) {
+        try {
+          const authData = JSON.parse(cb);
+          localStorage.removeItem('oauth_callback');
+          if (authData.type === 'GOOGLE_OAUTH_SUCCESS' || authData.type === 'FACEBOOK_OAUTH_SUCCESS') handleOAuthCallback(authData);
+        } catch (e) { localStorage.removeItem('oauth_callback'); }
+      }
+    }
+
+
+    async function handleOAuthCallback(authData) {
+      try {
+        const provider = authData.type === 'GOOGLE_OAUTH_SUCCESS' ? 'Google' : 'Facebook';
+        notify('Authenticating', 'Creating your account...');
+        const endpoint = authData.type === 'GOOGLE_OAUTH_SUCCESS' ? '/oauth/google/callback' : '/oauth/facebook/callback';
+        const authResponse = await fetch(API_BASE + endpoint, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: authData.code })
+        });
+        const authDataResponse = await authResponse.json();
+        if (!authDataResponse.success) throw new Error(authDataResponse.error || `${provider} authentication failed`);
+        const backendUser = authDataResponse.data.user;
+        const userData = {
+          ...backendUser,
+          preferredCurrency: backendUser.preferred_currency || backendUser.preferredCurrency || 'INR',
+          sidebar_collapsed: backendUser.sidebar_collapsed !== undefined ? backendUser.sidebar_collapsed : false
+        };
+        localStorage.setItem('token', authDataResponse.data.token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('isLoggedIn', 'true');
+        notify('Account Created!', 'Redirecting to dashboard...');
+        setTimeout(() => location.href = 'index.html', 800);
+      } catch (err) { notify(`Sign Up Failed`, err.message || 'Please try again'); }
+    }
+
+    let oauthMessageListener = async (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data.type !== 'GOOGLE_OAUTH_SUCCESS' && event.data.type !== 'FACEBOOK_OAUTH_SUCCESS') return;
+      if (oauthPopup && !oauthPopup.closed) { try { oauthPopup.close(); } catch (e) { } }
+      if (oauthPollInterval) { clearInterval(oauthPollInterval); oauthPollInterval = null; }
+      if (oauthPollTimeout) { clearTimeout(oauthPollTimeout); oauthPollTimeout = null; }
+      handleOAuthCallback(event.data);
+      window.removeEventListener('message', oauthMessageListener);
+    };
+    window.addEventListener('message', oauthMessageListener);
+
+    checkOAuthCallback();
+
+    if (localStorage.getItem('oauth_account_exists') === 'true') {
+      localStorage.removeItem('oauth_account_exists');
+      notify('Account Already Exists', 'This account is already registered. Redirecting to login...');
+      setTimeout(() => { window.location.href = 'login.html'; }, 2500);
+    }
+
+    if (isMobileDevice()) {
+      oauthPollInterval = setInterval(() => { checkOAuthCallback(); }, 1000);
+      setTimeout(() => { if (oauthPollInterval) { clearInterval(oauthPollInterval); oauthPollInterval = null; } }, 30000);
+    }
+
+    // Terms modal
+    document.getElementById('showTerms').addEventListener('click', (e) => {
+      e.preventDefault();
+      const modal = new bootstrap.Modal(document.getElementById('termsModal'));
+      modal.show();
+    });
+    document.getElementById('acceptTermsBtn').addEventListener('click', () => {
+      document.getElementById('acceptTerms').checked = true;
+      bootstrap.Modal.getInstance(document.getElementById('termsModal')).hide();
+    });
+    document.getElementById('rejectTerms').addEventListener('click', () => {
+      document.getElementById('acceptTerms').checked = false;
+      bootstrap.Modal.getInstance(document.getElementById('termsModal')).hide();
+    });
+
+    // Need Help - copy email
+    const emailContactItem = document.getElementById('emailContactItem');
+    if (emailContactItem) {
+      emailContactItem.addEventListener('click', function (e) {
+        if (e.target.closest('.copy-icon')) {
+          e.preventDefault(); e.stopPropagation();
+          navigator.clipboard.writeText('support@splitwise.space').then(() => {
+            const icon = this.querySelector('.copy-icon i');
+            icon.className = 'fas fa-check'; icon.style.color = '#28a745';
+            notify('Email Copied!', 'Email address copied to clipboard');
+            setTimeout(() => { icon.className = 'fas fa-copy'; icon.style.color = ''; }, 2000);
+          }).catch(() => notify('Copy Failed', 'Please manually copy the email'));
+        }
+      });
+    }
+
+    const needHelpLink = document.getElementById('needHelp');
+    if (needHelpLink) { needHelpLink.addEventListener('click', (e) => { e.preventDefault(); }); }
+
+    // Enter key
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const otpBox = document.getElementById('emailVerificationModal');
+        if (otpBox && otpBox.classList.contains('show')) { document.getElementById('verifyBtn').click(); }
+        else { document.getElementById('signupForm').dispatchEvent(new Event('submit')); }
+      }
+    });
+  </script>
+  <script src="js/sw-engine.js" defer></script>
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+  <!-- Block bottom overscroll (color gap) but keep pull-to-refresh working -->
+  <script>
+    (function () {
+      var startY = 0;
+      document.addEventListener('touchstart', function (e) {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        var scrollEl = document.scrollingElement || document.documentElement;
+        var atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 2;
+        var movingDown = e.touches[0].clientY < startY; // finger moving up = scrolling down
+        if (atBottom && movingDown) {
+          e.preventDefault(); // block overscroll at bottom only
+        }
+      }, { passive: false });
+    })();
+  </script>
+</body>
+
+</html>

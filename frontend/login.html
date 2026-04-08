@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Login - SplitWise</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="css/auth-split.css">
+  <link rel="stylesheet" href="css/design-system.css">
+
+  <style>
+    /* ── Override design-system.css body background on auth pages ── */
+    html, body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      background-color: #764ba2 !important; /* solid fallback shown during overscroll bounce */
+      overscroll-behavior-x: none !important; /* block horizontal bounce only */
+    }
+    /* Mobile: document scrolls naturally */
+
+    /* Force white text on gradient modal headers — overrides design-system global h-tag rule */
+    #forgotPasswordModal .modal-header h4,
+    #forgotPasswordModal .modal-header h4 i,
+    #needHelpModal .modal-header h5,
+    #needHelpModal .modal-header h5 i {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      font-weight: 800 !important;
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+    }
+    /* Subtitle p — white but NOT bold */
+    #forgotPasswordModal .modal-header p {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      font-weight: 400 !important;
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+    }
+    /* Force both modals over FULL viewport, centered (both panels visible behind) */
+    #needHelpModal.modal,
+    #forgotPasswordModal.modal {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    #needHelpModal .modal-dialog,
+    #forgotPasswordModal .modal-dialog {
+      margin: auto !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="notification-container" class="notification-container"></div>
+
+  <div class="auth-wrapper">
+
+    <!-- ===== LEFT PANEL ===== -->
+    <div class="auth-left">
+      <!-- Mesh texture -->
+      <div class="left-mesh"></div>
+      <!-- Centre vignette for depth -->
+      <div class="left-shade"></div>
+
+      <!-- Floating glow shapes -->
+      <div class="float-shape" style="width:160px;height:160px;top:5%;left:3%;background:radial-gradient(circle,rgba(167,139,250,0.18) 0%,transparent 70%);animation:floatAnim 7s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:100px;height:100px;top:60%;left:5%;background:radial-gradient(circle,rgba(99,102,241,0.2) 0%,transparent 70%);animation:floatAnim 9s 1s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:120px;height:120px;top:18%;right:5%;background:radial-gradient(circle,rgba(192,132,252,0.15) 0%,transparent 70%);animation:floatAnim 8s 2s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:70px;height:70px;top:78%;right:10%;background:radial-gradient(circle,rgba(167,139,250,0.18) 0%,transparent 70%);animation:floatAnim 6s 0.5s ease-in-out infinite;"></div>
+
+
+
+      <div class="auth-left-inner">
+        <div class="brand-logo">
+          <i class="fas fa-fingerprint"></i>
+        </div>
+
+        <h1 class="brand-name">SplitWise</h1>
+        <p class="brand-tagline">Your smart companion for managing<br>expenses and splitting bills</p>
+
+        <ul class="feature-list">
+          <li>
+            <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+            <span>Track personal & group expenses in real-time</span>
+          </li>
+          <li>
+            <div class="feature-icon"><i class="fas fa-users"></i></div>
+            <span>Split bills effortlessly with groups</span>
+          </li>
+          <li>
+            <div class="feature-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+            <span>Generate detailed PDF expense reports</span>
+          </li>
+          <li>
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <span>Secure login with Google & Facebook</span>
+          </li>
+        </ul>
+
+        <div class="trust-badges">
+          <div class="trust-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-bolt"></i>
+            <span>Real-time</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-file-pdf"></i>
+            <span>PDF Reports</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL ===== -->
+    <div class="auth-right">
+      <div class="auth-right-inner">
+
+        <div style="margin-bottom:1rem">
+          <a href="frontend.html" style="display:inline-flex;align-items:center;gap:6px;color:#764ba2;font-size:0.84rem;font-weight:700;text-decoration:none;padding:7px 18px;background:#fff;border-radius:50px;box-shadow:0 2px 10px rgba(118,75,162,0.15);transition:all .22s cubic-bezier(0.4,0,0.2,1)" onmouseover="this.style.background='#f3ebfe';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(118,75,162,0.22)'" onmouseout="this.style.background='#fff';this.style.transform='translateY(0)';this.style.boxShadow='0 2px 10px rgba(118,75,162,0.15)'">
+            <i class="fas fa-home" style="font-size:12px"></i> Back to Website
+          </a>
+        </div>
+        <div class="form-header">
+          <h2>Welcome Back 👋</h2>
+          <p>Login to manage your expenses smartly</p>
+        </div>
+
+        <form id="loginForm" autocomplete="off">
+          <!-- Email -->
+          <div class="field-group">
+            <label class="field-label" for="email"><i class="fas fa-envelope me-1"></i> Email Address</label>
+            <input type="email" class="field-input" id="email" placeholder="Enter your email" required
+              autocomplete="off">
+          </div>
+
+          <!-- Password -->
+          <div class="field-group">
+            <label class="field-label" for="password"><i class="fas fa-lock me-1"></i> Password</label>
+            <input type="password" class="field-input with-icon" id="password" placeholder="Enter your password"
+              required autocomplete="new-password">
+            <button type="button" class="field-icon-btn" id="togglePassword" tabindex="-1">
+              <i class="fas fa-eye" id="passwordToggleIcon"></i>
+            </button>
+          </div>
+
+          <!-- Forgot Password -->
+          <div class="forgot-row">
+            <a href="#" class="forgot-link" id="forgotLink"><i class="fas fa-key me-1"></i>Forgot Password?</a>
+          </div>
+
+          <!-- Login Button -->
+          <button type="submit" class="btn-main">
+            <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+          </button>
+
+          <!-- Social Divider -->
+          <div class="or-divider"><span>or continue with</span></div>
+
+          <!-- Social Buttons -->
+          <div class="social-row">
+            <button type="button" id="googleBtn" class="btn-social google">
+              <i class="fab fa-google"></i> Google
+            </button>
+            <button type="button" id="facebookBtn" class="btn-social facebook">
+              <i class="fab fa-facebook-f"></i> Facebook
+            </button>
+          </div>
+
+          <!-- Footer Links -->
+          <div class="auth-footer">
+            <span>Don't have an account? <a href="signup.html">Create Account</a></span>
+            <a href="#" class="help-link" id="needHelpLink" data-bs-toggle="modal" data-bs-target="#needHelpModal">
+              <i class="fas fa-headset me-1"></i>Need Help?
+            </a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NEED HELP MODAL ===== -->
+  <div class="modal fade need-help-modal modal-styled" id="needHelpModal" tabindex="-1" data-bs-backdrop="true"
+    data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <div class="help-icon"><i class="fas fa-headset"></i></div>
+            Need Help?
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="help-text">We're here to assist you! Reach out through any of the following channels:</p>
+          <a href="mailto:support@splitwise.space" class="contact-item" id="emailContactItem">
+            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+            <div class="contact-details">
+              <div class="contact-label">Email Address</div>
+              <div class="contact-value">support@splitwise.space</div>
+            </div>
+            <div class="copy-icon" title="Click to copy"><i class="fas fa-copy"></i></div>
+          </a>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+            style="border-radius:12px;padding:0.6rem 2rem;background:var(--primary-gradient);border:none;font-family:'Nunito',sans-serif;font-weight:700;">
+            <i class="fas fa-check me-2"></i>Got it
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FORGOT PASSWORD MODAL ===== -->
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h4 class="mb-1"><i class="fas fa-shield-alt me-2"></i>Reset Your Password</h4>
+            <p class="mb-0 opacity-75" style="font-size:0.9rem">Secure password recovery for your account</p>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Step 1: Enter Email -->
+          <div id="emailStep">
+            <div class="text-center mb-3">
+              <div class="d-inline-flex align-items-center justify-content-center"
+                style="width:70px;height:70px;background:var(--primary-gradient);border-radius:50%;margin-bottom:0.8rem">
+                <i class="fas fa-shield-alt" style="font-size:1.8rem;color:white"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Verify Your Identity</h5>
+              <p class="text-muted mb-0" style="font-size:0.9rem">Choose how to receive your verification code</p>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="fpEmail" placeholder="name@example.com">
+                <label for="fpEmail"><i class="fas fa-envelope me-2"></i>Email Address</label>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary w-100" id="sendCodeBtn"
+              style="padding:0.9rem;font-weight:600;position:relative;overflow:hidden">
+              <span class="btn-content"><i class="fas fa-paper-plane me-2"></i>Send Verification Code</span>
+              <span class="btn-loading" style="display:none"><span
+                  class="spinner-border spinner-border-sm me-2"></span>Sending...</span>
+            </button>
+          </div>
+
+          <!-- Step 2: Code + New Password -->
+          <div id="resetStep" style="display:none">
+
+            <!-- ── Compact Header ── -->
+            <div class="text-center mb-3">
+              <div style="width:52px;height:52px;background:#667eea;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.6rem">
+                <i class="fas fa-shield-alt" style="font-size:1.25rem;color:#fff"></i>
+              </div>
+              <h5 class="fw-bold mb-0" style="color:#312e81;font-size:1.05rem">Create New Password</h5>
+              <p class="mb-0" style="font-size:0.8rem;color:#6b7280;margin-top:0.2rem">Enter your verification code and set a new password</p>
+            </div>
+
+            <!-- ── Verification Code ── -->
+            <div class="mb-2">
+              <label class="fw-semibold d-block mb-1" style="font-size:0.8rem;color:#374151">
+                <i class="fas fa-envelope-open-text me-1" style="color:#667eea"></i>Verification Code
+              </label>
+              <div class="d-flex gap-2">
+                <input type="text" class="form-control" id="fpCode" placeholder="· · · · · ·" maxlength="6"
+                  style="border-radius:10px;text-align:center;font-size:1.25rem;font-weight:700;letter-spacing:0.4em;border:1.5px solid #d1d5db;padding:0.55rem 0.75rem;flex:1">
+                <button type="button" class="btn" id="resendCodeBtn"
+                  style="border-radius:10px;padding:0.55rem 1rem;background:#667eea;color:#fff;font-weight:600;border:none;white-space:nowrap;font-size:0.82rem;flex-shrink:0">
+                  <i class="fas fa-redo me-1"></i>Resend
+                </button>
+              </div>
+            </div>
+
+            <!-- ── New Password ── -->
+            <div class="mb-2">
+              <label class="fw-semibold d-block mb-1" style="font-size:0.8rem;color:#374151">
+                <i class="fas fa-lock me-1" style="color:#667eea"></i>New Password
+              </label>
+              <div style="position:relative">
+                <input type="password" class="form-control" id="fpPassword" placeholder="Create a strong password"
+                  style="border-radius:10px;border:1.5px solid #d1d5db;padding:0.6rem 2.8rem 0.6rem 0.9rem;font-size:0.92rem">
+                <button type="button" id="toggleFpPassword"
+                  style="position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;color:#9ca3af;cursor:pointer;padding:0;font-size:0.95rem;line-height:1">
+                  <i class="fas fa-eye" id="fpPasswordToggleIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- ── Confirm Password ── -->
+            <div class="mb-2">
+              <label class="fw-semibold d-block mb-1" style="font-size:0.8rem;color:#374151">
+                <i class="fas fa-lock me-1" style="color:#667eea"></i>Confirm New Password
+              </label>
+              <div style="position:relative">
+                <input type="password" class="form-control" id="fpConfirm" placeholder="Re-enter your password"
+                  style="border-radius:10px;border:1.5px solid #d1d5db;padding:0.6rem 2.8rem 0.6rem 0.9rem;font-size:0.92rem">
+                <button type="button" id="toggleFpConfirm"
+                  style="position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;color:#9ca3af;cursor:pointer;padding:0;font-size:0.95rem;line-height:1">
+                  <i class="fas fa-eye" id="fpConfirmToggleIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- ── Password Requirements ── -->
+            <div class="mb-3" style="background:#f5f3ff;border-radius:10px;border:1px solid #e0e7ff;padding:0.6rem 0.85rem">
+              <p class="mb-1" style="font-size:0.7rem;font-weight:700;color:#667eea;text-transform:uppercase;letter-spacing:0.05em">
+                <i class="fas fa-shield-alt me-1"></i>Password Requirements
+              </p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.18rem 0.4rem;font-size:0.76rem;color:#374151">
+                <div><i id="fpReqLen"     class="fas fa-times me-1" style="color:#ef4444;font-size:0.65rem"></i>8+ characters</div>
+                <div><i id="fpReqUpper"   class="fas fa-times me-1" style="color:#ef4444;font-size:0.65rem"></i>Uppercase letter</div>
+                <div><i id="fpReqNum"     class="fas fa-times me-1" style="color:#ef4444;font-size:0.65rem"></i>Number</div>
+                <div><i id="fpReqSpecial" class="fas fa-times me-1" style="color:#ef4444;font-size:0.65rem"></i>Special character</div>
+                <div><i id="fpReqMatch"   class="fas fa-times me-1" style="color:#ef4444;font-size:0.65rem"></i>Passwords match</div>
+                <div><i id="fpReqNotUsed" class="fas fa-times me-1" style="color:#ef4444;font-size:0.65rem"></i>Not used before</div>
+              </div>
+            </div>
+
+            <!-- ── Reset Button ── -->
+            <button type="button" class="btn w-100 mb-2" id="fpResetBtn"
+              style="padding:0.72rem;font-weight:700;border-radius:10px;background:#667eea;color:#fff;border:none;font-size:0.95rem">
+              <i class="fas fa-check-circle me-2"></i>Reset Password
+            </button>
+
+            <!-- ── Back Button ── -->
+            <button type="button" class="btn w-100" id="backToEmailBtn"
+              style="padding:0.55rem;border-radius:10px;font-size:0.88rem;border:1.5px solid #d1d5db;color:#6b7280;background:transparent;font-weight:600">
+              <i class="fas fa-arrow-left me-1"></i>Back
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+  <script>
+    const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+
+    function notify(title, message) {
+      const c = document.getElementById('notification-container');
+      const n = document.createElement('div');
+      n.className = 'notification';
+      n.innerHTML = `<i class="fas fa-info-circle"></i><div><strong style="display:block;color:#2c3e50">${title}</strong><small class="text-muted">${message}</small></div>`;
+      c.appendChild(n);
+      requestAnimationFrame(() => n.classList.add('show'));
+      setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 400); }, 3000);
+    }
+
+    async function api(path, body) {
+      const res = await fetch(API_BASE + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const errorMessage = data.error || data.message || `HTTP ${res.status}`;
+        const error = new Error(errorMessage);
+        error.status = res.status;
+        error.response = data;
+        throw error;
+      }
+      return data;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('DOM loaded - initializing login page');
+
+      // Check for OAuth callback in localStorage (from callback tab)
+      const oauthCallback = localStorage.getItem('oauth_callback');
+      if (oauthCallback) {
+        try {
+          const authData = JSON.parse(oauthCallback);
+          localStorage.removeItem('oauth_callback');
+          window.dispatchEvent(new MessageEvent('message', { data: authData, origin: window.location.origin }));
+        } catch (e) { console.error('Error processing OAuth callback:', e); }
+      }
+
+      // Password visibility toggle
+      const passwordInput = document.getElementById('password');
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+      if (togglePassword) {
+        togglePassword.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+          } else {
+            passwordInput.type = 'password';
+            passwordToggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+          }
+        });
+      }
+
+      // Login Form Submit
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        try {
+          notify('Authenticating...', 'Verifying your credentials');
+          const resp = await api('/auth/login', { email, password });
+          localStorage.removeItem('justLoggedOut');
+          localStorage.removeItem('logoutEvent');
+          const backendUser = resp.data.user;
+          const backendCurrency = backendUser.preferred_currency !== undefined ? backendUser.preferred_currency :
+            (backendUser.preferredCurrency !== undefined ? backendUser.preferredCurrency : null);
+          let finalCurrency = 'INR';
+          if (backendCurrency !== null && backendCurrency !== undefined) {
+            finalCurrency = backendCurrency || 'INR';
+          } else {
+            const existingUserStr = localStorage.getItem('user');
+            const existingUser = existingUserStr ? JSON.parse(existingUserStr) : null;
+            finalCurrency = (existingUser && existingUser.preferredCurrency) || 'INR';
+          }
+          const userData = { ...backendUser, preferredCurrency: finalCurrency, sidebar_collapsed: backendUser.sidebar_collapsed !== undefined ? backendUser.sidebar_collapsed : false };
+          delete userData.preferred_currency;
+          localStorage.setItem('token', resp.data.token);
+          localStorage.setItem('user', JSON.stringify(userData));
+          localStorage.setItem('isLoggedIn', 'true');
+          notify('Login Successful', 'Redirecting to dashboard...');
+          setTimeout(() => location.href = 'index.html', 800);
+        } catch (err) {
+          notify('Login Failed', err.message || 'Invalid credentials');
+        }
+      });
+
+      // Forgot Password Modal
+      document.getElementById('forgotLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+        modal.show();
+        document.getElementById('emailStep').style.display = 'block';
+        document.getElementById('resetStep').style.display = 'none';
+        document.getElementById('fpEmail').value = '';
+        document.getElementById('fpCode').value = '';
+        document.getElementById('fpPassword').value = '';
+        document.getElementById('fpConfirm').value = '';
+      });
+
+      // Password validation for forgot password
+      function validateFpPassword() {
+        const pw = document.getElementById('fpPassword').value;
+        const cpw = document.getElementById('fpConfirm').value;
+        const checks = {
+          len: pw.length >= 8, upper: /[A-Z]/.test(pw), num: /\d/.test(pw),
+          special: /[^A-Za-z0-9]/.test(pw), match: pw.length > 0 && pw === cpw, notUsed: true
+        };
+        ['fpReqLen', 'fpReqUpper', 'fpReqNum', 'fpReqSpecial', 'fpReqMatch'].forEach((id, i) => {
+          const ok = Object.values(checks)[i];
+          const el = document.getElementById(id);
+          el.className = `fas ${ok ? 'fa-check' : 'fa-times'} me-1`;
+          el.style.color = ok ? '#28a745' : '#dc3545';
+        });
+        return checks.len && checks.upper && checks.num && checks.special && checks.match;
+      }
+      document.getElementById('fpPassword').addEventListener('input', validateFpPassword);
+      document.getElementById('fpConfirm').addEventListener('input', validateFpPassword);
+
+      // Forgot password toggles
+      function setupFpToggle(inputId, btnId, iconId) {
+        const input = document.getElementById(inputId);
+        const btn = document.getElementById(btnId);
+        const icon = document.getElementById(iconId);
+        if (!input || !btn || !icon) return;
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+          else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+        });
+      }
+      document.getElementById('forgotLink').addEventListener('click', function () {
+        setTimeout(() => {
+          setupFpToggle('fpPassword', 'toggleFpPassword', 'fpPasswordToggleIcon');
+          setupFpToggle('fpConfirm', 'toggleFpConfirm', 'fpConfirmToggleIcon');
+        }, 100);
+      });
+
+      // Code input - only numbers
+      document.getElementById('fpCode').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); });
+
+      // Resend Code
+      document.getElementById('resendCodeBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const btn = e.target.closest('button');
+        const email = (document.getElementById('fpEmail').value || '').trim();
+        if (!email) return notify('Email Required', 'Please enter your email first');
+        btn.disabled = true;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try {
+          const response = await api('/auth/forgot-password', { email });
+          if (response && response.success) {
+            notify('Code Resent', 'OTP has been resent to your email');
+            let countdown = 60;
+            const interval = setInterval(() => {
+              countdown--;
+              btn.innerHTML = `<i class="fas fa-clock me-1"></i>${countdown}s`;
+              if (countdown <= 0) { clearInterval(interval); btn.innerHTML = originalHTML; btn.disabled = false; }
+            }, 1000);
+          } else { notify('Failed', response?.error || 'Could not resend code'); btn.innerHTML = originalHTML; btn.disabled = false; }
+        } catch (err) {
+          const errorMsg = err.message || 'Could not resend code';
+          if (err.status === 404 || errorMsg.toLowerCase().includes('not registered') || errorMsg.toLowerCase().includes('email is not')) {
+            notify('Email Not Found', 'This email is not registered');
+          } else { notify('Failed', errorMsg); }
+          btn.innerHTML = originalHTML; btn.disabled = false;
+        }
+      });
+
+      // Send Code
+      const sendCodeButton = document.getElementById('sendCodeBtn');
+      if (sendCodeButton) {
+        sendCodeButton.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const btn = e.currentTarget;
+          const btnContent = btn.querySelector('.btn-content');
+          const btnLoading = btn.querySelector('.btn-loading');
+          const email = (document.getElementById('fpEmail').value || '').trim();
+          if (!email) return notify('Missing Email', 'Please enter your email address');
+          if (!email.includes('@')) return notify('Invalid Email', 'Please enter a valid email address');
+          btnContent.style.display = 'none'; btnLoading.style.display = 'inline'; btn.disabled = true;
+          try {
+            const response = await api('/auth/forgot-password', { email });
+            if (response && response.success) {
+              notify('Code Sent', 'OTP has been sent to your email');
+              document.getElementById('emailStep').style.display = 'none';
+              document.getElementById('resetStep').style.display = 'block';
+            } else { notify('Failed', response?.error || 'Could not send code. Please try again.'); }
+          } catch (err) {
+            const errorMsg = err.message || 'Could not send code';
+            if (err.status === 404 || errorMsg.toLowerCase().includes('not registered') || errorMsg.toLowerCase().includes('email is not')) {
+              notify('Email Not Found', 'This email is not registered');
+            } else { notify('Failed', errorMsg); }
+          } finally { btnContent.style.display = 'inline'; btnLoading.style.display = 'none'; btn.disabled = false; }
+        });
+      }
+
+      // Back button
+      document.getElementById('backToEmailBtn').addEventListener('click', () => {
+        document.getElementById('resetStep').style.display = 'none';
+        document.getElementById('emailStep').style.display = 'block';
+      });
+
+      // Reset Password
+      document.getElementById('fpResetBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!validateFpPassword()) return notify('Invalid Password', 'Please meet all password requirements');
+        const email = (document.getElementById('fpEmail').value || '').trim();
+        const code = (document.getElementById('fpCode').value || '').trim();
+        const password = document.getElementById('fpPassword').value;
+        const confirm = document.getElementById('fpConfirm').value;
+        if (!email) return notify('Missing Email', 'Please enter your email address');
+        if (!code) return notify('Missing Code', 'Please enter the verification code');
+        if (!password || !confirm) return notify('Missing Fields', 'Please fill all password fields');
+        document.getElementById('fpReqNotUsed').className = 'fas fa-spinner fa-spin me-1';
+        document.getElementById('fpReqNotUsed').style.color = '#6c757d';
+        try {
+          const res = await fetch(API_BASE + '/auth/reset-password', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, password })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+          document.getElementById('fpReqNotUsed').className = 'fas fa-check me-1';
+          document.getElementById('fpReqNotUsed').style.color = '#28a745';
+          notify('Password Updated!', 'You can now log in with your new password');
+          setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+            modal.hide();
+          }, 1500);
+          document.getElementById('fpEmail').value = ''; document.getElementById('fpCode').value = '';
+          document.getElementById('fpPassword').value = ''; document.getElementById('fpConfirm').value = '';
+        } catch (err) {
+          document.getElementById('fpReqNotUsed').className = 'fas fa-times me-1';
+          document.getElementById('fpReqNotUsed').style.color = '#dc3545';
+          if (err.message && (err.message.toLowerCase().includes('reuse') || err.message.toLowerCase().includes('previously'))) {
+            notify('Password Previously Used', 'Please choose a completely new password.');
+          } else { notify('Reset Failed', err.message || 'Invalid code or request'); }
+        }
+      });
+
+      // OAuth vars
+      let oauthPopup = null;
+      let oauthPollInterval = null;
+      let oauthPollTimeout = null;
+
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+          (window.innerWidth <= 768) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      }
+
+      // Silent warm-up ping on page load (backend cold-start fix)
+      fetch(API_BASE + '/health', { method: 'GET', cache: 'no-store' }).catch(function(){});
+
+      // Google OAuth
+      document.getElementById('googleBtn').addEventListener('click', async () => {
+        try {
+          notify('Google Login', 'Opening Google account selector...');
+          const response = await fetch(API_BASE + '/oauth/google/url');
+          const data = await response.json();
+          if (!data.success || !data.data.url) throw new Error('Failed to get Google OAuth URL');
+          localStorage.setItem('oauth_return_url', window.location.href);
+          localStorage.setItem('oauth_provider', 'google');
+          window.location.href = data.data.url;
+        } catch (err) {
+          notify('Google Login Failed', err.message || 'Please try again');
+        }
+      });
+
+      // Facebook OAuth
+      document.getElementById('facebookBtn').addEventListener('click', async () => {
+        try {
+          notify('Facebook Login', 'Opening Facebook login...');
+          const response = await fetch(API_BASE + '/oauth/facebook/url');
+          const data = await response.json();
+          if (!data.success || !data.data.url) throw new Error('Failed to get Facebook OAuth URL');
+          localStorage.setItem('oauth_return_url', window.location.href);
+          localStorage.setItem('oauth_provider', 'facebook');
+          window.location.href = data.data.url;
+        } catch (err) {
+          notify('Facebook Login Failed', err.message || 'Please try again');
+        }
+      });
+
+      function checkOAuthCallback() {
+        const oauthCallback = localStorage.getItem('oauth_callback');
+        if (oauthCallback) {
+          try {
+            const authData = JSON.parse(oauthCallback);
+            localStorage.removeItem('oauth_callback');
+            if (authData.type === 'GOOGLE_OAUTH_SUCCESS' || authData.type === 'FACEBOOK_OAUTH_SUCCESS') {
+              handleOAuthCallback(authData);
+            }
+          } catch (e) { localStorage.removeItem('oauth_callback'); }
+        }
+      }
+
+      async function handleOAuthCallback(authData) {
+        try {
+          const provider = authData.type === 'GOOGLE_OAUTH_SUCCESS' ? 'Google' : 'Facebook';
+          notify('Authenticating', `Verifying with ${provider}...`);
+          const endpoint = authData.type === 'GOOGLE_OAUTH_SUCCESS' ? '/oauth/google/callback' : '/oauth/facebook/callback';
+          const authResponse = await fetch(API_BASE + endpoint, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: authData.code })
+          });
+          const authDataResponse = await authResponse.json();
+          if (!authDataResponse.success) throw new Error(authDataResponse.error || `${provider} authentication failed`);
+          localStorage.removeItem('justLoggedOut'); localStorage.removeItem('logoutEvent');
+          const backendUser = authDataResponse.data.user;
+          const backendCurrency = backendUser.preferred_currency !== undefined ? backendUser.preferred_currency :
+            (backendUser.preferredCurrency !== undefined ? backendUser.preferredCurrency : null);
+          let finalCurrency = 'INR';
+          if (backendCurrency !== null && backendCurrency !== undefined) { finalCurrency = backendCurrency || 'INR'; }
+          else { const eu = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null; finalCurrency = (eu && eu.preferredCurrency) || 'INR'; }
+          const userData = { ...backendUser, preferredCurrency: finalCurrency, sidebar_collapsed: backendUser.sidebar_collapsed !== undefined ? backendUser.sidebar_collapsed : false };
+          delete userData.preferred_currency;
+          localStorage.setItem('token', authDataResponse.data.token);
+          localStorage.setItem('user', JSON.stringify(userData));
+          localStorage.setItem('isLoggedIn', 'true');
+          notify(`${provider} Login Successful`, 'Redirecting to dashboard...');
+          setTimeout(() => location.href = 'index.html', 800);
+        } catch (err) { notify('Login Failed', err.message || 'Please try again'); }
+      }
+
+      // Message listener (popup method)
+      let oauthMessageListener = async (event) => {
+        if (event.origin !== window.location.origin) return;
+        if (event.data.type !== 'GOOGLE_OAUTH_SUCCESS' && event.data.type !== 'FACEBOOK_OAUTH_SUCCESS') return;
+        if (event.data.success && event.data.data) {
+          const provider = event.data.type === 'GOOGLE_OAUTH_SUCCESS' ? 'Google' : 'Facebook';
+          if (oauthPopup && !oauthPopup.closed) oauthPopup.close();
+          notify(`${provider} Login Successful`, 'Redirecting to dashboard...');
+          setTimeout(() => { window.location.href = 'index.html'; }, 800);
+          return;
+        }
+        if (oauthPopup && !oauthPopup.closed) { try { oauthPopup.close(); } catch (e) { } }
+        if (oauthPollInterval) { clearInterval(oauthPollInterval); oauthPollInterval = null; }
+        if (oauthPollTimeout) { clearTimeout(oauthPollTimeout); oauthPollTimeout = null; }
+        handleOAuthCallback(event.data);
+        window.removeEventListener('message', oauthMessageListener);
+      };
+      window.addEventListener('message', oauthMessageListener);
+
+      checkOAuthCallback();
+
+      if (localStorage.getItem('oauth_login_success') === 'true') {
+        localStorage.removeItem('oauth_login_success');
+        notify('Login Successful', 'Redirecting to dashboard...');
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+      }
+
+      if (isMobileDevice()) {
+        oauthPollInterval = setInterval(() => { checkOAuthCallback(); }, 1000);
+        setTimeout(() => { if (oauthPollInterval) { clearInterval(oauthPollInterval); oauthPollInterval = null; } }, 30000);
+      }
+
+      // Need Help - copy email
+      const emailContactItem = document.getElementById('emailContactItem');
+      if (emailContactItem) {
+        emailContactItem.addEventListener('click', function (e) {
+          if (e.target.closest('.copy-icon')) {
+            e.preventDefault(); e.stopPropagation();
+            navigator.clipboard.writeText('support@splitwise.space').then(() => {
+              const icon = this.querySelector('.copy-icon i');
+              icon.className = 'fas fa-check';
+              icon.style.color = '#28a745';
+              notify('Email Copied!', 'Email address copied to clipboard');
+              setTimeout(() => { icon.className = 'fas fa-copy'; icon.style.color = ''; }, 2000);
+            }).catch(() => notify('Copy Failed', 'Please manually copy the email'));
+          }
+        });
+      }
+
+      // Enter key
+      document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const forgotModal = document.getElementById('forgotPasswordModal');
+          if (forgotModal.classList.contains('show')) {
+            const resetStep = document.getElementById('resetStep');
+            if (resetStep.style.display === 'block') { document.getElementById('fpResetBtn').click(); }
+            else { document.getElementById('sendCodeBtn').click(); }
+          } else {
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+          }
+        }
+      });
+
+      console.log('All event listeners attached successfully');
+    });
+  </script>
+  <script src="js/sw-engine.js" defer></script>
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+  <!-- Block bottom overscroll (color gap) but keep pull-to-refresh working -->
+  <script>
+    (function () {
+      var startY = 0;
+      document.addEventListener('touchstart', function (e) {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        // Always check DOCUMENT scroll position (not .auth-right)
+        var scrollEl = document.scrollingElement || document.documentElement;
+        var atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 2;
+        var movingDown = e.touches[0].clientY < startY; // finger moving up = scrolling down
+        if (atBottom && movingDown) {
+          e.preventDefault(); // block bottom overscroll only � pull-to-refresh still works
+        }
+      }, { passive: false });
+    })();
+  </script>
+</body>
+
+</html>

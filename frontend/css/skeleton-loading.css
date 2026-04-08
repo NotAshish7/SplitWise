@@ -1,0 +1,744 @@
+/* Skeleton Loading Styles - Shimmer Effect */
+/* Premium skeleton loading with vibrant shimmer animation */
+
+.skeleton {
+    /* Strong, clearly visible shimmer */
+    background: linear-gradient(90deg,
+            #e8e8e8 0%,
+            #f5f5f5 20%,
+            #ffffff 40%,
+            #f0f0f0 60%,
+            #e8e8e8 80%,
+            #e8e8e8 100%);
+    background-size: 300% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    border: none !important;
+    outline: none !important;
+    will-change: background-position;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light theme skeleton - fully visible shimmer */
+body:not(.dark-theme) .skeleton {
+    background: linear-gradient(90deg,
+            #ebebeb 0%,
+            #f5f5f5 25%,
+            #ffffff 45%,
+            #f5f5f5 65%,
+            #ebebeb 100%);
+    background-size: 300% 100%;
+}
+
+/* Shimmer animation - smooth, continuous, premium feel */
+@keyframes shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+
+/* Dark theme skeleton - darker base, clearer shimmer */
+body.dark-theme .skeleton {
+    background: linear-gradient(90deg,
+            #2a2a2a 0%,
+            #333333 25%,
+            #3d3d3d 45%,
+            #333333 65%,
+            #2a2a2a 100%);
+    background-size: 300% 100%;
+}
+
+
+/* Optimize animation performance */
+@media (prefers-reduced-motion: no-preference) {
+    .skeleton {
+        animation: shimmer 1.8s ease-in-out infinite;
+    }
+}
+
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton {
+        animation: none;
+        background: #e8e8e8;
+    }
+
+    body:not(.dark-theme) .skeleton {
+        background: #e0e0e0;
+    }
+
+    body.dark-theme .skeleton {
+        background: #2e2e2e;
+    }
+}
+
+
+
+/* Skeleton variants with modern styling */
+.skeleton-circle {
+    border-radius: 50%;
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+}
+
+.skeleton-text:last-child {
+    margin-bottom: 0;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 60%;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.skeleton-subtitle {
+    height: 1.2rem;
+    width: 40%;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+}
+
+.skeleton-amount {
+    height: 2rem;
+    width: 50%;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+}
+
+.skeleton-button {
+    height: 2.5rem;
+    width: 120px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* Staggered animation for cascading load effect (YouTube-style) */
+.skeleton-stagger-1 {
+    animation-delay: 0.05s;
+}
+
+.skeleton-stagger-2 {
+    animation-delay: 0.1s;
+}
+
+.skeleton-stagger-3 {
+    animation-delay: 0.15s;
+}
+
+.skeleton-stagger-4 {
+    animation-delay: 0.2s;
+}
+
+.skeleton-stagger-5 {
+    animation-delay: 0.25s;
+}
+
+.skeleton-stagger-6 {
+    animation-delay: 0.3s;
+}
+
+.skeleton-stagger-7 {
+    animation-delay: 0.35s;
+}
+
+.skeleton-stagger-8 {
+    animation-delay: 0.4s;
+}
+
+/* Faster stagger for table rows */
+.skeleton-row-stagger-1 {
+    animation-delay: 0.03s;
+}
+
+.skeleton-row-stagger-2 {
+    animation-delay: 0.06s;
+}
+
+.skeleton-row-stagger-3 {
+    animation-delay: 0.09s;
+}
+
+.skeleton-row-stagger-4 {
+    animation-delay: 0.12s;
+}
+
+.skeleton-row-stagger-5 {
+    animation-delay: 0.15s;
+}
+
+.skeleton-row-stagger-6 {
+    animation-delay: 0.18s;
+}
+
+.skeleton-row-stagger-7 {
+    animation-delay: 0.21s;
+}
+
+.skeleton-row-stagger-8 {
+    animation-delay: 0.24s;
+}
+
+.skeleton-row-stagger-9 {
+    animation-delay: 0.27s;
+}
+
+.skeleton-row-stagger-10 {
+    animation-delay: 0.3s;
+}
+
+
+/* Ensure skeleton in table header has proper styling (white text on gradient background) */
+thead .skeleton,
+thead .skeleton-text {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+thead .skeleton-text {
+    height: 1rem;
+    border-radius: 4px;
+}
+
+.skeleton-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.skeleton-card {
+    background: var(--card-bg, #ffffff);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.1));
+    margin-bottom: 1.5rem;
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    outline: none !important;
+}
+
+.skeleton-card::before,
+.skeleton-card::after {
+    display: none !important;
+    content: none !important;
+}
+
+.dark-theme .skeleton-card {
+    background: #1a1a1a;
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    outline: none !important;
+}
+
+/* Stats Card Skeleton */
+.skeleton-stats-card {
+    background: var(--card-bg, #ffffff);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.1));
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: none !important;
+    outline: none !important;
+}
+
+.dark-theme .skeleton-stats-card {
+    background: #1a1a1a;
+    border: none !important;
+    outline: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-stats-card .skeleton-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.skeleton-stats-card .skeleton-title {
+    width: 70%;
+    height: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-stats-card .skeleton-amount {
+    width: 60%;
+    height: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-stats-card .skeleton-text {
+    width: 50%;
+    height: 0.875rem;
+}
+
+/* Table Row Skeleton */
+.skeleton-table-row {
+    border-bottom: none !important;
+    border-top: none !important;
+}
+
+.dark-theme .skeleton-table-row {
+    border-bottom: none !important;
+    border-top: none !important;
+}
+
+.skeleton-table-row td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
+.skeleton-table-row .skeleton {
+    margin-bottom: 0;
+    display: inline-block;
+}
+
+/* List Item Skeleton */
+.skeleton-list-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dark-theme .skeleton-list-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skeleton-list-item .skeleton-avatar {
+    flex-shrink: 0;
+}
+
+.skeleton-list-item .skeleton-content {
+    flex: 1;
+}
+
+.skeleton-list-item .skeleton-title {
+    width: 60%;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-list-item .skeleton-text {
+    width: 80%;
+}
+
+/* Chart Skeleton */
+.skeleton-chart {
+    height: 300px;
+    border-radius: 8px;
+    margin-bottom: 0;
+}
+
+/* Ensure skeleton cards match exact dimensions of real dashboard tiles */
+.skeleton-container .stats-card {
+    padding: 2rem !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    height: 100% !important;
+    min-height: auto;
+}
+
+.skeleton-container .action-card {
+    padding: 2.2rem !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.skeleton-container .chart-container {
+    padding: 2rem !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    margin-top: 3rem !important;
+}
+
+/* Ensure Quick Actions grid matches */
+.skeleton-container .quick-actions {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: 1.8rem !important;
+    margin-top: 3rem !important;
+}
+
+/* Ensure skeleton cards match exact dimensions of real groups page tiles */
+.skeleton-container .card {
+    padding: 2rem !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    height: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+.skeleton-container .group-card {
+    padding: 1.5rem !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Ensure skeleton buttons match exact button sizes */
+.skeleton-container .skeleton-button {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Group Card Skeleton */
+.skeleton-group-card {
+    background: var(--card-bg, #ffffff);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.1));
+    margin-bottom: 1.5rem;
+    border: none !important;
+    outline: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.dark-theme .skeleton-group-card {
+    background: #1a1a1a;
+    border: none !important;
+    outline: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-group-card .skeleton-title {
+    width: 70%;
+    height: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.skeleton-group-card .skeleton-text {
+    width: 90%;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-group-card .skeleton-text:nth-child(3) {
+    width: 60%;
+}
+
+.skeleton-group-card .skeleton-button {
+    margin-top: 1rem;
+    width: 100px;
+}
+
+/* Dashboard Stats Skeleton */
+.skeleton-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Expenses List Skeleton */
+.skeleton-expenses-list {
+    margin-top: 1rem;
+}
+
+.skeleton-expenses-list .skeleton-table-row {
+    margin-bottom: 0.5rem;
+}
+
+/* Groups Grid Skeleton */
+.skeleton-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Fade in animation when content loads - smooth and premium */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98) translateZ(0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1) translateZ(0);
+    }
+}
+
+/* Staggered fade-in for multiple elements - YouTube style */
+@keyframes fadeInStagger {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98) translateZ(0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1) translateZ(0);
+    }
+}
+
+.content-loaded {
+    animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: opacity, transform;
+    opacity: 0;
+}
+
+.content-loaded-visible {
+    opacity: 1;
+    animation: fadeInStagger 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Smooth fade-in for stat cards with modern easing */
+.stat-card.content-appearing {
+    animation: fadeInStagger 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0;
+}
+
+/* Smooth fade-in for table rows */
+.expense-row-animate {
+    animation: fadeInStagger 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0;
+}
+
+/* Smooth fade-in for group cards */
+.group-card-appearing {
+    animation: fadeInStagger 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0;
+}
+
+/* Smooth fade out for skeleton with subtle scale */
+.skeleton-container.fade-out {
+    animation: fadeOut 0.35s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    will-change: opacity, transform;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateZ(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.98) translateZ(0);
+    }
+}
+
+/* Hide skeleton when content is loaded */
+.skeleton-container.hidden {
+    display: none;
+}
+
+/* Smooth transition for skeleton containers */
+.skeleton-container {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Ensure smooth rendering */
+.skeleton-stats-card,
+.skeleton-card,
+.skeleton-group-card {
+    will-change: background-position;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Remove all borders from skeleton stat cards - highest specificity */
+.skeleton-stat-card-wrapper,
+.skeleton-stat-card-wrapper.stat-card,
+#quickStats .skeleton-stat-card-wrapper,
+#quickStats .skeleton-container .stat-card,
+.skeleton-container .skeleton-stat-card-wrapper,
+.skeleton-container .stat-card {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    outline: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Reduce gap between skeleton tiles and content below - AGGRESSIVE */
+#quickStats.skeleton-loading,
+#quickStats:has(.skeleton-container),
+.row.mb-4.skeleton-loading,
+.row.mb-4:has(.skeleton-container),
+#quickStats:has(.skeleton-stat-card-wrapper),
+.row.mb-4:has(.skeleton-stats-card) {
+    margin-bottom: 0.25rem !important;
+    padding-bottom: 0 !important;
+}
+
+/* Reduce spacing for skeleton containers */
+.skeleton-container {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Ensure skeleton rows have reduced spacing */
+#quickStats.skeleton-loading {
+    margin-bottom: 0.25rem !important;
+    padding-bottom: 0 !important;
+}
+
+.row.mb-4.skeleton-loading {
+    margin-bottom: 0.25rem !important;
+    padding-bottom: 0 !important;
+}
+
+/* Additional gap reduction for expenses page - target the section below quickStats */
+#quickStats+.row,
+#quickStats+div:not(.skeleton-container),
+#quickStats.skeleton-loading+.row,
+#quickStats.skeleton-loading+div:not(.skeleton-container) {
+    margin-top: 0.5rem !important;
+}
+
+/* Target the filter/navigation section that comes after quickStats */
+#quickStats~.row:has(.btn),
+#quickStats~.d-flex:has(.btn) {
+    margin-top: 0.5rem !important;
+}
+
+/* Additional gap reduction for groups page */
+.row.mb-4.skeleton-loading+#groupsContainer,
+.row.mb-4.skeleton-loading+.row {
+    margin-top: 0.5rem !important;
+}
+
+/* Ensure no extra spacing on skeleton stat cards */
+.skeleton-stat-card-wrapper,
+.skeleton-stats-card {
+    margin-bottom: 0 !important;
+}
+
+/* Reduce mb-3 and mb-4 on skeleton containers */
+#quickStats.skeleton-loading .mb-3,
+#quickStats.skeleton-loading .mb-4,
+.row.mb-4.skeleton-loading .mb-3,
+.row.mb-4.skeleton-loading .mb-4 {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Target the row that contains filter buttons on expenses page */
+#quickStats~.row.mt-3,
+#quickStats~.row.mt-4 {
+    margin-top: 0.5rem !important;
+}
+
+/* When skeleton is loading, reduce margin on the entire quickStats row */
+#quickStats.skeleton-loading {
+    margin-bottom: 0.25rem !important;
+}
+
+/* After skeleton is removed, ensure proper spacing */
+#quickStats:not(.skeleton-loading):not(:has(.skeleton-container)) {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Remove borders from skeleton containers */
+.skeleton-container .stat-card,
+.skeleton-container .skeleton-stat-card-wrapper,
+.skeleton-container .col-md-3 .stat-card,
+.skeleton-container .col-md-3 .skeleton-stat-card-wrapper {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    outline: none !important;
+}
+
+/* Remove any pseudo-element borders */
+.skeleton-container .stat-card::before,
+.skeleton-container .stat-card::after,
+.skeleton-container .skeleton-stat-card-wrapper::before,
+.skeleton-container .skeleton-stat-card-wrapper::after,
+.skeleton-stat-card-wrapper::before,
+.skeleton-stat-card-wrapper::after,
+.skeleton-stat-card-wrapper.stat-card::before,
+.skeleton-stat-card-wrapper.stat-card::after {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* EXACT MATCH: Ensure skeleton elements match real element dimensions */
+.skeleton-container .stat-card,
+.skeleton-container .card,
+.skeleton-container .stats-card,
+.skeleton-container .action-card,
+.skeleton-container .group-card {
+    /* Match exact dimensions */
+    min-height: inherit !important;
+    height: inherit !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure skeleton table rows match real table row heights and padding */
+.skeleton-table-row td {
+    padding: 1rem !important;
+    vertical-align: middle !important;
+    height: auto !important;
+}
+
+/* Ensure skeleton buttons match real button sizes */
+.skeleton-container .skeleton-button {
+    box-sizing: border-box !important;
+    display: inline-block !important;
+    line-height: normal !important;
+}
+
+/* Ensure skeleton filter bar elements match */
+.skeleton-container .btn-group,
+.skeleton-container .input-group {
+    display: flex !important;
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure skeleton search bar matches */
+.skeleton-container .input-group-text {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure skeleton table header matches */
+.skeleton-container thead th {
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+}

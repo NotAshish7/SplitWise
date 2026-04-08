@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta name="theme-color" content="transparent"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard — SplitWise</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSb()"></div>
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sb" id="sb">
+    <div class="sb-head">
+      <div class="sb-ico">???</div>
+      <div>
+        <div class="sb-brand">SplitWise</div>
+        <div class="sb-role"><span class="admin-badge">Admin</span> Portal</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-sec">Main</div>
+      <button class="nl active" onclick="showPage('overview',this)"><i class="fa fa-chart-pie"></i> Overview</button>
+      <button class="nl" onclick="showPage('tickets',this)"><i class="fa fa-ticket"></i> All Tickets <span class="nbadge" id="openCount">0</span></button>
+      <div class="nav-sec">Management</div>
+      <button class="nl" onclick="showPage('agents',this)"><i class="fa fa-users"></i> Agents</button>
+      <button class="nl" onclick="showPage('keys',this)"><i class="fa fa-key"></i> Access Keys</button>
+      <button class="nl" onclick="showPage('settings',this)"><i class="fa fa-cog"></i> Settings</button>
+    </nav>
+    <div class="sb-foot">
+      <div class="av" id="sbAv">A</div>
+      <div><div class="nm" id="sbName">Admin</div><div class="rl">Administrator</div></div>
+      <button class="lbtn" onclick="logout()" title="Logout"><i class="fa fa-sign-out"></i></button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hbtn" onclick="openSb()"><i class="fa fa-bars"></i></button>
+      <h2 id="pageTitle">Overview</h2>
+      <div class="srch"><i class="fa fa-search"></i><input type="text" id="srchInput" placeholder="Search tickets..." oninput="debounceSearch()"></div>
+      <button class="ibtn" onclick="loadPage()" title="Refresh"><i class="fa fa-rotate-right" id="refreshIco"></i></button>
+      <button class="ibtn" onclick="showPage('tickets',document.querySelector('.nl:nth-child(2)'))" title="Tickets"><i class="fa fa-ticket"></i></button>
+    </div>
+
+    <!-- OVERVIEW PAGE -->
+    <div class="page active" id="page-overview">
+      <div class="ov-scroll">
+        <div class="stats-grid" id="statsGrid">
+          <div class="scard c-purple" onclick="showPage('tickets',null,'all')">
+            <div class="sc-ico ci-purple"><i class="fa fa-ticket"></i></div>
+            <div class="sc-val" id="st-total">—</div>
+            <div class="sc-lbl">Total Tickets</div>
+          </div>
+          <div class="scard c-blue" onclick="showPage('tickets',null,'open')">
+            <div class="sc-ico ci-blue"><i class="fa fa-circle-dot"></i></div>
+            <div class="sc-val" id="st-open">—</div>
+            <div class="sc-lbl">Open</div>
+          </div>
+          <div class="scard c-amber" onclick="showPage('tickets',null,'in_progress')">
+            <div class="sc-ico ci-amber"><i class="fa fa-spinner"></i></div>
+            <div class="sc-val" id="st-inprog">—</div>
+            <div class="sc-lbl">In Progress</div>
+          </div>
+          <div class="scard c-green" onclick="showPage('tickets',null,'closed')">
+            <div class="sc-ico ci-green"><i class="fa fa-check-circle"></i></div>
+            <div class="sc-val" id="st-closed">—</div>
+            <div class="sc-lbl">Resolved</div>
+          </div>
+          <div class="scard c-red">
+            <div class="sc-ico ci-red"><i class="fa fa-fire"></i></div>
+            <div class="sc-val" id="st-urgent">—</div>
+            <div class="sc-lbl">Urgent</div>
+          </div>
+        </div>
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="ch-head"><h3>Ticket Status Breakdown</h3><span id="chartUpdated">—</span></div>
+            <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="ch-head"><h3>Priority Distribution</h3></div>
+            <div class="chart-wrap"><canvas id="priorityChart"></canvas></div>
+          </div>
+        </div>
+        <div class="recent-card">
+          <div class="rc-head">
+            <h3>Recent Tickets</h3>
+            <button class="view-all" onclick="showPage('tickets',document.querySelectorAll('.nl')[1])">View All ?</button>
+          </div>
+          <div id="recentTable"><div class="spin"><i class="fa fa-spinner fa-spin"></i></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKETS PAGE -->
+    <div class="page" id="page-tickets">
+      <div class="filter-bar">
+        <select class="fsel" id="fStatus" onchange="applyFilters()">
+          <option value="">All Status</option>
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="closed">Closed</option>
+        </select>
+        <select class="fsel" id="fPriority" onchange="applyFilters()">
+          <option value="">All Priority</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+        <select class="fsel" id="fAssigned" onchange="applyFilters()">
+          <option value="">All Assigned</option>
+          <option value="unassigned">Unassigned</option>
+        </select>
+        <button class="fbtn" onclick="clearFilters()"><i class="fa fa-x"></i> Clear</button>
+        <span class="fcnt" id="ticketCount">0 tickets</span>
+      </div>
+      <div class="content-area" style="flex:1;overflow:hidden;display:flex">
+        <div class="tbl-wrap" id="ticketTableWrap">
+          <table>
+            <thead><tr>
+              <th onclick="sortBy('ticketId')">ID <i class="fa fa-sort" style="opacity:.4;font-size:9px"></i></th>
+              <th onclick="sortBy('name')">User</th>
+              <th onclick="sortBy('subject')">Subject</th>
+              <th onclick="sortBy('status')">Status</th>
+              <th onclick="sortBy('priority')">Priority</th>
+              <th>Assigned</th>
+              <th onclick="sortBy('createdAt')">Created</th>
+              <th>Days</th>
+            </tr></thead>
+            <tbody id="ticketTbody"></tbody>
+          </table>
+          <div id="ticketEmpty" class="empty" style="display:none"><i class="fa fa-inbox"></i>No tickets found</div>
+          <div id="ticketSpin" class="spin"><i class="fa fa-spinner fa-spin"></i> Loading…</div>
+        </div>
+        <div class="dp" id="dp">
+          <div class="dp-hd">
+            <span class="tid" id="dpId">—</span>
+            <span class="badge" id="dpStatus"></span>
+            <button class="dp-close" onclick="closeDp()"><i class="fa fa-x"></i></button>
+          </div>
+          <div class="dp-body" id="dpBody"></div>
+          <div class="dp-actions" id="dpActions"></div>
+        </div>
+      </div>
+      <div class="pager" id="pager"></div>
+    </div>
+
+    <!-- AGENTS PAGE -->
+    <div class="page" id="page-agents">
+      <div class="ag-scroll">
+        <div class="ag-top">
+          <h2>Agent Management</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="openCreateAgent()"><i class="fa fa-plus"></i> New Agent</button>
+            <button class="btn btn-secondary" onclick="loadAgents()"><i class="fa fa-rotate-right"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="ag-grid" id="agentGrid"><div class="spin"><i class="fa fa-spinner fa-spin"></i></div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="set-scroll">
+        <div style="margin-bottom:16px"><div style="font-size:16px;font-weight:800;margin-bottom:4px">Settings</div><div style="font-size:12px;color:var(--m)">Manage your admin account and portal configuration</div></div>
+        <div class="set-section">
+          <div class="set-head"><i class="fa fa-user"></i> Admin Profile</div>
+          <div class="set-item"><span class="l">Name</span><span class="r" id="setName">—</span></div>
+          <div class="set-item"><span class="l">Email</span><span class="r" id="setEmail">—</span></div>
+          <div class="set-item"><span class="l">Role</span><span class="r"><span class="admin-badge">Admin</span></span></div>
+          <div class="set-item"><span class="l">Access Token</span><span class="r" id="setToken" style="font-family:monospace;font-size:11px">—</span></div>
+        </div>
+        <div class="set-section">
+          <div class="set-head"><i class="fa fa-shield-halved"></i> Admin Portal Keys</div>
+          <div class="set-item">
+            <div><div class="l">Create New Admin Account</div><div style="font-size:11px;color:var(--m);margin-top:2px">Create an additional admin with master key</div></div>
+            <button class="btn btn-secondary" onclick="showPage('agents',document.querySelectorAll('.nl')[2]);setTimeout(()=>openCreateAgent(),50)"><i class="fa fa-plus"></i> New Admin</button>
+          </div>
+          <div class="set-item" id="agentCountItem">
+            <span class="l">Active Agents</span>
+            <span class="r" id="setAgentCount">—</span>
+          </div>
+        </div>
+        <div class="set-section">
+          <div class="set-head"><i class="fa fa-lock"></i> Security</div>
+          <div class="set-item">
+            <div><div class="l">Change Password</div><div style="font-size:11px;color:var(--m);margin-top:2px">Update your admin portal password</div></div>
+            <button class="btn btn-secondary" onclick="openChangePassword()">Change</button>
+          </div>
+        </div>
+        <div class="set-section">
+          <div class="set-head"><i class="fa fa-envelope"></i> Email Configuration</div>
+          <div class="set-item">
+            <div><div class="l">Test Email Delivery</div><div style="font-size:11px;color:var(--m);margin-top:2px">Send a test email to verify SMTP is working</div></div>
+            <button class="btn btn-secondary" onclick="testEmail()"><i class="fa fa-paper-plane"></i> Send Test</button>
+          </div>
+        </div>
+        <div class="set-section">
+          <div class="set-head"><i class="fa fa-circle-info"></i> System Info</div>
+          <div class="set-item"><span class="l">Portal Version</span><span class="r">2.0.0</span></div>
+          <div class="set-item"><span class="l">Real-time Updates</span><span class="r" id="sseStatus"><span class="dot dot-amber" style="display:inline-block;margin-right:4px"></span>Connecting…</span></div>
+          <div class="set-item"><span class="l">Total Agents</span><span class="r" id="setAgentCount">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- KEYS PAGE -->
+    <div class="page" id="page-keys">
+      <div class="set-scroll">
+        <div style="margin-bottom:16px"><div style="font-size:16px;font-weight:800;margin-bottom:4px">Access Key Management</div><div style="font-size:12px;color:var(--m)">Create admin/agent accounts and generate client access tokens</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <!-- Admin / Agent Token -->
+          <div class="set-section">
+            <div class="set-head"><i class="fa fa-shield-halved"></i> Admin / Agent Account</div>
+            <div style="padding:14px 18px">
+              <div class="form-group"><label class="form-group label">Full Name *</label><input class="finput" id="kaName" placeholder="e.g. Ravi Kumar"></div>
+              <div class="form-group"><label class="form-group label">Email *</label><input class="finput" type="email" id="kaEmail" placeholder="agent@example.com"></div>
+              <div class="form-group"><label class="form-group label">Password *</label><input class="finput" type="password" id="kaPw" placeholder="Min 8 characters"></div>
+              <div class="form-group">
+                <label class="form-group label">Role</label>
+                <select class="finput" id="kaRole"><option value="agent">Agent</option><option value="admin">Admin</option></select>
+              </div>
+              <div id="kaResult" style="display:none;background:#f0f4ff;border:1px solid #c7d2fe;border-radius:9px;padding:11px;margin-bottom:12px;font-size:12px">
+                <div style="font-weight:700;color:#667eea;margin-bottom:5px">? Account Created!</div>
+                <div>Token: <code id="kaToken" style="background:#e0e7ff;padding:2px 8px;border-radius:5px;color:#4f46e5"></code></div>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('kaToken').textContent).then(()=>notify('Copied!','ok'))" class="btn btn-secondary" style="margin-top:8px;font-size:11px"><i class="fa fa-copy"></i> Copy Token</button>
+              </div>
+              <button class="btn btn-primary" style="width:100%" onclick="createKeyAccount()"><i class="fa fa-plus"></i> Create Account</button>
+            </div>
+          </div>
+          <!-- Client Token -->
+          <div class="set-section">
+            <div class="set-head"><i class="fa fa-key"></i> Client Access Token</div>
+            <div style="padding:14px 18px">
+              <div class="form-group"><label class="form-group label">Client / User Name *</label><input class="finput" id="kcName" placeholder="e.g. Rahul Sharma"></div>
+              <div class="form-group"><label class="form-group label">Email (optional)</label><input class="finput" type="email" id="kcEmail" placeholder="client@example.com"></div>
+              <div id="kcResult" style="display:none;background:#f0f4ff;border:1px solid #c7d2fe;border-radius:9px;padding:11px;margin-bottom:12px;font-size:12px">
+                <div style="font-weight:700;color:#667eea;margin-bottom:5px">? Token Generated!</div>
+                <div>Name: <strong id="kcResultName"></strong></div>
+                <div style="margin-top:4px">Token: <code id="kcToken" style="background:#e0e7ff;padding:2px 8px;border-radius:5px;color:#4f46e5"></code></div>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('kcToken').textContent).then(()=>notify('Copied!','ok'))" class="btn btn-secondary" style="margin-top:8px;font-size:11px"><i class="fa fa-copy"></i> Copy Token</button>
+              </div>
+              <button class="btn btn-primary" style="width:100%" onclick="createClientToken()"><i class="fa fa-plus"></i> Generate Token</button>
+              <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)">
+                <div style="font-size:12px;font-weight:700;margin-bottom:8px">Regenerate Master Key</div>
+                <input class="finput" type="password" id="mkCurKey" placeholder="Current master key" style="margin-bottom:8px">
+                <div id="mkNewResult" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px;margin-bottom:10px;font-size:12px">
+                  <div style="font-weight:700;color:#059669;margin-bottom:5px">? New Key:</div>
+                  <code id="mkNewVal" style="background:#dcfce7;padding:2px 8px;border-radius:5px;color:#166534;word-break:break-all"></code>
+                  <button onclick="navigator.clipboard.writeText(document.getElementById('mkNewVal').textContent).then(()=>notify('Copied!','ok'))" class="btn btn-secondary" style="margin-top:8px;font-size:11px"><i class="fa fa-copy"></i> Copy & Save</button>
+                </div>
+                <button class="btn btn-danger" style="width:100%" onclick="regenMasterKeyInline()"><i class="fa fa-rotate-right"></i> Regenerate Master Key</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="createAgentModal">
+  <div class="modal">
+    <h3>? Create New Agent</h3>
+    <div class="form-group"><label>Full Name *</label><input class="finput" id="newAgentName" placeholder="Agent name"></div>
+    <div class="form-group"><label>Email *</label><input class="finput" type="email" id="newAgentEmail" placeholder="agent@example.com"></div>
+    <div class="form-group"><label>Initial Password *</label><input class="finput" type="password" id="newAgentPass" placeholder="Min 8 characters"></div>
+    <div class="form-group">
+      <label>Role</label>
+      <select class="finput" id="newAgentRole"><option value="agent">Agent</option><option value="admin">Admin</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('createAgentModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createAgent()"><i class="fa fa-plus"></i> Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="changePwModal">
+  <div class="modal">
+    <h3>?? Change Password</h3>
+    <div class="form-group"><label>New Password *</label><input class="finput" type="password" id="newPw" placeholder="Min 8 characters"></div>
+    <div class="form-group"><label>Confirm Password *</label><input class="finput" type="password" id="confPw" placeholder="Repeat password"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('changePwModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resetAgentPwModal">
+  <div class="modal">
+    <h3>?? Reset Agent Password</h3>
+    <p style="font-size:12px;color:var(--m);margin-bottom:14px">Reset password for: <strong id="resetAgentName">—</strong></p>
+    <div class="form-group"><label>New Password *</label><input class="finput" type="password" id="resetAgentPw" placeholder="Min 8 characters"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('resetAgentPwModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doResetAgentPw()">Reset Password</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="clientKeyModal">
+  <div class="modal">
+    <h3>?? Generate Client Token</h3>
+    <p style="font-size:12px;color:var(--m);margin-bottom:14px">Create an access token for a new app user or client integration.</p>
+    <div class="form-group"><label>Client / User Name *</label><input class="finput" id="clientKeyName" placeholder="e.g. Rahul Sharma"></div>
+    <div class="form-group"><label>Email (optional)</label><input class="finput" type="email" id="clientKeyEmail" placeholder="client@example.com"></div>
+    <div id="clientKeyResult" style="display:none;background:#f0f4ff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px">
+      <div style="font-weight:700;margin-bottom:6px;color:#667eea">? Token Generated!</div>
+      <div style="margin-bottom:4px">Name: <strong id="ckrName"></strong></div>
+      <div style="margin-bottom:4px">Token: <code id="ckrToken" style="background:#e0e7ff;padding:2px 7px;border-radius:5px;font-size:12px;color:#4f46e5"></code></div>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('ckrToken').textContent).then(()=>notify('Copied!','ok'))" class="btn btn-secondary" style="margin-top:8px;font-size:11px"><i class="fa fa-copy"></i> Copy Token</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('clientKeyModal')">Close</button>
+      <button class="btn btn-primary" onclick="genClientToken()"><i class="fa fa-plus"></i> Generate Token</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="masterKeyModal">
+  <div class="modal">
+    <h3>?? Regenerate Master Key</h3>
+    <p style="font-size:12px;color:var(--m);margin-bottom:14px">This will invalidate the current master key. You will not be able to create new admin accounts with the old key.</p>
+    <div class="form-group"><label>Current Master Key *</label><input class="finput" id="curMasterKey" type="password" placeholder="Enter current master key"></div>
+    <div id="mkResult" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px">
+      <div style="font-weight:700;margin-bottom:6px;color:#059669">? New Master Key:</div>
+      <code id="newMkVal" style="background:#dcfce7;padding:4px 10px;border-radius:6px;font-size:13px;color:#166534;display:block;margin-bottom:8px;word-break:break-all"></code>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('newMkVal').textContent).then(()=>notify('Copied!','ok'))" class="btn btn-secondary" style="font-size:11px"><i class="fa fa-copy"></i> Copy & Save Securely</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('masterKeyModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="regenMasterKey()"><i class="fa fa-rotate-right"></i> Regenerate</button>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+<script>
+const API = (() => {
+  const h = window.location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:4000/api/support';
+  if (h.includes('splitwise.space')) return 'https://api.splitwise.space/api/support'; return `${window.location.protocol}//${h.replace(':5500',':4000').replace('5500','4000')}/api/support`; })();
+let agent = null, tickets = [], agents = [], sortKey = 'createdAt', sortDir = -1;
+let page = 1, totalPages = 1, filterStatus = '', filterPriority = '', filterAssigned = '', srchVal = '';
+let currentTicket = null, charts = {}, sseConn = null, resetAgentId = null, srchTimer = null;
+
+const tok = () => sessionStorage.getItem('support_jwt');
+const hdr = () => ({ 'Content-Type':'application/json', Authorization:'Bearer '+tok() });
+
+async function init() {
+  if (!tok()) return location.href = 'admin-login.html';
+  try {
+    const r = await fetch(API+'/auth/me', { headers: hdr() });
+    if (!r.ok) return location.href = 'admin-login.html';
+    agent = (await r.json()).data;
+    if (agent.role !== 'admin') return location.href = 'agent-dashboard.html';
+    document.getElementById('sbName').textContent = agent.name || 'Admin';
+    document.getElementById('sbAv').textContent = (agent.name||'A')[0].toUpperCase();
+    document.getElementById('setName').textContent = agent.name || '—';
+    document.getElementById('setEmail').textContent = agent.email || '—';
+    document.getElementById('setToken').textContent = agent.accessToken || '—';
+    if (agent.avatarColor) document.getElementById('sbAv').style.background = agent.avatarColor;
+  } catch(e) { return location.href = 'admin-login.html'; }
+  await loadPage();
+  connectSSE();
+}
+
+async function loadPage() {
+  const ico = document.getElementById('refreshIco');
+  ico.classList.add('refresh-spin');
+  await Promise.all([loadStats(), loadTickets(), loadAgents()]);
+  ico.classList.remove('refresh-spin');
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch(API+'/stats', { headers: hdr() });
+    const d = (await r.json()).data || {};
+    document.getElementById('st-total').textContent = (d.open||0) + (d.inProgress||0) + (d.closed||0);
+    document.getElementById('st-open').textContent = d.open || 0;
+    document.getElementById('st-inprog').textContent = d.inProgress || 0;
+    document.getElementById('st-closed').textContent = d.closed || 0;
+    document.getElementById('st-urgent').textContent = d.urgent || 0;
+    document.getElementById('openCount').textContent = (d.open||0) + (d.inProgress||0);
+    document.getElementById('chartUpdated').textContent = 'Updated '+new Date().toLocaleTimeString();
+    buildCharts(d);
+  } catch(e){}
+}
+
+function buildCharts(d) {
+  const defs = { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#64748b', font:{ size:11 } } } } };
+  if (charts.status) charts.status.destroy();
+  charts.status = new Chart(document.getElementById('statusChart'), {
+    type:'doughnut',
+    data:{ labels:['Open','In Progress','Resolved'], datasets:[{ data:[d.open||0, d.inProgress||0, d.closed||0], backgroundColor:['rgba(59,130,246,.7)','rgba(245,158,11,.7)','rgba(16,185,129,.7)'], borderWidth:0 }] },
+    options:{ ...defs, cutout:'70%' }
+  });
+  if (charts.priority) charts.priority.destroy();
+  charts.priority = new Chart(document.getElementById('priorityChart'), {
+    type:'bar',
+    data:{ labels:['Low','Medium','High','Urgent'], datasets:[{ data:[d.low||0, d.medium||0, d.high||0, d.urgent||0], backgroundColor:['rgba(59,130,246,.7)','rgba(245,158,11,.7)','rgba(239,68,68,.6)','rgba(239,68,68,.9)'], borderRadius:6, borderWidth:0 }] },
+    options:{ ...defs, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:'rgba(0,0,0,.06)' }, ticks:{ color:'#64748b', font:{size:10} } }, y:{ grid:{ color:'rgba(0,0,0,.06)' }, ticks:{ color:'#64748b', font:{size:10} } } } }
+  });
+}
+
+async function loadTickets() {
+  const q = new URLSearchParams({ page, limit:30, sort: (sortDir<0?'-':'')+sortKey });
+  if (filterStatus) q.set('status', filterStatus);
+  if (filterPriority) q.set('priority', filterPriority);
+  if (filterAssigned) q.set('assignedTo', filterAssigned);
+  if (srchVal) q.set('search', srchVal);
+  try {
+    document.getElementById('ticketSpin').style.display='block';
+    const r = await fetch(API+'/tickets?'+q, { headers:hdr() });
+    const d = await r.json();
+    tickets = d.data?.tickets || [];
+    document.getElementById('ticketCount').textContent = (d.data?.pagination?.total||0)+' tickets';
+    totalPages = d.data?.pagination?.pages || 1;
+    document.getElementById('ticketSpin').style.display='none';
+    renderTickets(); renderPager(); renderRecent();
+  } catch(e){ document.getElementById('ticketSpin').style.display='none'; }
+}
+
+async function loadAgents() {
+  try {
+    const r = await fetch(API+'/admin/agents-all', { headers:hdr() });
+    const d = await r.json();
+    if (!d.success) { console.warn('agents-all failed:', d.error); return; }
+    agents = d.data || [];
+    document.getElementById('setAgentCount').textContent = agents.filter(a=>a.role!=='admin').length;
+    const sel = document.getElementById('fAssigned');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">All Assigned</option><option value="unassigned">Unassigned</option>';
+    agents.filter(a=>a.isActivated && a.role!=='admin').forEach(a => {
+      const o=document.createElement('option'); o.value=a.name||a.accessToken; o.textContent=a.name||a.accessToken;
+      if((a.name||a.accessToken)===cur) o.selected=true; sel.appendChild(o);
+    });
+    renderAgents();
+  } catch(e){ console.warn('loadAgents error',e); }
+}
+
+function renderTickets() {
+  const tb = document.getElementById('ticketTbody');
+  const em = document.getElementById('ticketEmpty');
+  if (!tickets.length) { tb.innerHTML=''; em.style.display='block'; return; }
+  em.style.display='none';
+  tb.innerHTML = tickets.map(t => {
+    const days = t.daysOpen||0;
+    const dc = days<2?'d-ok':days<5?'d-warn':'d-hot';
+    const ag = agents.find(a=>a.name===t.assignedTo);
+    const ac = ag?.avatarColor||'#667eea';
+    const aInit = t.assignedTo?t.assignedTo[0].toUpperCase():'?';
+    return `<tr onclick="openDp('${t.ticketId}')" ${currentTicket?.ticketId===t.ticketId?'class="sel"':''}>
+      <td><span class="tid">${t.ticketId}</span></td>
+      <td><div class="tw">${esc(t.name)}</div><div class="te">${esc(t.email)}</div></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.subject)}</td>
+      <td><span class="badge b-${t.status}">${t.status.replace('_',' ')}</span></td>
+      <td><span class="badge b-${t.priority}">${t.priority}</span></td>
+      <td>${t.assignedTo?`<div style="display:flex;align-items:center"><span class="avsm" style="background:${ac}">${aInit}</span>${esc(t.assignedTo)}</div>`:'<span style="color:var(--m);font-size:11px">—</span>'}</td>
+      <td style="white-space:nowrap">${fmtDate(t.createdAt)}</td>
+      <td><span class="days-ch ${dc}">${days}d</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderRecent() {
+  const rt = document.getElementById('recentTable');
+  const latest = [...tickets].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
+  if (!latest.length) { rt.innerHTML='<div class="empty"><i class="fa fa-inbox"></i>No tickets yet</div>'; return; }
+  rt.innerHTML = `<table><thead><tr><th>ID</th><th>User</th><th>Subject</th><th>Status</th><th>Priority</th></tr></thead><tbody>`
+    + latest.map(t=>`<tr onclick="showPage('tickets',null);setTimeout(()=>openDp('${t.ticketId}'),100)">
+      <td><span class="tid">${t.ticketId}</span></td>
+      <td>${esc(t.name)}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.subject)}</td>
+      <td><span class="badge b-${t.status}">${t.status.replace('_',' ')}</span></td>
+      <td><span class="badge b-${t.priority}">${t.priority}</span></td>
+    </tr>`).join('') + '</tbody></table>';
+}
+
+function renderPager() {
+  const p = document.getElementById('pager');
+  if (totalPages <= 1) { p.innerHTML=''; return; }
+  let html = `<button class="pg" ${page===1?'disabled':''} onclick="gPage(${page-1})"><i class="fa fa-chevron-left"></i></button>`;
+  for (let i=1;i<=totalPages;i++) {
+    if (i===1||i===totalPages||Math.abs(i-page)<=1) html+=`<button class="pg${i===page?' active':''}" onclick="gPage(${i})">${i}</button>`;
+    else if (Math.abs(i-page)===2) html+=`<span style="color:var(--m);padding:0 4px">…</span>`;
+  }
+  html += `<button class="pg" ${page===totalPages?'disabled':''} onclick="gPage(${page+1})"><i class="fa fa-chevron-right"></i></button>`;
+  html += `<span class="pi">Page ${page} of ${totalPages}</span>`;
+  p.innerHTML = html;
+}
+
+function gPage(n) { page=n; loadTickets(); }
+
+async function openDp(tid) {
+  document.querySelectorAll('#ticketTbody tr').forEach(r=>r.classList.remove('sel'));
+  try {
+    const r = await fetch(API+'/tickets/'+tid, { headers:hdr() });
+    currentTicket = (await r.json()).data;
+    renderDp();
+    document.getElementById('dp').classList.add('open');
+    document.querySelectorAll('#ticketTbody tr').forEach(r=>{ if(r.querySelector('.tid')?.textContent===tid) r.classList.add('sel'); });
+  } catch(e){ notify('Failed to load ticket','err'); }
+}
+
+function renderDp() {
+  const t = currentTicket;
+  if (!t) return;
+  document.getElementById('dpId').textContent = t.ticketId;
+  document.getElementById('dpStatus').className = 'badge b-'+t.status;
+  document.getElementById('dpStatus').textContent = t.status.replace('_',' ');
+  const body = document.getElementById('dpBody');
+  const msgs = (t.replies||[]).map(r=>{
+    const isAgent = r.from==='support'||r.from==='auto';
+    return `<div class="msg ${isAgent?'msg-s':'msg-u'}">
+      <div class="bub">${esc(r.text)}</div>
+      <div class="msg-meta">${isAgent?`${r.agent||'Support'} · `:''}${fmtDate(r.createdAt||t.createdAt)}</div>
+    </div>`;
+  }).join('');
+  body.innerHTML = `
+    <div class="dp-sec">User Info</div>
+    <div class="meta-card">
+      <div class="meta-row"><span class="l">Name</span><span class="r">${esc(t.name)}</span></div>
+      <div class="meta-row"><span class="l">Email</span><span class="r">${esc(t.email)}</span></div>
+      <div class="meta-row"><span class="l">Subject</span><span class="r">${esc(t.subject)}</span></div>
+      <div class="meta-row"><span class="l">Priority</span><span class="r"><span class="badge b-${t.priority}">${t.priority}</span></span></div>
+      <div class="meta-row"><span class="l">Created</span><span class="r">${fmtDate(t.createdAt)}</span></div>
+      ${t.closedAt?`<div class="meta-row"><span class="l">Closed</span><span class="r">${fmtDate(t.closedAt)}</span></div>`:''}
+    </div>
+    <div class="dp-sec">Original Message</div>
+    <div class="omsg">${esc(t.message||'—')}</div>
+    ${msgs?`<div class="dp-sec">Conversation</div>${msgs}`:''}
+    ${(t.internalNotes||[]).length?`<div class="dp-sec">Internal Notes</div>`+(t.internalNotes.map(n=>`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:12px"><div style="font-size:10px;color:var(--am);font-weight:700;margin-bottom:4px">${n.agent} — ${fmtDate(n.timestamp||t.createdAt)}</div>${esc(n.text)}</div>`).join('')):''}
+  `;
+  const agentOpts = agents.filter(a=>a.isActivated).map(a=>`<option value="${a.name}" ${t.assignedTo===a.name?'selected':''}>${a.name}</option>`).join('');
+  document.getElementById('dpActions').innerHTML = `
+    <div class="dp-controls">
+      <select class="sel-sm" id="dpAssign" onchange="updateTicket('assignedTo',this.value)">
+        <option value="">Unassigned</option>${agentOpts}
+      </select>
+      <select class="sel-sm" id="dpPriority" onchange="updateTicket('priority',this.value)">
+        <option value="low" ${t.priority==='low'?'selected':''}>Low</option>
+        <option value="medium" ${t.priority==='medium'?'selected':''}>Medium</option>
+        <option value="high" ${t.priority==='high'?'selected':''}>High</option>
+        <option value="urgent" ${t.priority==='urgent'?'selected':''}>Urgent</option>
+      </select>
+      <select class="sel-sm" id="dpSt" onchange="updateTicket('status',this.value)">
+        <option value="open" ${t.status==='open'?'selected':''}>Open</option>
+        <option value="in_progress" ${t.status==='in_progress'?'selected':''}>In Progress</option>
+        <option value="closed" ${t.status==='closed'?'selected':''}>Closed</option>
+      </select>
+    </div>
+    <textarea class="ta" id="replyTa" rows="3" placeholder="Write a reply to the user…"></textarea>
+    <div class="reply-btns">
+      <button class="btn btn-primary" onclick="sendReply()"><i class="fa fa-paper-plane"></i> Send Reply</button>
+      <button class="note-toggle" onclick="toggleNote()">+ Add Internal Note</button>
+    </div>
+    <div class="internal-note" id="notePad">
+      <textarea class="ta" id="noteTa" rows="2" placeholder="Internal note (not sent to user)…"></textarea>
+      <button class="btn btn-secondary" style="margin-top:6px" onclick="addNote()"><i class="fa fa-note-sticky"></i> Save Note</button>
+    </div>
+  `;
+}
+
+function closeDp() { document.getElementById('dp').classList.remove('open'); currentTicket=null; document.querySelectorAll('#ticketTbody tr').forEach(r=>r.classList.remove('sel')); }
+function toggleNote() { document.getElementById('notePad').classList.toggle('show'); }
+
+async function updateTicket(field, value) {
+  if (!currentTicket) return;
+  const body = { agent: agent.name };
+  body[field] = value;
+  try {
+    const r = await fetch(API+'/tickets/'+currentTicket.ticketId, { method:'PATCH', headers:hdr(), body:JSON.stringify(body) });
+    if (r.ok) { notify('Ticket updated','ok'); await openDp(currentTicket.ticketId); loadStats(); renderTickets(); }
+    else notify('Update failed','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+async function sendReply() {
+  const msg = document.getElementById('replyTa').value.trim();
+  if (!msg || !currentTicket) return;
+  const btn = document.querySelector('[onclick="sendReply()"]');
+  btn.disabled=true;
+  try {
+    const r = await fetch(API+'/tickets/'+currentTicket.ticketId+'/reply', { method:'POST', headers:hdr(), body:JSON.stringify({ message:msg }) });
+    if (r.ok) { notify('Reply sent','ok'); document.getElementById('replyTa').value=''; await openDp(currentTicket.ticketId); }
+    else notify('Send failed','err');
+  } catch(e){ notify('Error','err'); }
+  btn.disabled=false;
+}
+
+async function addNote() {
+  const txt = document.getElementById('noteTa').value.trim();
+  if (!txt || !currentTicket) return;
+  try {
+    const r = await fetch(API+'/tickets/'+currentTicket.ticketId+'/note', { method:'POST', headers:hdr(), body:JSON.stringify({ text:txt }) });
+    if (r.ok) { notify('Note saved','ok'); document.getElementById('noteTa').value=''; toggleNote(); await openDp(currentTicket.ticketId); }
+    else notify('Failed','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+function renderAgents() {
+  const g = document.getElementById('agentGrid');
+  if (!agents.length) { g.innerHTML='<div class="empty"><i class="fa fa-users"></i>No agents yet</div>'; return; }
+  g.innerHTML = agents.map(a=>{
+    const isAdmin = a.role==='admin';
+    const ac = a.avatarColor||'#667eea';
+    const init = (a.name||'?')[0].toUpperCase();
+    const statusClr = a.isActivated?'dot-green':a.needsPasswordChange?'dot-amber':'dot-grey';
+    const statusLbl = a.isActivated?'Active':a.needsPasswordChange?'Pending Setup':'Inactive';
+    return `<div class="ag-card" id="agcard-${a._id}">
+      <div class="ag-role"><span class="badge ${isAdmin?'b-urgent':'b-open'}">${a.role}</span></div>
+      <div class="ag-head">
+        <div class="ag-av" style="background:${ac}">${init}</div>
+        <div><div class="ag-nm">${esc(a.name||'—')}</div><div class="ag-em">${esc(a.email||'No email set')}</div></div>
+      </div>
+      <div class="ag-status"><div class="dot ${statusClr}"></div>${statusLbl}</div>
+      <div style="font-size:10px;color:var(--m);font-weight:600;margin-bottom:10px">Token: <span style="font-family:monospace;color:var(--p)">${a.accessToken||'—'}</span></div>
+      <div class="ag-actions">
+        <button class="btn btn-secondary" style="flex:1;font-size:11px" onclick="openResetPw('${a._id}','${esc(a.name||'')}')"><i class="fa fa-key"></i> Reset PW</button>
+        ${!isAdmin?`<button class="btn ${a.isActivated?'btn-danger':'btn-success'}" style="font-size:11px" onclick="toggleAgent('${a._id}',${!a.isActivated})">${a.isActivated?'Deactivate':'Activate'}</button>`:''}
+        ${!isAdmin?`<button class="btn btn-danger" style="font-size:11px;padding:8px 10px" onclick="deleteAgent('${a._id}','${esc(a.name||'')}')"><i class="fa fa-trash"></i></button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCreateAgent() { document.getElementById('createAgentModal').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+async function createAgent() {
+  const name=document.getElementById('newAgentName').value.trim();
+  const email=document.getElementById('newAgentEmail').value.trim();
+  const pass=document.getElementById('newAgentPass').value;
+  const role=document.getElementById('newAgentRole').value;
+  if (!name||!email||pass.length<8) { notify('Fill all fields (password min 8)','err'); return; }
+  try {
+    const r = await fetch(API+'/admin/create-admin', { method:'POST', headers:hdr(), body:JSON.stringify({ name, email, password:pass }) });
+    const d = await r.json();
+    if (r.ok && d.data?.accessToken) {
+      notify('Agent created: '+d.data.accessToken,'ok'); closeModal('createAgentModal'); loadAgents();
+      document.getElementById('newAgentName').value=''; document.getElementById('newAgentEmail').value=''; document.getElementById('newAgentPass').value='';
+    } else notify(d.error||'Failed to create agent','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+async function toggleAgent(id, activate) {
+  if (!confirm(activate?'Activate this agent?':'Deactivate this agent?')) return;
+  try {
+    const r = await fetch(API+'/admin/agents/'+id+'/activate', { method:'PATCH', headers:hdr(), body:JSON.stringify({ activate }) });
+    const d = await r.json();
+    if (r.ok) { notify(d.data?.message||'Done','ok'); loadAgents(); }
+    else notify(d.error||'Failed','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+async function deleteAgent(id, name) {
+  if (!confirm('Delete agent "'+name+'"? This cannot be undone.')) return;
+  try {
+    const r = await fetch(API+'/admin/agents/'+id+'/remove', { method:'DELETE', headers:hdr() });
+    const d = await r.json();
+    if (r.ok) { notify(d.data?.message||'Agent deleted','ok'); loadAgents(); }
+    else notify(d.error||'Failed to delete','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+function openResetPw(id, name) { resetAgentId=id; document.getElementById('resetAgentName').textContent=name; document.getElementById('resetAgentPw').value=''; document.getElementById('resetAgentPwModal').classList.add('show'); }
+async function doResetAgentPw() {
+  const pw=document.getElementById('resetAgentPw').value;
+  if (pw.length<8) { notify('Password must be at least 8 characters','err'); return; }
+  try {
+    const r = await fetch(API+'/admin/reset-agent-pw', { method:'POST', headers:hdr(), body:JSON.stringify({ agentId:resetAgentId, newPassword:pw }) });
+    const d = await r.json();
+    if (r.ok) { notify('Password reset for '+d.data?.name,'ok'); closeModal('resetAgentPwModal'); document.getElementById('resetAgentPw').value=''; }
+    else notify(d.error||'Failed','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+function openChangePassword() { document.getElementById('changePwModal').classList.add('show'); }
+async function changePassword() {
+  const np=document.getElementById('newPw').value, cp=document.getElementById('confPw').value;
+  if (np.length<8) { notify('Password min 8 characters','err'); return; }
+  if (np!==cp) { notify('Passwords do not match','err'); return; }
+  try {
+    const r = await fetch(API+'/auth/change-password', { method:'POST', headers:hdr(), body:JSON.stringify({ newPassword:np }) });
+    if (r.ok) { notify('Password changed','ok'); closeModal('changePwModal'); document.getElementById('newPw').value=''; document.getElementById('confPw').value=''; }
+    else notify('Failed','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+async function testEmail() {
+  const email = agent?.email || prompt('Enter email to send test to:');
+  if (!email) return;
+  try {
+    const r = await fetch(API+'/admin/test-email-jwt', { method:'POST', headers:hdr(), body:JSON.stringify({ email }) });
+    const d = await r.json();
+    if (r.ok) notify('Test email sent to '+email,'ok');
+    else notify(d.error||'Email failed','err');
+  } catch(e){ notify('Error sending email','err'); }
+}
+
+function showPage(name, btn, filterVal) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nl').forEach(n=>n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const titles={overview:'Overview',tickets:'All Tickets',agents:'Agent Management',keys:'Access Key Management',settings:'Settings'};
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+  if (name==='tickets' && filterVal) { document.getElementById('fStatus').value=filterVal; filterStatus=filterVal; loadTickets(); }
+  closeSb();
+}
+
+function applyFilters() {
+  filterStatus=document.getElementById('fStatus').value;
+  filterPriority=document.getElementById('fPriority').value;
+  filterAssigned=document.getElementById('fAssigned').value;
+  page=1; loadTickets();
+}
+function clearFilters() { document.getElementById('fStatus').value=''; document.getElementById('fPriority').value=''; document.getElementById('fAssigned').value=''; filterStatus=filterPriority=filterAssigned=''; page=1; loadTickets(); }
+function sortBy(k) { if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=-1; } loadTickets(); }
+function debounceSearch() { clearTimeout(srchTimer); srchTimer=setTimeout(()=>{ srchVal=document.getElementById('srchInput').value.trim(); page=1; loadTickets(); },400); }
+
+function connectSSE() {
+  if (!tok()) return;
+  if (sseConn) { sseConn.close(); sseConn = null; }
+  sseConn = new EventSource(API+'/events?token='+tok());
+  sseConn.onopen = ()=>{ document.getElementById('sseStatus').innerHTML='<span class="dot dot-green" style="display:inline-block;margin-right:4px"></span>Live'; };
+  sseConn.onerror = ()=>{ document.getElementById('sseStatus').innerHTML='<span class="dot dot-grey" style="display:inline-block;margin-right:4px"></span>Disconnected'; if(sseConn){sseConn.close();sseConn=null;} setTimeout(connectSSE,8000); };
+  sseConn.addEventListener('ticket:new', ()=>{ loadStats(); loadTickets(); });
+  sseConn.addEventListener('ticket:updated', ()=>{ loadStats(); loadTickets(); });
+  sseConn.addEventListener('ticket:replied', e=>{ const d=JSON.parse(e.data||'{}'); if(currentTicket?.ticketId===d.ticketId) openDp(d.ticketId); });
+}
+
+function logout() { if(confirm('Logout?')){ if(sseConn)sseConn.close(); sessionStorage.removeItem('support_jwt'); location.href='admin-login.html'; } }
+function openSb() { document.getElementById('sb').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSb() { document.getElementById('sb').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+function fmtDate(d){ if(!d)return'—'; const dt=new Date(d); return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' '+dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+
+let notifTimer;
+function notify(msg, type='ok'){
+  const n=document.getElementById('notif'); n.textContent=''; n.className='notif '+type;
+  const i=document.createElement('i'); i.className=type==='ok'?'fa fa-check-circle':type==='err'?'fa fa-circle-xmark':'fa fa-triangle-exclamation';
+  n.appendChild(i); n.appendChild(document.createTextNode(' '+msg));
+  n.classList.add('show'); clearTimeout(notifTimer); notifTimer=setTimeout(()=>n.classList.remove('show'),3500);
+}
+
+function openGenClientKey() {
+  document.getElementById('clientKeyName').value='';
+  document.getElementById('clientKeyEmail').value='';
+  document.getElementById('clientKeyResult').style.display='none';
+  document.getElementById('clientKeyModal').classList.add('show');
+}
+async function genClientToken() {
+  const name=document.getElementById('clientKeyName').value.trim();
+  const email=document.getElementById('clientKeyEmail').value.trim();
+  if (!name) { notify('Enter a client name','err'); return; }
+  try {
+    const r = await fetch(API+'/admin/gen-agent', { method:'POST', headers:hdr(), body:JSON.stringify({ name, email, role:'agent' }) });
+    const d = await r.json();
+    if (r.ok && d.data) {
+      document.getElementById('ckrName').textContent=d.data.name||name;
+      document.getElementById('ckrToken').textContent=d.data.accessToken||'—';
+      document.getElementById('clientKeyResult').style.display='block';
+      notify('Agent token generated!','ok');
+    } else notify(d.error||'Failed to generate token','err');
+  } catch(e){ notify('Error','err'); }
+}
+function openRegenMasterKey() {
+  document.getElementById('curMasterKey').value='';
+  document.getElementById('mkResult').style.display='none';
+  document.getElementById('masterKeyModal').classList.add('show');
+}
+async function regenMasterKey() {
+  const cur=document.getElementById('curMasterKey').value.trim();
+  if (!cur) { notify('Enter current master key','err'); return; }
+  try {
+    const r = await fetch(API+'/admin/regen-master-key', { method:'POST', headers:hdr(), body:JSON.stringify({ currentKey:cur }) });
+    const d = await r.json();
+    if (r.ok && d.data?.newKey) {
+      document.getElementById('newMkVal').textContent=d.data.newKey;
+      document.getElementById('mkResult').style.display='block';
+      document.getElementById('curMasterKey').value='';
+      notify('Master key regenerated — save it now!','warn');
+    } else notify(d.error||'Failed — check current key','err');
+  } catch(e){ notify('Error','err'); }
+}
+
+async function createKeyAccount() {
+  const name=document.getElementById('kaName').value.trim();
+  const email=document.getElementById('kaEmail').value.trim();
+  const pw=document.getElementById('kaPw').value;
+  const role=document.getElementById('kaRole').value;
+  if (!name||!email||pw.length<8) { notify('Fill all fields (password min 8 chars)','err'); return; }
+  try {
+    // Use /admin/create-admin (JWT-protected, checks caller is admin)
+    const r=await fetch(API+'/admin/create-admin',{method:'POST',headers:hdr(),body:JSON.stringify({name,email,password:pw})});
+    const d=await r.json();
+    if (r.ok&&d.data) {
+      document.getElementById('kaToken').textContent=d.data.accessToken||'—';
+      document.getElementById('kaResult').style.display='block';
+      notify('Admin account created: '+d.data.accessToken,'ok'); loadAgents();
+      document.getElementById('kaName').value=''; document.getElementById('kaEmail').value=''; document.getElementById('kaPw').value='';
+    } else notify(d.error||'Failed to create account','err');
+  } catch(e){ notify('Error','err'); }
+}
+async function createClientToken() {
+  const name=document.getElementById('kcName').value.trim();
+  const email=document.getElementById('kcEmail').value.trim();
+  if (!name) { notify('Enter an agent name','err'); return; }
+  try {
+    const r=await fetch(API+'/admin/gen-agent',{method:'POST',headers:hdr(),body:JSON.stringify({name,email,role:'agent'})});
+    const d=await r.json();
+    if (r.ok&&d.data) {
+      document.getElementById('kcResultName').textContent=d.data.name||name;
+      document.getElementById('kcToken').textContent=d.data.accessToken||'—';
+      // Also show temp password if available
+      const pwEl=document.getElementById('kcResult').querySelector('code');
+      if(pwEl&&d.data.tempPassword) pwEl.title='Temp PW: '+d.data.tempPassword;
+      document.getElementById('kcResult').style.display='block';
+      notify('Agent token generated! Temp PW: '+d.data.tempPassword,'ok');
+    } else notify(d.error||'Failed','err');
+  } catch(e){ notify('Error','err'); }
+}
+async function regenMasterKeyInline() {
+  notify('Master key regen requires server .env update — contact your system admin or update SUPPORT_DASHBOARD_TOKEN in .env directly.','warn');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeDp(); document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('show')); } });
+</script>
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+</body>
+</html>

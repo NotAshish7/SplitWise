@@ -1,0 +1,30 @@
+{
+  "name": "smart-expense-manager-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "dev:watch": "node --watch src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "csv-stringify": "^6.5.2",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "google-auth-library": "^9.15.1",
+    "googleapis": "^171.4.0",
+    "imap-simple": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mailparser": "^3.9.6",
+    "mongoose": "^8.0.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.9.15",
+    "pdfkit": "^0.15.0",
+    "zod": "^3.23.8"
+  }
+}

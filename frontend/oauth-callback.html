@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" style="opacity: 0; visibility: hidden;">
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+    <title>OAuth Callback - SplitWise</title>
+    <!-- Favicon - High Quality Wallet Logo -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ROOT CAUSE FIX: Make page completely invisible during redirect */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            opacity: 0;
+            /* Completely invisible */
+            pointer-events: none;
+            /* Disable all interactions */
+        }
+
+        .callback-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            display: none;
+            /* Hidden during redirect, shown on error */
+        }
+
+        .callback-container.show {
+            display: block;
+        }
+
+
+        /* Show page only when there's an error */
+        html.show-error {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        body.show-error {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+    </style>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+
+<body style="opacity: 0; visibility: hidden; background: transparent;">
+    <div class="callback-container">
+        <div id="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h4 class="mt-3">Processing authentication...</h4>
+            <p class="text-muted">Please wait</p>
+        </div>
+        <div id="success" style="display: none;">
+            <div class="success-icon">?</div>
+            <h4>Authentication Successful!</h4>
+            <p class="text-muted">Redirecting you back...</p>
+        </div>
+        <div id="error" style="display: none;">
+            <div class="error-icon">?</div>
+            <h4>Authentication Failed</h4>
+            <p class="text-muted" id="errorMessage">Something went wrong</p>
+            <button class="btn btn-primary mt-3" onclick="window.close()">Close Window</button>
+        </div>
+    </div>
+
+    <script>
+        (async function () {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const error = urlParams.get('error');
+                const state = urlParams.get('state');
+
+                if (error) {
+                    showError('Authentication cancelled or denied');
+                    return;
+                }
+
+                if (!code) {
+                    showError('No authorization code received');
+                    return;
+                }
+
+                // Determine provider from localStorage
+                const storedProvider = localStorage.getItem('oauth_provider');
+                let messageType = 'GOOGLE_OAUTH_SUCCESS';
+
+                if (storedProvider === 'facebook') {
+                    messageType = 'FACEBOOK_OAUTH_SUCCESS';
+                } else if (storedProvider === 'google') {
+                    messageType = 'GOOGLE_OAUTH_SUCCESS';
+                } else {
+                    const currentUrl = window.location.href.toLowerCase();
+                    if (currentUrl.includes('facebook') || (state && state.includes('facebook'))) {
+                        messageType = 'FACEBOOK_OAUTH_SUCCESS';
+                    }
+                }
+
+                console.log('?? OAuth Provider:', messageType);
+
+                // ROOT CAUSE FIX: Authenticate with backend FIRST
+                const provider = messageType === 'FACEBOOK_OAUTH_SUCCESS' ? 'Facebook' : 'Google';
+                const endpoint = messageType === 'FACEBOOK_OAUTH_SUCCESS' ? '/oauth/facebook/callback' : '/oauth/google/callback';
+
+                // ROOT CAUSE FIX: Determine correct backend URL for all environments
+                let API_BASE;
+                const currentOrigin = window.location.origin;
+
+                if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
+                    API_BASE = 'http://localhost:4000/api';
+                } else if (currentOrigin.includes('devtunnels.ms')) {
+                    // VS Code tunnel - replace frontend port with backend port
+                    API_BASE = currentOrigin.replace('-5500.', '-4000.') + '/api';
+                } else {
+                    // Production: frontend is on splitwise.space, backend is on api.splitwise.space
+                    API_BASE = 'https://api.splitwise.space/api';
+                }
+
+
+                console.log(`?? Authenticating with ${provider}...`);
+                console.log(`?? API endpoint: ${API_BASE}${endpoint}`);
+
+                // Send code to backend
+                const authResponse = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+
+                console.log('?? Response status:', authResponse.status);
+
+                if (!authResponse.ok) {
+                    const errorText = await authResponse.text();
+                    console.error('? Backend error response:', errorText);
+                    showError(`Authentication failed: ${authResponse.status} - ${errorText}`);
+                    return;
+                }
+
+                const authData = await authResponse.json();
+                console.log('?? Auth data received:', authData);
+
+                if (!authData.success) {
+                    console.error('? Auth failed:', authData.error);
+                    showError(authData.error || `${provider} authentication failed`);
+                    return;
+                }
+
+                console.log('? Backend authentication successful');
+
+                // ROOT CAUSE FIX: Check if account already existed (for signup page notification)
+                const accountAlreadyExists = authData.data.account_exists === true;
+                if (accountAlreadyExists) {
+                    console.log('?? Account already exists - user tried to signup but has an account');
+                    localStorage.setItem('oauth_account_exists', 'true');
+                } else {
+                    localStorage.removeItem('oauth_account_exists');
+                }
+
+                // Clear logout flags
+                localStorage.removeItem('justLoggedOut');
+                localStorage.removeItem('logoutEvent');
+
+                // Save token and user data
+                const backendUser = authData.data.user;
+                const backendCurrency = backendUser.preferred_currency || backendUser.preferredCurrency || 'INR';
+
+                const userData = {
+                    ...backendUser,
+                    preferredCurrency: backendCurrency,
+                    sidebar_collapsed: backendUser.sidebar_collapsed || false
+                };
+                delete userData.preferred_currency;
+
+                localStorage.setItem('token', authData.data.token);
+                localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.removeItem('oauth_return_url');
+                localStorage.removeItem('oauth_provider');
+
+                console.log(`? ${provider} login successful - user data saved`);
+
+                // ROOT CAUSE FIX: Check if this is a popup or full-page redirect
+                const isPopup = window.opener && !window.opener.closed;
+
+                if (isPopup) {
+                    // DESKTOP POPUP MODE: Send auth data to login page and close popup
+                    console.log('?? Popup mode - sending data to login page and closing');
+
+                    const authMessage = {
+                        type: messageType,
+                        success: true,
+                        data: {
+                            token: authData.data.token,
+                            user: userData
+                        }
+                    };
+
+                    // Send message to opener (login.html)
+                    window.opener.postMessage(authMessage, window.location.origin);
+
+                    // Close popup immediately
+                    window.close();
+                } else {
+                    // MOBILE/TABLET REDIRECT MODE: Redirect back to login page
+                    console.log('?? Redirect mode - returning to login page');
+
+                    // Store auth success flag
+                    localStorage.setItem('oauth_login_success', 'true');
+
+                    // Redirect back to login page (it will detect success and go to dashboard)
+                    const returnUrl = localStorage.getItem('oauth_return_url') || window.location.origin + '/login.html';
+                    window.location.replace(returnUrl);
+                }
+
+            } catch (err) {
+                console.error('?? OAuth callback error:', err);
+                console.error('Stack trace:', err.stack);
+                showError(`Authentication error: ${err.message}`);
+            }
+        })();
+
+        function showSuccess() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.documentElement.classList.add('show-error');
+            document.body.classList.add('show-error');
+            document.querySelector('.callback-container').classList.add('show');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+    </script>
+    <script src="js/sw-engine.js" defer></script>
+</body>
+
+</html>

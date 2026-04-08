@@ -1,0 +1,203 @@
+/* Performance Optimization CSS */
+/* This file contains performance optimizations to reduce lag and improve smoothness */
+
+/* Enable GPU acceleration for frequently animated elements */
+.card,
+.stats-card,
+.btn,
+.nav-link,
+.notification,
+.modal-content,
+.sidebar {
+    will-change: transform;
+    /* NOTE: Do NOT add transform:translateZ(0) here — it conflicts with
+       hover multi-value transforms (translateY + scale) on .card/.stats-card */
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Optimize hover transitions - use transform instead of top/left */
+.card:hover,
+.stats-card:hover,
+.btn:hover {
+    will-change: transform, box-shadow;
+}
+
+/* Reduce animation complexity */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Optimize table rendering */
+.table {
+    contain: layout style paint;
+}
+
+.table tbody tr {
+    will-change: auto; /* Only enable when needed */
+}
+
+.table tbody tr:hover {
+    will-change: background-color, transform;
+}
+
+/* Optimize modal animations */
+.modal {
+    will-change: opacity;
+}
+
+.modal.show .modal-dialog {
+    will-change: transform;
+}
+
+/* Optimize sidebar */
+.sidebar {
+    contain: layout style;
+}
+
+/* Optimize chart containers */
+.chart-container {
+    contain: layout style paint;
+}
+
+.chart-container canvas {
+    will-change: auto;
+}
+
+/* Smooth scrolling optimization */
+* {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize notification animations */
+.notification {
+    contain: layout style paint;
+}
+
+.notification.show {
+    will-change: transform, opacity;
+}
+
+/* Force hardware acceleration for transforms */
+.translateX,
+.translateY,
+[style*="transform"] {
+    transform: translateZ(0);
+}
+
+/* Optimize form inputs */
+.form-control:focus,
+.form-select:focus {
+    will-change: border-color, box-shadow;
+}
+
+/* Batch repaints */
+.main-content {
+    contain: layout style;
+}
+
+/* Optimize images if any */
+img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Remove unnecessary transitions on static text elements only - allow animations on interactive elements */
+p:not(.btn):not(.nav-link):not(.notification), 
+span:not(.btn):not(.nav-link):not(.notification),
+h1:not(.btn):not(.nav-link), 
+h2:not(.btn):not(.nav-link), 
+h3:not(.btn):not(.nav-link), 
+h4:not(.btn):not(.nav-link), 
+h5:not(.btn):not(.nav-link), 
+h6:not(.btn):not(.nav-link), 
+label:not(.btn):not(.nav-link) {
+    transition: none !important;
+}
+
+/* Optimize badge animations */
+.badge {
+    will-change: auto;
+    contain: layout style paint;
+}
+
+/* Reduce paint areas */
+.card::before {
+    will-change: transform;
+    contain: strict;
+}
+
+/* Optimize dropdown menus */
+.dropdown-menu {
+    contain: layout style paint;
+    will-change: opacity, transform;
+}
+
+/* Composite layers for better performance */
+.modal-backdrop {
+    will-change: opacity;
+    transform: translateZ(0);
+}
+
+/* Optimize button group transitions */
+.btn-group .btn {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Prevent layout thrashing — NOTE: do NOT use contain:layout on .row/.col
+   because it clips child overflow, which blocks the card hover lift animation */
+.d-flex {
+    contain: style;
+}
+
+/* Optimize stats cards specifically */
+.stats-card::before {
+    will-change: opacity;
+    transform: translateZ(0);
+}
+
+/* Smooth font rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Optimize input rendering */
+input, textarea, select {
+    transform: translateZ(0);
+}
+
+/* Reduce reflow on hover effects */
+a, button {
+    display: inline-block;
+}
+
+/* Optimize notification container */
+.notification-container {
+    contain: layout style;
+    pointer-events: none;
+}
+
+.notification-container .notification {
+    pointer-events: auto;
+}
+
+/* NOTE: content-visibility:auto removed from .card — it prevents hover
+   transforms from firing on cards that are near the viewport edge.
+   Table rows keep it since they don't have hover transforms. */
+@supports (content-visibility: auto) {
+    .table tbody tr {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 56px;
+    }
+}
+
+

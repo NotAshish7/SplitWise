@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Dashboard - SplitWise</title>
+    <!-- Favicon - High Quality Wallet Logo -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/collapsible-sidebar.css">
+    <link rel="stylesheet" href="css/skeleton-loading.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ROOT CAUSE FIX: Check authentication IMMEDIATELY before any content renders -->
+    <script>
+        (function () {
+            'use strict';
+
+            // Check authentication IMMEDIATELY (synchronous check)
+            function checkAuthImmediate() {
+                const token = localStorage.getItem('token');
+                const user = localStorage.getItem('user');
+                const justLoggedOut = localStorage.getItem('justLoggedOut');
+
+                // If user just logged out, redirect immediately
+                if (justLoggedOut === 'true') {
+                    window.location.replace('frontend.html');
+                    return false;
+                }
+
+                // If no authentication data, redirect immediately
+                if (!token || !user) {
+                    window.location.replace('frontend.html');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Run check immediately (before DOM is ready)
+            const isAuthenticated = checkAuthImmediate();
+
+            // If authenticated, wait for body and mark it
+            if (isAuthenticated) {
+                // Use DOMContentLoaded or immediate if body exists
+                function markAuthenticated() {
+                    if (document.body) {
+                        document.body.classList.remove('auth-checking');
+                        document.body.classList.add('authenticated');
+                    }
+                }
+
+                if (document.body) {
+                    markAuthenticated();
+                } else {
+                    // Body doesn't exist yet, wait for it
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', markAuthenticated);
+                    } else {
+                        // Use setTimeout as fallback
+                        setTimeout(markAuthenticated, 0);
+                    }
+                }
+            }
+        })();
+    </script>
+    <style>
+        /* SplitWise - Consolidated Stylesheet */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #2c3e50;
+            --body-color: #ffffff;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+            --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --sidebar-width: 240px;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--body-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+
+
+
+        /* ROOT CAUSE FIX: Don't hide entire body - causes visible refresh flash */
+        /* Just ensure content renders after auth check */
+
+
+        /* ROOT CAUSE FIX: Removed auth-checking overlay - caused white flash */
+        /* Auth check happens instantly, no need for loading overlay */
+        body.auth-checking::before {
+            /* Disabled - was causing white flash on navigation */
+            display: none !important;
+        }
+
+        .page-loading {
+            /* Disabled - not needed, causes flash */
+            display: none !important;
+        }
+
+        body.ready {
+            opacity: 1;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--navbar-bg);
+            box-shadow: var(--shadow);
+            padding: 0.5rem 0.875rem 1.25rem 0.875rem;
+            /* ROOT CAUSE FIX: Minimal top padding to align with header */
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-header {
+            padding: 0.5rem 0.75rem;
+            /* ROOT CAUSE FIX: Minimal padding to align with main header */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 0.75rem;
+            /* ROOT CAUSE FIX: Reduced margin to bring nav links closer */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the content (wallet icon + SEM) */
+            /* ROOT CAUSE FIX: Calculate height to align border with page header (64px total - 0.5rem sidebar padding = ~56px) */
+            min-height: calc(64px - 0.5rem);
+            /* Match page header height minus sidebar top padding */
+            height: calc(64px - 0.5rem);
+        }
+
+        .sidebar-header h5 {
+            font-weight: 800;
+            font-size: 1.35rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0;
+            margin-left: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            margin-right: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the icon and text */
+            gap: 0.0rem;
+            /* ROOT CAUSE FIX: Reduced gap to match other pages spacing */
+        }
+
+        .sidebar-header h5 .me-2 {
+            margin-right: 0.25rem !important;
+            /* ROOT CAUSE FIX: Override Bootstrap me-2 (0.5rem) to reduce spacing */
+        }
+
+        .nav-link {
+            color: white !important;
+            opacity: 0.85;
+            padding: 0.875rem 0.875rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            opacity: 1;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-link i {
+            width: 22px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        /* Fixed Page Header */
+        .page-header-fixed {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            padding: 0.75rem 2.5rem;
+            /* ROOT CAUSE FIX: Reduced top/bottom padding to match sidebar border */
+            padding-left: 1.5rem;
+            /* Space for button (44px button + 10px gap = ~54px) */
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            /* Reduced gap */
+            height: 64px;
+            /* ROOT CAUSE FIX: Fixed height to align with sidebar border */
+            min-height: 64px;
+        }
+
+        body.sidebar-collapsed .page-header-fixed {
+            left: 80px;
+        }
+
+        .page-header-fixed h2 {
+            margin: 0;
+            margin-left: 3.5rem;
+            /* Space for button (44px) + gap (10px) = ~54px */
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+            overflow: visible;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: nowrap;
+        }
+
+        /* Desktop Navigation Toggle Button */
+        .desktop-nav-toggle {
+            position: absolute;
+            left: 0.75rem;
+            /* Positioned inside header, fully visible */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        body.sidebar-collapsed .desktop-nav-toggle {
+            left: 0.75rem;
+            /* Same position when sidebar is collapsed */
+        }
+
+        .desktop-nav-toggle:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .desktop-nav-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem;
+            padding-top: calc(2.5rem + 64px);
+            /* ROOT CAUSE FIX: Updated to match new header height (64px) */
+            animation: fadeIn 0.6s ease-out;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 80px;
+        }
+
+        /* Card Styles */
+        .stats-card,
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            height: 100%;
+            /* Spring easing for elastic popup feel */
+            transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        filter 0.3s ease !important;
+            will-change: transform, box-shadow;
+            position: relative;
+            overflow: hidden !important;
+            border: none;
+            isolation: isolate;
+            cursor: pointer;
+        }
+
+        /* White / border stat cards — indigo glow popup */
+        .stats-card:not([style*="background: linear-gradient"]):not([style*="background:linear-gradient"]):hover,
+        .card:not([style*="background: linear-gradient"]):not([style*="background:linear-gradient"]):hover {
+            transform: translateY(-12px) scale(1.03) !important;
+            box-shadow: 0 20px 52px rgba(108,99,255,0.22),
+                        0 6px 18px rgba(108,99,255,0.14) !important;
+        }
+
+        .stats-card .icon,
+        .card .icon {
+            font-size: 2.5rem;
+            background: var(--navbar-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        filter 0.3s ease;
+        }
+
+        /* Gradient stat cards — icon plain white */
+        .stats-card[style*="background: linear-gradient"] .icon,
+        .stats-card[style*="background:linear-gradient"] .icon {
+            font-size: 2.4rem;
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            -webkit-text-fill-color: white !important;
+            background-clip: unset !important;
+            background-color: transparent !important;
+            color: white !important;
+            width: auto;
+            height: auto;
+            box-shadow: none;
+            border-radius: 0;
+            flex-shrink: 0;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        filter 0.3s ease;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
+        }
+
+        /* Icon bounce on gradient card hover */
+        .stats-card[style*="background: linear-gradient"]:hover .icon,
+        .stats-card[style*="background:linear-gradient"]:hover .icon {
+            transform: scale(1.18) rotate(8deg);
+            filter: drop-shadow(0 4px 16px rgba(0,0,0,0.35)) brightness(1.15);
+        }
+
+        /* Gradient cards hover — deep shadow popup */
+        .stats-card[style*="background: linear-gradient"]:hover,
+        .stats-card[style*="background:linear-gradient"]:hover {
+            transform: translateY(-12px) scale(1.04) !important;
+            filter: brightness(1.08) saturate(1.1);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.30),
+                        0 10px 24px rgba(0,0,0,0.16) !important;
+        }
+
+        /* Amount text size */
+        .stats-card h3 {
+            font-size: 1.5rem !important;
+            font-weight: 700;
+        }
+
+        .stats-card h2 {
+            font-size: 1.5rem !important;
+            font-weight: 700;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.8rem;
+            margin-top: 3rem;
+        }
+
+        /* Action Card Styles */
+        .action-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .action-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1.2rem;
+            background: var(--navbar-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.4s ease;
+        }
+
+        /* Chart Container Styles */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 3rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Footer Styles */
+        footer {
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            background: var(--light-color);
+            position: relative;
+            bottom: 0;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        /* Notification System */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            border-left-color: var(--success-color);
+        }
+
+        .notification-error {
+            border-left-color: var(--danger-color);
+        }
+
+        /* Button Styles */
+        .btn {
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--navbar-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/topnav.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style id="sw-topnav-override">
+        /* SplitWise TopNav Layout Overrides */
+        .sidebar, .sidebar-overlay, .page-header-fixed { display: none !important; }
+        .main-content {
+            margin-left: 0 !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+        footer {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+        body { padding-top: 0 !important; }
+        /* Ensure topnav stacks correctly */
+        body.sidebar-collapsed .main-content { margin-left: 0 !important; }
+        body.sidebar-collapsed .page-header-fixed { left: 0 !important; display: none !important; }
+    </style>
+</head>
+
+<body class="auth-checking">
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="fas fa-wallet"></i><span class="brand-text">SplitWise</span></h5>
+            <button class="sidebar-close-btn sw-sidebar-close" id="sidebarCloseBtn" aria-label="Close sidebar" title="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="nav flex-column">
+            <!-- ROOT CAUSE FIX: Reduced margin-top from mt-4 (1.5rem) to 0.5rem -->
+            <a href="index.html" class="nav-link active">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="expenses.html" class="nav-link">
+                <i class="fas fa-receipt"></i> <span>Expenses</span>
+            </a>
+            <a href="groups.html" class="nav-link">
+                <i class="fas fa-users"></i> <span>Groups</span>
+            </a>
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-chart-bar"></i> <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Notification Button at Bottom -->
+        <div class="mt-auto">
+            <div class="nav-link notification-bell" id="notificationBellBtn">
+                <i class="fas fa-bell"></i> <span>Notifications</span>
+                <span class="notification-badge" id="notificationBadge"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Overlay -->
+    <div class="notification-overlay" id="notificationOverlay"></div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3><i class="fas fa-bell me-2"></i>Notifications</h3>
+            <button class="close-btn" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-actions-bar">
+            <button class="btn-mark-all" id="markAllReadBtn">
+                <i class="fas fa-check-double me-1"></i>Mark All Read
+            </button>
+            <button class="btn-clear-all" id="clearAllBtn">
+                <i class="fas fa-trash me-1"></i>Clear All
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Fixed Page Header -->
+    <div class="page-header-fixed">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle mobile menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="desktop-nav-toggle" id="desktopNavToggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h2 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Dashboard Overview</h2>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+
+            <!-- Stats Cards Row 1 - Main Overview -->
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card"
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="card-title mb-1" style="font-size:0.85rem; opacity:0.9; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Personal Monthly</h6>
+                                <h3 class="mb-0" id="personalMonthly" style="font-size:1.6rem; font-weight:800;"><span class="currency-symbol">₹</span>0</h3>
+                            </div>
+                            <i class="fas fa-wallet icon"></i>
+                        </div>
+                        <small style="opacity: 0.85;"><i class="fas fa-calendar-alt me-1"></i>My expenses this month</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card"
+                        style="background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); color: white;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="card-title mb-1" style="font-size:0.85rem; opacity:0.9; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Personal Overall</h6>
+                                <h3 class="mb-0" id="personalOverall" style="font-size:1.6rem; font-weight:800;"><span class="currency-symbol">₹</span>0</h3>
+                            </div>
+                            <i class="fas fa-chart-line icon"></i>
+                        </div>
+                        <small style="opacity: 0.85;"><i class="fas fa-infinity me-1"></i>Total personal expenses</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card"
+                        style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%); color: white;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="card-title mb-1" style="font-size:0.85rem; opacity:0.9; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Group Monthly</h6>
+                                <h3 class="mb-0" id="groupMonthly" style="font-size:1.6rem; font-weight:800;"><span class="currency-symbol">₹</span>0</h3>
+                            </div>
+                            <i class="fas fa-users icon"></i>
+                        </div>
+                        <small style="opacity: 0.85;"><i class="fas fa-calendar-alt me-1"></i>Group expenses this month</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stats-card"
+                        style="background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="card-title mb-1" style="font-size:0.85rem; opacity:0.9; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Group Overall</h6>
+                                <h3 class="mb-0" id="groupOverall" style="font-size:1.6rem; font-weight:800;"><span class="currency-symbol">₹</span>0</h3>
+                            </div>
+                            <i class="fas fa-layer-group icon"></i>
+                        </div>
+                        <small style="opacity: 0.85;"><i class="fas fa-infinity me-1"></i>Total group expenses</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row 2 - Money Owed -->
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="stats-card" style="border-left: 4px solid #1cc88a;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">I'll Get Back</h5>
+                            <i class="fas fa-arrow-circle-down icon" style="color: #1cc88a;"></i>
+                        </div>
+                        <h3 class="mb-0 text-success" id="moneyOwedToMe"><span class="currency-symbol">₹</span>0</h3>
+                        <p class="text-muted mb-0">Others owe me</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="stats-card" style="border-left: 4px solid #e74a3b;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">I Have to Pay</h5>
+                            <i class="fas fa-arrow-circle-up icon" style="color: #e74a3b;"></i>
+                        </div>
+                        <h3 class="mb-0 text-danger" id="moneyIPay"><span class="currency-symbol">₹</span>0</h3>
+                        <p class="text-muted mb-0">I owe others</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="stats-card" style="border-left: 4px solid #667eea;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Net Balance</h5>
+                            <i class="fas fa-balance-scale icon" style="color: #667eea;"></i>
+                        </div>
+                        <h3 class="mb-0" id="netBalance" style="color: #667eea;"><span class="currency-symbol">₹</span>0
+                        </h3>
+                        <p class="text-muted mb-0">Overall settlement</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <h4 class="mb-3">Quick Actions</h4>
+            <div class="quick-actions">
+                <div class="action-card" onclick="window.location.href='expenses.html'">
+                    <i class="fas fa-plus-circle"></i>
+                    <h5>Add Expense</h5>
+                    <p class="text-muted">Record a new expense</p>
+                </div>
+                <div class="action-card" onclick="window.location.href='groups.html'">
+                    <i class="fas fa-users"></i>
+                    <h5>Create Group</h5>
+                    <p class="text-muted">Split expenses with friends</p>
+                </div>
+                <div class="action-card" onclick="window.location.href='reports.html'">
+                    <i class="fas fa-file-export"></i>
+                    <h5>Export Report</h5>
+                    <p class="text-muted">Download expense summary</p>
+                </div>
+            </div>
+
+            <!-- Detailed Breakdown Section -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-3">
+                            <i class="fas fa-hand-holding-usd me-2"></i>Who Owes Me Money
+                        </h5>
+                        <div id="owesToMeList">
+                            <p class="text-muted text-center py-3">No pending receivables</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-3">
+                            <i class="fas fa-hand-holding-heart me-2"></i>Whom I Owe Money
+                        </h5>
+                        <div id="iOweList">
+                            <p class="text-muted text-center py-3">No pending payments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1: Personal vs Group -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-4">
+                            <i class="fas fa-chart-line me-2"></i>Monthly Expenses Trend
+                        </h5>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="monthlyExpensesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-4">
+                            <i class="fas fa-chart-pie me-2"></i>Personal vs Group Expenses
+                        </h5>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="personalVsGroupChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2: Categories -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-4">
+                            <i class="fas fa-tags me-2"></i>Personal Expense Categories
+                        </h5>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="personalCategoriesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-4">
+                            <i class="fas fa-layer-group me-2"></i>Group Expense Categories
+                        </h5>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="groupCategoriesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="mb-0">© 2026 SplitWise. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/groups-api.js"></script>
+    <script src="js/skeleton-loader.js"></script>
+    <script>
+        // API Configuration - ROOT CAUSE FIX: groups-api.js already declares const API_BASE globally
+        // Don't redeclare it - groups-api.js makes it available globally, or use window.API_BASE
+        // Since const API_BASE is already declared by groups-api.js, we'll just use it directly
+        // If for some reason it's not available, use window.API_BASE
+        // Note: We're NOT declaring API_BASE here - just using the one from groups-api.js
+
+        // Enhanced notification system
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+            notification.innerHTML = `
+                <i class="fas fa-${icon} me-3"></i>
+                <div class="notification-content">
+                    <p class="mb-0">${message}</p>
+                </div>
+            `;
+
+            container.appendChild(notification);
+
+            setTimeout(() => notification.classList.add('show'), 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Fetch expenses from backend API (includes both personal and group expenses)
+        async function fetchExpensesFromAPI() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.warn('⚠️ No auth token, using localStorage fallback');
+                    return getUserExpenses();
+                }
+
+                console.log('📥 Fetching expenses from backend API...');
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
+                    const errorText = await response.text().catch(() => 'Unknown error');
+                    console.error('Error response:', errorText);
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📊 API response:', data);
+
+                if (data.success && data.data && data.data.items) {
+                    console.log(`✅ Successfully fetched ${data.data.items.length} expenses from backend`);
+                    return data.data.items;
+                }
+
+                console.warn('⚠️ API returned success but no items found:', data);
+                return [];
+            } catch (error) {
+                console.error('❌ Error fetching expenses from API:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                // Fallback to localStorage
+                console.log('🔄 Falling back to localStorage');
+                return getUserExpenses();
+            }
+        }
+
+        // Get or initialize user expenses from localStorage (fallback)
+        function getUserExpenses() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user.email || 'guest';
+            const storageKey = `expenses_${userId}`;
+
+            const storedExpenses = localStorage.getItem(storageKey);
+            if (storedExpenses) {
+                try {
+                    return JSON.parse(storedExpenses);
+                } catch (e) {
+                    console.error('Error parsing expenses:', e);
+                    return [];
+                }
+            }
+            return [];
+        }
+
+        // Note: Expenses are stored in backend only
+        // This function is kept for backward compatibility but does nothing
+        function saveUserExpenses(expenses) {
+            // Expenses are stored in backend - no localStorage writes
+            console.warn('saveUserExpenses called but expenses are stored in backend only');
+        }
+
+        // Get user groups from backend API
+        async function getUserGroups() {
+            try {
+                if (window.GroupsAPI && window.GroupsAPI.syncGroupsWithBackend) {
+                    const result = await window.GroupsAPI.syncGroupsWithBackend();
+                    if (result.success && result.groups) {
+                        return result.groups;
+                    }
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching groups from backend:', error);
+                return [];
+            }
+        }
+
+
+        // ROOT CAUSE FIX: Calculate group expenses and balances from backend API
+        // Uses the SAME logic as groups.html updateGroupBalances for consistency
+        async function calculateGroupData() {
+            console.log('💰 Starting calculateGroupData...');
+            console.log('🔍 GroupsAPI available:', !!window.GroupsAPI);
+            console.log('🔍 GroupsAPI methods:', window.GroupsAPI ? Object.keys(window.GroupsAPI) : 'N/A');
+
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userName = user.name || 'You';
+            const userCurrency = user.preferredCurrency || 'INR';
+
+            console.log('👤 User:', userName, 'Currency:', userCurrency);
+
+            // Get exchange rates for conversion
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            let totalGroupExpenses = 0;
+            let monthlyGroupExpenses = 0;
+            let moneyToReceive = 0;  // Money others owe me
+            let moneyToPay = 0;      // Money I owe others
+
+            // ROOT CAUSE FIX: Track per-person balances for detailed lists
+            const owesMe = {};  // { personName: amount }
+            const iOwe = {};    // { personName: amount }
+
+            const currentDate = new Date();
+            const thisMonth = currentDate.getMonth();
+            const thisYear = currentDate.getFullYear();
+
+            try {
+                // ROOT CAUSE FIX: Check if GroupsAPI is available
+                if (!window.GroupsAPI || !window.GroupsAPI.syncGroupsWithBackend) {
+                    console.error('❌ GroupsAPI not available! Cannot calculate group balances.');
+                    return {
+                        totalGroupExpenses: 0,
+                        monthlyGroupExpenses: 0,
+                        iOwe: {},
+                        owesMe: {},
+                        totalOwedToMe: 0,
+                        totalIOwe: 0,
+                        netBalance: 0
+                    };
+                }
+
+                // ROOT CAUSE FIX: Fetch groups from backend API
+                console.log('📥 Fetching groups from backend...');
+                const groups = await getUserGroups();
+                console.log(`✅ Found ${groups.length} groups`);
+
+                if (groups.length === 0) {
+                    console.log('⚠️ No groups found, returning zero balances');
+                    return {
+                        totalGroupExpenses: 0,
+                        monthlyGroupExpenses: 0,
+                        iOwe: {},
+                        owesMe: {},
+                        totalOwedToMe: 0,
+                        totalIOwe: 0,
+                        netBalance: 0
+                    };
+                }
+
+                // ROOT CAUSE FIX: Calculate balances using SAME logic as groups page
+                for (const group of groups) {
+                    try {
+                        console.log(`📊 Processing group: ${group.name} (${group.id})`);
+                        console.log(`👥 Members: ${group.members?.join(', ') || 'None'}`);
+
+                        // Fetch expenses for this group
+                        if (window.GroupsAPI && window.GroupsAPI.getGroupExpenses) {
+                            const expensesResult = await window.GroupsAPI.getGroupExpenses(group.id);
+                            console.log(`📋 Group ${group.name} expenses result:`, expensesResult);
+
+                            if (expensesResult.success && expensesResult.expenses && Array.isArray(expensesResult.expenses)) {
+                                const groupExpenses = expensesResult.expenses;
+                                console.log(`💰 Found ${groupExpenses.length} expenses for group ${group.name}`);
+
+                                // ROOT CAUSE FIX: Calculate balances using balance system (same as groups page)
+                                const balances = {}; // { memberName: balance }
+
+                                // Initialize balances
+                                if (group.members && Array.isArray(group.members)) {
+                                    group.members.forEach(member => {
+                                        balances[member] = 0;
+                                    });
+                                } else {
+                                    console.warn(`⚠️ Group ${group.name} has no members array`);
+                                    continue;
+                                }
+
+                                // Process each expense
+                                groupExpenses.forEach(expense => {
+                                    const paidBy = expense.paid_by || expense.paidBy || '';
+                                    const expenseCurrency = expense.currency || 'INR';
+                                    const totalAmountRaw = parseFloat(expense.amount || 0);
+                                    const totalAmount = convertAmount(totalAmountRaw, expenseCurrency, userCurrency);
+                                    const splitData = expense.split_data || expense.splitData || {};
+
+                                    console.log(`💳 Expense: ${expense.description}, Paid by: ${paidBy}, Amount: ${totalAmountRaw} ${expenseCurrency}`);
+
+                                    // ROOT CAUSE FIX: Only process expenses where ALL members involved are currently ACTIVE
+                                    // Skip expenses where paidBy or any split member is not in the current active members list
+                                    // This ensures removed/left members don't affect balance calculations
+
+                                    // Check if paidBy is an active member
+                                    const isPaidByActive = group.members.some(m =>
+                                        m.toLowerCase().trim() === paidBy.toLowerCase().trim()
+                                    );
+
+                                    if (!isPaidByActive) {
+                                        console.log(`⚠️ Skipping expense: paidBy "${paidBy}" is not an active member in group ${group.name}`);
+                                        return; // Skip expenses paid by inactive/removed members
+                                    }
+
+                                    // Check if ALL members in split_data are active members
+                                    const splitMembers = Object.keys(splitData);
+                                    const allSplitMembersActive = splitMembers.length === 0 || splitMembers.every(member => {
+                                        return group.members.some(m =>
+                                            m.toLowerCase().trim() === member.toLowerCase().trim()
+                                        );
+                                    });
+
+                                    if (!allSplitMembersActive) {
+                                        console.log(`⚠️ Skipping expense: some members in split_data are not active members in group ${group.name}`);
+                                        return; // Skip expenses with inactive members in split
+                                    }
+
+                                    // ROOT CAUSE FIX: Use case-insensitive matching for paidBy
+                                    const paidByKey = Object.keys(balances).find(key =>
+                                        key.toLowerCase().trim() === paidBy.toLowerCase().trim()
+                                    );
+
+                                    if (paidByKey) {
+                                        // The person who paid gets credited the full amount
+                                        balances[paidByKey] = (balances[paidByKey] || 0) + totalAmount;
+                                        console.log(`  ✅ Credited ${paidByKey}: +${totalAmount}`);
+                                    } else {
+                                        console.warn(`  ⚠️ PaidBy "${paidBy}" not found in balances`);
+                                    }
+
+                                    // Each person in the split gets debited their share
+                                    // ROOT CAUSE FIX: Only process splits for active members (already verified above)
+                                    Object.keys(splitData).forEach(member => {
+                                        const memberKey = Object.keys(balances).find(key =>
+                                            key.toLowerCase().trim() === member.toLowerCase().trim()
+                                        );
+
+                                        if (memberKey) {
+                                            const shareRaw = parseFloat(splitData[member] || 0);
+                                            const share = convertAmount(shareRaw, expenseCurrency, userCurrency);
+                                            balances[memberKey] = (balances[memberKey] || 0) - share;
+                                            console.log(`  ✅ Debited ${memberKey}: -${share}`);
+                                        } else {
+                                            console.warn(`  ⚠️ Member "${member}" not found in balances`);
+                                        }
+                                    });
+
+                                    // Track expenses (user's share only)
+                                    const userKey = Object.keys(balances).find(key =>
+                                        key.toLowerCase().trim() === userName.toLowerCase().trim()
+                                    );
+                                    if (userKey) {
+                                        const splitKeys = Object.keys(splitData);
+                                        const userSplitKey = splitKeys.find(key =>
+                                            key.toLowerCase().trim() === userName.toLowerCase().trim()
+                                        );
+
+                                        if (userSplitKey) {
+                                            const userShareRaw = parseFloat(splitData[userSplitKey] || 0);
+                                            const userShare = convertAmount(userShareRaw, expenseCurrency, userCurrency);
+
+                                            totalGroupExpenses += userShare;
+                                            const expenseDate = new Date(expense.date || expense.spent_at);
+                                            if (expenseDate.getMonth() === thisMonth && expenseDate.getFullYear() === thisYear) {
+                                                monthlyGroupExpenses += userShare;
+                                            }
+                                            console.log(`  📊 User share: ${userShare} (${expenseCurrency} → ${userCurrency})`);
+                                        }
+                                    }
+                                });
+
+                                console.log(`💰 Balances calculated:`, balances);
+
+                                // ROOT CAUSE FIX: Calculate what I owe or am owed in this group (same as groups page)
+                                const userKey = Object.keys(balances).find(key =>
+                                    key.toLowerCase().trim() === userName.toLowerCase().trim()
+                                );
+                                const myBalance = userKey ? (balances[userKey] || 0) : 0;
+
+                                console.log(`💰 My balance in group ${group.name}: ${myBalance}`);
+                                console.log(`💰 All balances in group ${group.name}:`, balances);
+
+                                // ROOT CAUSE FIX: Track per-person balances for detailed lists
+                                // If myBalance > 0: others owe me (find members with negative balances)
+                                // If myBalance < 0: I owe others (find members with positive balances)
+                                if (myBalance > 0) {
+                                    // Others owe me - find members who owe money
+                                    Object.keys(balances).forEach(member => {
+                                        if (member.toLowerCase().trim() !== userName.toLowerCase().trim()) {
+                                            const memberBalance = balances[member] || 0;
+                                            if (memberBalance < 0) {
+                                                // Member owes money - they owe me proportionally
+                                                const totalOwed = Math.abs(Object.values(balances)
+                                                    .filter(b => b < 0)
+                                                    .reduce((sum, b) => sum + b, 0));
+
+                                                if (totalOwed > 0.01) {
+                                                    const memberOwed = Math.abs(memberBalance);
+                                                    const myOwedAmount = (memberOwed / totalOwed) * myBalance;
+                                                    owesMe[member] = (owesMe[member] || 0) + myOwedAmount;
+                                                }
+                                            }
+                                        }
+                                    });
+                                    moneyToReceive += myBalance;
+                                    console.log(`  ✅ Others owe me: ${myBalance} (Total: ${moneyToReceive})`);
+                                } else if (myBalance < 0) {
+                                    // I owe others - find members who are owed money
+                                    Object.keys(balances).forEach(member => {
+                                        if (member.toLowerCase().trim() !== userName.toLowerCase().trim()) {
+                                            const memberBalance = balances[member] || 0;
+                                            if (memberBalance > 0) {
+                                                // Member is owed money - I owe them proportionally
+                                                const totalOwed = Object.values(balances)
+                                                    .filter(b => b > 0)
+                                                    .reduce((sum, b) => sum + b, 0);
+
+                                                if (totalOwed > 0.01) {
+                                                    const memberOwed = memberBalance;
+                                                    const myOwedAmount = (memberOwed / totalOwed) * Math.abs(myBalance);
+                                                    iOwe[member] = (iOwe[member] || 0) + myOwedAmount;
+                                                }
+                                            }
+                                        }
+                                    });
+                                    moneyToPay += Math.abs(myBalance);
+                                    console.log(`  ✅ I owe others: ${Math.abs(myBalance)} (Total: ${moneyToPay})`);
+                                }
+                            } else {
+                                console.warn(`⚠️ Failed to fetch expenses for group ${group.name}:`, expensesResult);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`❌ Error processing group ${group.id}:`, error);
+                        console.error('Error stack:', error.stack);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error calculating group data:', error);
+                console.error('Error stack:', error.stack);
+            }
+
+            // Calculate totals for display
+            const totalOwedToMe = moneyToReceive;
+            const totalIOwe = moneyToPay;
+            const netBalance = totalOwedToMe - totalIOwe;
+
+            console.log('💰 Final balances:', {
+                totalOwedToMe,
+                totalIOwe,
+                netBalance,
+                totalGroupExpenses,
+                monthlyGroupExpenses,
+                owesMe,
+                iOwe
+            });
+
+            // ROOT CAUSE FIX: owesMe and iOwe are already populated above
+            // Filter out zero amounts for cleaner display
+            const filteredOwesMe = {};
+            const filteredIOwe = {};
+
+            Object.keys(owesMe).forEach(person => {
+                if (owesMe[person] > 0.01) { // Filter out very small amounts
+                    filteredOwesMe[person] = owesMe[person];
+                }
+            });
+
+            Object.keys(iOwe).forEach(person => {
+                if (iOwe[person] > 0.01) { // Filter out very small amounts
+                    filteredIOwe[person] = iOwe[person];
+                }
+            });
+
+            return {
+                totalGroupExpenses,
+                monthlyGroupExpenses,
+                iOwe: filteredIOwe,
+                owesMe: filteredOwesMe,
+                totalOwedToMe,
+                totalIOwe,
+                netBalance
+            };
+        }
+
+        // Update dashboard stats
+        async function updateDashboardStats(expenses) {
+            console.log('📊 updateDashboardStats called with expenses:', expenses?.length || 0);
+            console.log('📊 updateDashboardStats - expenses sample:', expenses?.slice(0, 2));
+
+            const currentDate = new Date();
+            const thisMonth = currentDate.getMonth();
+            const thisYear = currentDate.getFullYear();
+
+            // Separate personal and group expenses from API
+            const allExpenses = expenses || [];
+            console.log('📊 updateDashboardStats - allExpenses:', allExpenses.length);
+
+            const personalExpenses = allExpenses.filter(e => !e.type || e.type === 'personal');
+            const groupExpenses = allExpenses.filter(e => e.type === 'group');
+
+            console.log('📊 updateDashboardStats - personalExpenses:', personalExpenses.length);
+            console.log('📊 updateDashboardStats - groupExpenses:', groupExpenses.length);
+
+            let personalMonthly = 0;
+            let personalOverall = 0;
+            let groupMonthly = 0;
+            let groupOverall = 0;
+
+            // Process personal expenses
+            personalExpenses.forEach(expense => {
+                try {
+                    const amount = parseFloat(expense.amount) || 0;
+                    personalOverall += amount;
+                    const expenseDate = new Date(expense.spent_at || expense.date);
+                    if (expenseDate.getMonth() === thisMonth && expenseDate.getFullYear() === thisYear) {
+                        personalMonthly += amount;
+                    }
+                } catch (e) {
+                    console.error('Error processing personal expense:', expense, e);
+                }
+            });
+
+            // Process group expenses - Only include expenses where user is involved in split
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userName = user.name || 'You';
+
+            groupExpenses.forEach(expense => {
+                try {
+                    // Check if user is involved in this expense's split
+                    const splitData = expense.split_data || expense.splitData || {};
+
+                    // ROOT CAUSE FIX: Use case-insensitive matching and check if user is in split_data keys
+                    const splitKeys = Object.keys(splitData);
+                    const userInSplit = splitKeys.some(key =>
+                        key.toLowerCase().trim() === userName.toLowerCase().trim()
+                    );
+
+                    // Find user's share with case-insensitive matching
+                    let userShare = 0;
+                    if (userInSplit) {
+                        const matchingKey = splitKeys.find(key =>
+                            key.toLowerCase().trim() === userName.toLowerCase().trim()
+                        );
+                        userShare = parseFloat(splitData[matchingKey]) || 0;
+                    }
+
+                    // Only count expenses where user has a share (is involved)
+                    // If split_data is empty but expense exists, include it (fallback for legacy data)
+                    if (userShare > 0 || (splitKeys.length === 0 && expense.amount > 0)) {
+                        const shareToUse = userShare > 0 ? userShare : (parseFloat(expense.amount) || 0);
+                        groupOverall += shareToUse;
+                        const expenseDate = new Date(expense.spent_at || expense.date);
+                        if (expenseDate.getMonth() === thisMonth && expenseDate.getFullYear() === thisYear) {
+                            groupMonthly += shareToUse;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error processing group expense:', expense, e);
+                }
+            });
+
+            // ROOT CAUSE FIX: Group balances (from calculateGroupData) - now async
+            const groupData = await calculateGroupData();
+
+            // Format number with commas
+            const formatAmount = (num, decimals = 0) => {
+                return parseFloat(num).toLocaleString('en-IN', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            };
+
+            // ROOT CAUSE FIX: Get currency symbol and conversion rates
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() : '₹';
+            // ROOT CAUSE FIX: Reuse user variable declared earlier (line 859), don't redeclare
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            // ROOT CAUSE FIX: Convert all amounts (expenses are stored in INR by default for legacy data)
+            // Personal expenses currency is stored in expense.currency field
+            let convertedPersonalMonthly = 0;
+            let convertedPersonalOverall = 0;
+            personalExpenses.forEach(expense => {
+                try {
+                    const amount = parseFloat(expense.amount) || 0;
+                    const expenseCurrency = expense.currency || 'INR';
+                    convertedPersonalOverall += convertAmount(amount, expenseCurrency, userCurrency);
+                    const expenseDate = new Date(expense.spent_at || expense.date);
+                    if (expenseDate.getMonth() === thisMonth && expenseDate.getFullYear() === thisYear) {
+                        convertedPersonalMonthly += convertAmount(amount, expenseCurrency, userCurrency);
+                    }
+                } catch (e) {
+                    console.error('Error converting personal expense:', expense, e);
+                }
+            });
+
+            // Group expenses currency is stored in expense.currency field
+            // Only include expenses where user is involved in split
+            let convertedGroupMonthly = 0;
+            let convertedGroupOverall = 0;
+            groupExpenses.forEach(expense => {
+                try {
+                    // Check if user is involved in this expense's split
+                    const splitData = expense.split_data || expense.splitData || {};
+
+                    // ROOT CAUSE FIX: Use case-insensitive matching and check if user is in split_data keys
+                    const splitKeys = Object.keys(splitData);
+                    const userInSplit = splitKeys.some(key =>
+                        key.toLowerCase().trim() === userName.toLowerCase().trim()
+                    );
+
+                    // Find user's share with case-insensitive matching
+                    let userShare = 0;
+                    if (userInSplit) {
+                        const matchingKey = splitKeys.find(key =>
+                            key.toLowerCase().trim() === userName.toLowerCase().trim()
+                        );
+                        userShare = parseFloat(splitData[matchingKey]) || 0;
+                    }
+
+                    // Only count expenses where user has a share (is involved)
+                    // If split_data is empty but expense exists, include it (fallback for legacy data)
+                    if (userShare > 0 || (splitKeys.length === 0 && expense.amount > 0)) {
+                        const shareToUse = userShare > 0 ? userShare : (parseFloat(expense.amount) || 0);
+                        const expenseCurrency = expense.currency || 'INR';
+                        const convertedShare = convertAmount(shareToUse, expenseCurrency, userCurrency);
+                        convertedGroupOverall += convertedShare;
+                        const expenseDate = new Date(expense.spent_at || expense.date);
+                        if (expenseDate.getMonth() === thisMonth && expenseDate.getFullYear() === thisYear) {
+                            convertedGroupMonthly += convertedShare;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error converting group expense:', expense, e);
+                }
+            });
+
+            // ROOT CAUSE FIX: Group balances are already converted to userCurrency in calculateGroupData
+            // Don't convert again - use them directly
+            const convertedTotalOwedToMe = groupData.totalOwedToMe; // Already converted
+            const convertedTotalIOwe = groupData.totalIOwe; // Already converted
+            const convertedNetBalance = convertedTotalOwedToMe - convertedTotalIOwe;
+
+            console.log('💰 Updating dashboard UI with balances:', {
+                totalOwedToMe: convertedTotalOwedToMe,
+                totalIOwe: convertedTotalIOwe,
+                netBalance: convertedNetBalance,
+                groupData: groupData
+            });
+
+            // ROOT CAUSE FIX: Update currency symbols in spans
+            document.querySelectorAll('.currency-symbol').forEach(span => {
+                span.textContent = currencySymbol;
+            });
+
+            // ROOT CAUSE FIX: Update all stat cards with converted amounts and proper decimals
+            document.getElementById('personalMonthly').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(convertedPersonalMonthly, 2)}`;
+            document.getElementById('personalOverall').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(convertedPersonalOverall, 2)}`;
+            document.getElementById('groupMonthly').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(convertedGroupMonthly, 2)}`;
+            document.getElementById('groupOverall').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(convertedGroupOverall, 2)}`;
+
+            document.getElementById('moneyOwedToMe').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(convertedTotalOwedToMe, 2)}`;
+            document.getElementById('moneyIPay').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(convertedTotalIOwe, 2)}`;
+
+            const netBalanceEl = document.getElementById('netBalance');
+            netBalanceEl.innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(Math.abs(convertedNetBalance), 2)}`;
+
+            if (convertedNetBalance > 0) {
+                netBalanceEl.style.color = '#1cc88a';
+                netBalanceEl.parentElement.querySelector('p').textContent = 'You will get back';
+            } else if (convertedNetBalance < 0) {
+                netBalanceEl.style.color = '#e74a3b';
+                netBalanceEl.parentElement.querySelector('p').textContent = 'You need to pay';
+            } else {
+                netBalanceEl.style.color = '#667eea';
+                netBalanceEl.parentElement.querySelector('p').textContent = 'All settled up!';
+            }
+
+            // Update detailed lists
+            updateOwedLists(groupData.owesMe, groupData.iOwe);
+
+            return {
+                allExpenses: allExpenses, // ROOT CAUSE FIX: Include allExpenses for charts
+                personalExpenses,
+                personalMonthly,
+                personalOverall,
+                convertedPersonalMonthly,
+                convertedPersonalOverall,
+                convertedGroupMonthly,
+                convertedGroupOverall,
+                groupData
+            };
+        }
+
+        // Update who owes whom lists
+        function updateOwedLists(owesMe, iOwe) {
+            const owesToMeList = document.getElementById('owesToMeList');
+            const iOweList = document.getElementById('iOweList');
+
+            // ROOT CAUSE FIX: Get currency symbol once (amounts are already in user's currency from calculateGroupData)
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() :
+                (() => {
+                    const userCurrency = user.preferredCurrency || 'INR';
+                    return userCurrency === 'USD' ? '$' : userCurrency === 'EUR' ? '€' :
+                        userCurrency === 'GBP' ? '£' : userCurrency === 'JPY' ? '¥' :
+                            userCurrency === 'AUD' ? 'A$' : '₹';
+                })();
+
+            // Who owes me
+            if (!owesMe || Object.keys(owesMe).length === 0) {
+                owesToMeList.innerHTML = '<p class="text-muted text-center py-3"><i class="fas fa-check-circle me-2"></i>No pending receivables</p>';
+            } else {
+                let html = '<div class="list-group">';
+                Object.entries(owesMe).sort((a, b) => b[1] - a[1]).forEach(([person, amount]) => {
+                    // ROOT CAUSE FIX: Amount is already in user's currency from calculateGroupData, no need to convert again
+                    const displayAmount = parseFloat(amount || 0);
+                    if (displayAmount > 0.01) { // Only show amounts greater than 0.01
+                        html += `
+                            <div class="list-group-item d-flex justify-content-between align-items-center" style="border-radius: 10px; margin-bottom: 8px; border: 1px solid #1cc88a;">
+                                <div>
+                                    <i class="fas fa-user-circle me-2" style="color: #1cc88a;"></i>
+                                    <strong>${person}</strong>
+                                    <br><small class="text-muted">Owes you</small>
+                                </div>
+                                <span class="badge bg-success" style="font-size: 1rem; padding: 8px 15px;">${currencySymbol}${displayAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        `;
+                    }
+                });
+                html += '</div>';
+                owesToMeList.innerHTML = html;
+            }
+
+            // Whom I owe
+            if (!iOwe || Object.keys(iOwe).length === 0) {
+                iOweList.innerHTML = '<p class="text-muted text-center py-3"><i class="fas fa-check-circle me-2"></i>No pending payments</p>';
+            } else {
+                let html = '<div class="list-group">';
+                Object.entries(iOwe).sort((a, b) => b[1] - a[1]).forEach(([person, amount]) => {
+                    // ROOT CAUSE FIX: Amount is already in user's currency from calculateGroupData, no need to convert again
+                    const displayAmount = parseFloat(amount || 0);
+                    if (displayAmount > 0.01) { // Only show amounts greater than 0.01
+                        html += `
+                            <div class="list-group-item d-flex justify-content-between align-items-center" style="border-radius: 10px; margin-bottom: 8px; border: 1px solid #e74a3b;">
+                                <div>
+                                    <i class="fas fa-user-circle me-2" style="color: #e74a3b;"></i>
+                                    <strong>${person}</strong>
+                                    <br><small class="text-muted">You owe</small>
+                                </div>
+                                <span class="badge bg-danger" style="font-size: 1rem; padding: 8px 15px;">${currencySymbol}${displayAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        `;
+                    }
+                });
+                html += '</div>';
+                iOweList.innerHTML = html;
+            }
+        }
+
+        // Chart instances for cleanup
+        let monthlyChart = null;
+        let personalVsGroupChart = null;
+        let personalCategoriesChart = null;
+        let groupCategoriesChart = null;
+
+        // Update charts
+        async function updateCharts(dashboardData) {
+            // ROOT CAUSE FIX: Get currency symbol and conversion rates
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() : '₹';
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            // Get all expenses (personal + group) from the passed data or fetch from API
+            const allExpenses = dashboardData?.allExpenses || [];
+            console.log('📊 updateCharts - allExpenses:', allExpenses.length);
+            console.log('📊 updateCharts - dashboardData:', dashboardData);
+
+            const personalExpenses = allExpenses.filter(e => !e.type || e.type === 'personal');
+            console.log('📊 updateCharts - personalExpenses:', personalExpenses.length);
+
+            // ROOT CAUSE FIX: await the async calculateGroupData() function
+            const groupData = await calculateGroupData();
+            console.log('📊 updateCharts - groupData:', groupData);
+
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // ROOT CAUSE FIX: Prepare personal expense data with currency conversion
+            const personalMonthlyData = new Array(12).fill(0);
+            const personalCategoryData = {};
+
+            personalExpenses.forEach(expense => {
+                try {
+                    const date = new Date(expense.spent_at || expense.date);
+                    if (!isNaN(date.getTime())) {
+                        const month = date.getMonth();
+                        const amount = parseFloat(expense.amount) || 0;
+                        const expenseCurrency = expense.currency || 'INR';
+                        const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+                        personalMonthlyData[month] += convertedAmount;
+
+                        const category = expense.category || 'Other';
+                        personalCategoryData[category] = (personalCategoryData[category] || 0) + convertedAmount;
+                    }
+                } catch (e) {
+                    console.error('Error processing expense:', expense, e);
+                }
+            });
+
+            // ROOT CAUSE FIX: Prepare group expense data with currency conversion
+            // IMPORTANT: Only include user's share, not the full group expense amount
+            const groupMonthlyData = new Array(12).fill(0);
+            const groupCategoryData = {};
+            const groupExpensesFromAPI = allExpenses.filter(e => e.type === 'group');
+
+            // Get user name for split calculation
+            const userName = user.name || 'You';
+
+            // ROOT CAUSE FIX: Fetch group names to map group IDs to names for legacy data
+            let groupNameMap = {};
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const groupsResponse = await fetch(`${API_BASE}/groups`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (groupsResponse.ok) {
+                        const groupsData = await groupsResponse.json();
+                        if (groupsData.success && groupsData.data && groupsData.data.items) {
+                            groupsData.data.items.forEach(group => {
+                                groupNameMap[group._id] = group.name;
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not fetch group names:', e);
+            }
+
+            // ROOT CAUSE FIX: Process group expenses and calculate user's share instead of full amount
+            groupExpensesFromAPI.forEach(expense => {
+                try {
+                    // ROOT CAUSE FIX: Calculate user's share from split_data instead of using full amount
+                    const splitData = expense.split_data || expense.splitData || {};
+                    const splitKeys = Object.keys(splitData);
+
+                    // Find user's share with case-insensitive matching
+                    let userShare = 0;
+                    if (splitKeys.length > 0) {
+                        const userKey = splitKeys.find(key =>
+                            key.toLowerCase().trim() === userName.toLowerCase().trim()
+                        );
+                        if (userKey) {
+                            userShare = parseFloat(splitData[userKey]) || 0;
+                        }
+                    } else {
+                        // Fallback for legacy data: if no split_data, assume equal split (but this shouldn't happen with backend)
+                        // Skip expenses without split_data to avoid incorrect calculations
+                        console.warn('⚠️ Group expense has no split_data, skipping:', expense);
+                        return;
+                    }
+
+                    // Skip if user has no share in this expense
+                    if (userShare <= 0) {
+                        return;
+                    }
+
+                    const date = new Date(expense.spent_at || expense.date);
+                    if (!isNaN(date.getTime())) {
+                        const month = date.getMonth();
+                        const expenseCurrency = expense.currency || 'INR';
+                        // ROOT CAUSE FIX: Convert user's share (not full amount) to user's preferred currency
+                        const convertedUserShare = convertAmount(userShare, expenseCurrency, userCurrency);
+                        groupMonthlyData[month] += convertedUserShare;
+
+                        // ROOT CAUSE FIX: Use group name from category field (backend now returns names)
+                        // If category still contains group ID (legacy data), try to map it
+                        let category = expense.category || 'Group: Unknown';
+                        if (category.startsWith('Group: ') && expense.group_id) {
+                            // Check if category contains a group ID (long alphanumeric string)
+                            const categoryPart = category.replace('Group: ', '');
+                            // If it looks like an ObjectId (24 hex characters), try to map it
+                            if (/^[0-9a-f]{24}$/i.test(categoryPart) && groupNameMap[categoryPart]) {
+                                category = `Group: ${groupNameMap[categoryPart]}`;
+                            } else if (groupNameMap[expense.group_id]) {
+                                // Fallback: use group_id from expense object
+                                category = `Group: ${groupNameMap[expense.group_id]}`;
+                            }
+                        }
+                        // ROOT CAUSE FIX: Add user's share to category data, not full amount
+                        groupCategoryData[category] = (groupCategoryData[category] || 0) + convertedUserShare;
+                    }
+                } catch (e) {
+                    console.error('Error processing group expense:', expense, e);
+                }
+            });
+
+            // Destroy existing charts if they exist
+            if (monthlyChart) monthlyChart.destroy();
+            if (personalVsGroupChart) personalVsGroupChart.destroy();
+            if (personalCategoriesChart) personalCategoriesChart.destroy();
+            if (groupCategoriesChart) groupCategoriesChart.destroy();
+
+            // Chart 1: Monthly Expenses Trend (Personal + Group)
+            const monthlyCtx = document.getElementById('monthlyExpensesChart').getContext('2d');
+            monthlyChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Personal Expenses',
+                        data: personalMonthlyData,
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }, {
+                        label: 'Group Expenses',
+                        data: groupMonthlyData,
+                        borderColor: 'rgb(246, 194, 62)',
+                        backgroundColor: 'rgba(246, 194, 62, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // FIXED: Allow charts to fill container on mobile
+                    aspectRatio: window.innerWidth <= 767 ? 1.2 : 2, // FIXED: Better aspect ratio on mobile
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: window.innerWidth <= 767 ? 'bottom' : 'top', // FIXED: Legend at bottom on mobile
+                            labels: {
+                                font: { family: 'Nunito', size: window.innerWidth <= 767 ? 11 : 12 }, // FIXED: Smaller font on mobile
+                                padding: window.innerWidth <= 767 ? 8 : 10,
+                                boxWidth: window.innerWidth <= 767 ? 12 : 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function (context) {
+                                    // ROOT CAUSE FIX: Use dynamic currency symbol
+                                    return context.dataset.label + ': ' + currencySymbol + context.parsed.y.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    // ROOT CAUSE FIX: Use dynamic currency symbol and show decimals
+                                    return currencySymbol + value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                },
+                                font: { family: 'Nunito', size: window.innerWidth <= 767 ? 10 : 12 } // FIXED: Smaller font on mobile
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            ticks: {
+                                font: { family: 'Nunito', size: window.innerWidth <= 767 ? 10 : 12 }, // FIXED: Smaller font on mobile
+                                maxRotation: window.innerWidth <= 767 ? 45 : 0, // FIXED: Rotate labels on mobile
+                                minRotation: window.innerWidth <= 767 ? 45 : 0
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Personal vs Group Pie Chart
+            const pvgCtx = document.getElementById('personalVsGroupChart').getContext('2d');
+            // ROOT CAUSE FIX: Use already converted totals from dashboardData or calculate from expenses
+            const totalPersonal = dashboardData?.convertedPersonalOverall || 0;
+            // ROOT CAUSE FIX: Calculate group total as sum of user shares (already calculated in groupCategoryData)
+            // This ensures we're showing only the user's portion of group expenses, not the full group amounts
+            const totalGroup = Object.values(groupCategoryData).reduce((sum, value) => sum + value, 0);
+
+            if (totalPersonal === 0 && totalGroup === 0) {
+                personalVsGroupChart = new Chart(pvgCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{ data: [1], backgroundColor: ['rgba(200, 200, 200, 0.3)'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // ROOT CAUSE FIX: Disable to fill container properly
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            } else {
+                personalVsGroupChart = new Chart(pvgCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Personal', 'Group'],
+                        datasets: [{
+                            data: [totalPersonal, totalGroup],
+                            backgroundColor: ['rgba(102, 126, 234, 0.8)', 'rgba(246, 194, 62, 0.8)'],
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // ROOT CAUSE FIX: Disable to fill container properly and match other charts
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { font: { family: 'Nunito', size: 12 }, padding: 15 }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.raw;
+                                        const total = totalPersonal + totalGroup;
+                                        const percentage = Math.round((value / total) * 100);
+                                        // ROOT CAUSE FIX: Use dynamic currency symbol and decimals
+                                        return `${context.label}: ${currencySymbol}${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 3: Personal Categories
+            const personalCatCtx = document.getElementById('personalCategoriesChart').getContext('2d');
+            const personalCategories = Object.keys(personalCategoryData);
+            const personalCategoryAmounts = personalCategories.map(cat => personalCategoryData[cat]);
+
+            if (personalCategories.length === 0) {
+                personalCategoriesChart = new Chart(personalCatCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{ data: [1], backgroundColor: ['rgba(200, 200, 200, 0.3)'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // ROOT CAUSE FIX: Disable to fill container properly
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            } else {
+                const backgroundColors = [
+                    'rgba(102, 126, 234, 0.8)', 'rgba(118, 75, 162, 0.8)', 'rgba(28, 200, 138, 0.8)',
+                    'rgba(54, 185, 204, 0.8)', 'rgba(246, 194, 62, 0.8)', 'rgba(231, 74, 59, 0.8)',
+                    'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)'
+                ];
+
+                personalCategoriesChart = new Chart(personalCatCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: personalCategories,
+                        datasets: [{
+                            data: personalCategoryAmounts,
+                            backgroundColor: backgroundColors.slice(0, personalCategories.length),
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // ROOT CAUSE FIX: Disable to fill container properly and match other charts
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { font: { family: 'Nunito', size: 11 }, padding: 10, boxWidth: 15 }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.raw;
+                                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        // ROOT CAUSE FIX: Use dynamic currency symbol and decimals
+                                        return `${context.label}: ${currencySymbol}${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 4: Group Categories
+            const groupCatCtx = document.getElementById('groupCategoriesChart').getContext('2d');
+            const groupCategories = Object.keys(groupCategoryData);
+            const groupCategoryAmounts = groupCategories.map(cat => groupCategoryData[cat]);
+
+            if (groupCategories.length === 0) {
+                groupCategoriesChart = new Chart(groupCatCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Groups'],
+                        datasets: [{ data: [1], backgroundColor: ['rgba(200, 200, 200, 0.3)'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // ROOT CAUSE FIX: Disable to fill container properly
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            } else {
+                const backgroundColors = [
+                    'rgba(102, 126, 234, 0.8)', 'rgba(118, 75, 162, 0.8)', 'rgba(28, 200, 138, 0.8)',
+                    'rgba(54, 185, 204, 0.8)', 'rgba(246, 194, 62, 0.8)', 'rgba(231, 74, 59, 0.8)',
+                    'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)'
+                ];
+
+                groupCategoriesChart = new Chart(groupCatCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: groupCategories,
+                        datasets: [{
+                            data: groupCategoryAmounts,
+                            backgroundColor: backgroundColors.slice(0, groupCategories.length),
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // ROOT CAUSE FIX: Disable to fill container properly and match Personal Categories chart size
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { font: { family: 'Nunito', size: 11 }, padding: 10, boxWidth: 15 }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.raw;
+                                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        // ROOT CAUSE FIX: Use dynamic currency symbol and decimals
+                                        return `${context.label}: ${currencySymbol}${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async function () {
+            // ROOT CAUSE FIX: Only initialize if authenticated (should always be true at this point)
+            if (!document.body.classList.contains('authenticated')) {
+                console.log('⚠️ Not authenticated - skipping dashboard initialization');
+                return;
+            }
+
+            console.log('🚀 Initializing Dashboard...');
+
+            // Show page immediately
+            document.body.classList.add('ready');
+
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userName = user.name || 'Guest User';
+
+            let hasCachedData = false;
+
+            // Load cached data first for instant display
+            try {
+                const cachedExpenses = getUserExpenses();
+                if (cachedExpenses && cachedExpenses.length > 0) {
+                    console.log(`📊 Loading ${cachedExpenses.length} cached expenses...`);
+                    hasCachedData = true;
+                    const dashboardData = await updateDashboardStats(cachedExpenses);
+                    if (dashboardData && dashboardData.allExpenses) {
+                        // Update charts with cached data (non-blocking)
+                        updateCharts(dashboardData).catch(err => {
+                            console.warn('Charts update with cached data failed:', err);
+                        });
+                    }
+                } else {
+                    // Show skeleton if no cached data
+                    if (typeof showSkeletonDashboard === 'function') {
+                        showSkeletonDashboard();
+                    }
+                }
+            } catch (e) {
+                console.warn('No cached expenses found');
+                // Show skeleton if no cached data
+                if (typeof showSkeletonDashboard === 'function') {
+                    showSkeletonDashboard();
+                }
+            }
+
+            // Load fresh data in background (non-blocking)
+            (async function loadFreshData() {
+                try {
+                    console.log('📥 Fetching fresh expenses from API...');
+                    const userExpenses = await fetchExpensesFromAPI();
+
+                    console.log(`✅ Loaded ${userExpenses.length} expenses from API`);
+
+                    // Validate expenses data
+                    if (!userExpenses || !Array.isArray(userExpenses)) {
+                        console.error('❌ Invalid expenses data:', userExpenses);
+                        return;
+                    }
+
+                    // Update dashboard with fresh data
+                    console.log('📊 Updating dashboard stats with fresh data...');
+                    const dashboardData = await updateDashboardStats(userExpenses);
+
+                    if (!dashboardData || !dashboardData.allExpenses) {
+                        console.error('❌ Dashboard data is missing allExpenses:', dashboardData);
+                        // Hide skeleton on error
+                        if (!hasCachedData && typeof hideSkeleton === 'function') {
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    setTimeout(() => {
+                                        hideSkeleton('dashboardSkeleton');
+                                    }, 150);
+                                });
+                            });
+                        }
+                        return;
+                    }
+
+                    // Update charts with fresh data
+                    console.log('📈 Updating charts with fresh data...');
+                    await updateCharts(dashboardData);
+                    console.log('✅ Charts updated successfully');
+
+                    // Hide skeleton only after all data is loaded and rendered (exactly like expenses/reports pages)
+                    if (!hasCachedData && typeof hideSkeleton === 'function') {
+                        // Wait for content to be rendered using requestAnimationFrame (same as expenses/reports pages)
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                // Verify that content is actually rendered before hiding skeleton
+                                const container = document.querySelector('.main-content .container-fluid');
+                                const statsCards = container?.querySelectorAll('.stats-card');
+                                const quickActions = container?.querySelector('.quick-actions');
+
+                                // Check if stats are updated (not showing "0" anymore or have actual content)
+                                const statsUpdated = statsCards && statsCards.length > 0 && (
+                                    statsCards[0]?.querySelector('h3')?.textContent !== '₹0' ||
+                                    statsCards[0]?.querySelector('h3')?.textContent !== '$0'
+                                );
+
+                                // Check if quick actions are visible
+                                const quickActionsUpdated = quickActions && quickActions.querySelectorAll('.action-card').length > 0;
+
+                                // Only hide skeleton when content is ready (like expenses/reports page timing)
+                                if (statsUpdated && quickActionsUpdated) {
+                                    // Both ready - hide immediately (same timing as expenses/reports page)
+                                    setTimeout(() => {
+                                        hideSkeleton('dashboardSkeleton');
+                                    }, 150);
+                                } else {
+                                    // Wait a bit more for content to render
+                                    setTimeout(() => {
+                                        hideSkeleton('dashboardSkeleton');
+                                    }, 300);
+                                }
+                            });
+                        });
+                    } else if (hasCachedData) {
+                        // Page loaded silently - no notification on refresh
+                    }
+
+                    // Add content-loaded class for fade-in animation
+                    const container = document.querySelector('.main-content .container-fluid');
+                    if (container) {
+                        container.classList.add('content-loaded');
+                    }
+
+                    // Show welcome message (only once per session) - AFTER skeleton is hidden
+                    // This function will be called by hideSkeleton when skeleton finishes hiding
+                    if (!hasCachedData && !sessionStorage.getItem('dashboard_page_loaded')) {
+                        sessionStorage.setItem('dashboard_page_loaded', 'true');
+                        // Wait for skeleton to be hidden before showing welcome notification
+                        // This will be called after hideSkeleton completes
+                        window.dashboardWelcomeShown = false;
+                        window.showDashboardWelcome = function () {
+                            if (window.dashboardWelcomeShown) return;
+                            window.dashboardWelcomeShown = true;
+                            setTimeout(() => {
+                                if (userExpenses.length === 0) {
+                                    showNotification(`Welcome ${userName}! Start tracking your expenses.`, 'info');
+                                } else {
+                                    showNotification(`Welcome back ${userName}!`, 'success');
+                                }
+                            }, 300); // Small delay after skeleton is hidden
+                        };
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading fresh data:', error);
+                    // Hide skeleton on error
+                    if (!hasCachedData && typeof hideSkeleton === 'function') {
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                setTimeout(() => {
+                                    hideSkeleton('dashboardSkeleton');
+                                }, 150);
+                            });
+                        });
+                    }
+
+                    // Silent on refresh - no notification needed
+                }
+            })();
+        });
+    </script>
+    <script src="js/prevent-auto-scroll.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="js/sidebar-toggle.js"></script>
+    <script>
+        // Desktop navigation toggle
+        document.addEventListener('DOMContentLoaded', function () {
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebar = document.querySelector('.sidebar');
+
+            // ROOT CAUSE FIX: Store scroll position before locking body
+            let bodyScrollPosition = 0;
+
+            // ROOT CAUSE FIX: Function to lock body scroll
+            function lockBodyScroll() {
+                bodyScrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${bodyScrollPosition}px`;
+                document.body.style.width = '100%';
+                document.body.style.height = '100%';
+                document.body.classList.add('sidebar-open');
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = 'hidden';
+                    mainContent.style.position = 'fixed';
+                }
+            }
+
+            // ROOT CAUSE FIX: Function to unlock body scroll
+            function unlockBodyScroll() {
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+                document.body.classList.remove('sidebar-open');
+                window.scrollTo(0, bodyScrollPosition);
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = '';
+                    mainContent.style.position = '';
+                }
+            }
+
+            // ROOT CAUSE FIX: Mobile menu toggle function with proper scroll locking
+            function toggleMobileMenu() {
+                if (!sidebar) return;
+                const isOpening = !sidebar.classList.contains('show');
+                sidebar.classList.toggle('show');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('show');
+                    if (isOpening) {
+                        sidebarOverlay.style.display = 'block';
+                    } else {
+                        sidebarOverlay.style.display = 'none';
+                    }
+                }
+                if (sidebar.classList.contains('show')) {
+                    lockBodyScroll();
+                } else {
+                    unlockBodyScroll();
+                }
+            }
+
+            // Mobile menu button handler
+            if (mobileMenuBtn) {
+                const newMobileBtn = mobileMenuBtn.cloneNode(true);
+                mobileMenuBtn.parentNode.replaceChild(newMobileBtn, mobileMenuBtn);
+                newMobileBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Close mobile menu when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleMobileMenu);
+            }
+
+            // Sidebar close button
+            const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+            if (sidebarCloseBtn) {
+                const newCloseBtn = sidebarCloseBtn.cloneNode(true);
+                sidebarCloseBtn.parentNode.replaceChild(newCloseBtn, sidebarCloseBtn);
+                newCloseBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    if (sidebar) {
+                        sidebar.classList.remove('show');
+                        if (sidebarOverlay) {
+                            sidebarOverlay.classList.remove('show');
+                            sidebarOverlay.style.display = 'none';
+                        }
+                        unlockBodyScroll();
+                    }
+                });
+            }
+
+            if (desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Check if mobile - use mobile menu toggle
+                    if (window.innerWidth <= 767) {
+                        toggleMobileMenu();
+                        return;
+                    }
+
+                    // Desktop: use global toggle function or fallback
+                    if (typeof globalToggleSidebar === 'function') {
+                        globalToggleSidebar();
+                    } else {
+                        document.body.classList.toggle('sidebar-collapsed');
+                        if (sidebar) {
+                            sidebar.classList.toggle('collapsed');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="js/currency.js"></script>
+    <script src="js/notifications-manager.js"></script>
+    <script src="js/notification-panel.js" defer></script>
+    <script src="js/topnav.js" defer></script>
+    <script src="js/navigation-init.js" defer></script>
+    <script src="js/sw-engine.js" defer></script>
+</body>
+
+</html>
+
