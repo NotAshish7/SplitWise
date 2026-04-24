@@ -1,0 +1,3344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reports - SplitWise</title>
+    <!-- Favicon - High Quality Wallet Logo -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/collapsible-sidebar.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #2c3e50;
+            --body-color: #ffffff;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+            --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --sidebar-width: 240px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--body-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.ready {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--navbar-bg);
+            box-shadow: var(--shadow);
+            padding: 0.5rem 0.875rem 1.25rem 0.875rem;
+            /* ROOT CAUSE FIX: Minimal top padding to align with header */
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0.5rem 0.75rem;
+            /* ROOT CAUSE FIX: Minimal padding to align with main header */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 0.75rem;
+            /* ROOT CAUSE FIX: Reduced margin to bring nav links closer */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the content (wallet icon + SEM) */
+            /* ROOT CAUSE FIX: Calculate height to align border with page header (64px total - 0.5rem sidebar padding = ~56px) */
+            min-height: calc(64px - 0.5rem);
+            /* Match page header height minus sidebar top padding */
+            height: calc(64px - 0.5rem);
+        }
+
+        .sidebar-header h5 {
+            font-weight: 800;
+            font-size: 1.35rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0;
+            margin-left: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            margin-right: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the icon and text */
+        }
+
+        .sidebar-header h5 .me-2 {
+            margin-right: 0.25rem !important;
+            /* ROOT CAUSE FIX: Override Bootstrap me-2 (0.5rem) to reduce spacing */
+        }
+
+        .nav-link {
+            color: white !important;
+            opacity: 0.85;
+            padding: 0.875rem 0.875rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            opacity: 1;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link i {
+            width: 22px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Fixed Page Header */
+        .page-header-fixed {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            padding: 0.75rem 2.5rem;
+            /* ROOT CAUSE FIX: Reduced top/bottom padding to match sidebar border */
+            padding-left: 1.5rem;
+            /* Space for button (44px button + 10px gap = ~54px) */
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            height: 64px;
+            /* ROOT CAUSE FIX: Fixed height to align with sidebar border (smaller header) */
+            min-height: 64px;
+        }
+
+        body.sidebar-collapsed .page-header-fixed {
+            left: 80px;
+        }
+
+        .page-header-fixed h2 {
+            margin: 0;
+            margin-left: 3.5rem;
+            /* Space for button (44px) + gap (10px) = ~54px */
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .header-actions .btn {
+            white-space: nowrap;
+        }
+
+        .export-buttons-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            /* Hidden on desktop, shown on mobile via responsive.css */
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 0;
+            cursor: pointer;
+            margin-right: 0.75rem;
+            z-index: 1001;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .mobile-menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Desktop Navigation Toggle Button */
+        .desktop-nav-toggle {
+            position: absolute;
+            left: 0.75rem;
+            /* Positioned inside header, fully visible */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        body.sidebar-collapsed .desktop-nav-toggle {
+            left: 0.75rem;
+            /* Same position when sidebar is collapsed */
+        }
+
+        .desktop-nav-toggle:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .desktop-nav-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem;
+            padding-top: calc(2.5rem + 64px);
+            /* ROOT CAUSE FIX: Updated to match new header height (64px) */
+            animation: fadeIn 0.6s ease-out;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 80px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--navbar-bg);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 4px solid var(--primary-color);
+            text-align: left;
+            overflow: hidden;
+            min-width: 0;
+            min-height: 160px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 0 1rem 0;
+            flex-shrink: 0;
+        }
+
+        .stat-card h6 {
+            margin-bottom: 0.5rem;
+            flex-shrink: 0;
+            text-align: left;
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Allow amounts to wrap vertically if too large - starts right after title */
+        .stat-card h2,
+        .stat-card h3 {
+            overflow: hidden;
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            text-align: left;
+            line-height: 1.3;
+            font-size: 1.5rem !important;
+            /* ROOT CAUSE FIX: Reduce amount text size for better appearance */
+            font-weight: 700;
+            margin: 0;
+            padding: 0;
+            margin-top: 0;
+            flex-grow: 0;
+            flex-shrink: 0;
+            min-height: 0;
+            box-sizing: border-box;
+        }
+
+        .stat-card h2 .currency-symbol,
+        .stat-card h3 .currency-symbol {
+            display: inline;
+            vertical-align: baseline;
+            margin-right: 0.25rem;
+            font-size: inherit;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Amount value wrapper - prevents breaking within numbers, only breaks at spaces/comma groups */
+        .stat-card .amount-value {
+            display: inline;
+            white-space: normal;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        /* Keep numbers readable - prevent character-level breaking */
+        .stat-card h2,
+        .stat-card h3 {
+            font-variant-numeric: tabular-nums;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: keep-all;
+            text-align: left;
+        }
+
+        /* Insert zero-width spaces after commas to allow safe breaking points */
+        .stat-card .amount-value::before {
+            content: '';
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* ROOT CAUSE FIX: Chart container wrapper for Chart.js - explicit height on desktop */
+        .chart-container>div[style*="position: relative"] {
+            position: relative !important;
+            width: 100% !important;
+            height: 400px !important;
+            min-height: 400px !important;
+            max-height: 400px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* ROOT CAUSE FIX: Chart canvas sizing - ensure visibility */
+        .chart-container canvas {
+            max-width: 100% !important;
+            height: 100% !important;
+            width: 100% !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            margin-top: 0;
+            padding-top: 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn {
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--navbar-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+        }
+
+        /* Export Excel button hover effect (same as PDF) */
+        .btn-success:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+
+        /* Export PDF button hover effect */
+        .btn-danger:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        /* Filter buttons hover effects - All filter buttons (Month, Year, All, All Expenses, Personal Only, Group Only) */
+        label.btn.btn-outline-primary:hover,
+        label.btn.btn-outline-success:hover,
+        label.btn.btn-outline-info:hover,
+        label.btn.btn-outline-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        /* Ensure all filter buttons have transition and prevent overlap */
+        label.btn.btn-outline-primary,
+        label.btn.btn-outline-success,
+        label.btn.btn-outline-info,
+        label.btn.btn-outline-warning {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            box-shadow: none;
+        }
+
+        /* Prevent button group overlap on hover */
+        .btn-group {
+            position: relative;
+            display: flex;
+        }
+
+        .btn-group label.btn {
+            position: relative;
+            flex: 1;
+        }
+
+        /* Ensure hovered button appears above others without causing layout shift */
+        .btn-group label.btn:hover {
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Export buttons hover transitions */
+        .export-buttons-container .btn {
+            transition: all 0.3s ease;
+        }
+
+        .table {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table thead th {
+            background: var(--navbar-bg);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(to right, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        footer {
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            background: var(--light-color);
+            position: relative;
+            bottom: 0;
+            width: calc(100% - var(--sidebar-width));
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-collapsed footer {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .expense-row-animate {
+            animation: slideInRight 0.4s ease-out;
+        }
+
+        /* Responsive styles are now handled by mobile-responsive.css */
+    </style>
+    <link rel="stylesheet" href="css/topnav.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style id="sw-topnav-override">
+        /* SplitWise TopNav Layout Overrides */
+        .sidebar, .sidebar-overlay, .page-header-fixed { display: none !important; }
+        .main-content {
+            margin-left: 0 !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+        footer {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+        body { padding-top: 0 !important; }
+        /* Ensure topnav stacks correctly */
+        body.sidebar-collapsed .main-content { margin-left: 0 !important; }
+        body.sidebar-collapsed .page-header-fixed { left: 0 !important; display: none !important; }
+    </style>
+</head>
+
+<body>
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="fas fa-wallet"></i><span class="brand-text">SplitWise</span></h5>
+            <button class="sidebar-close-btn sw-sidebar-close" id="sidebarCloseBtn" aria-label="Close sidebar" title="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="nav flex-column">
+            <!-- ROOT CAUSE FIX: Reduced margin-top from mt-4 (1.5rem) to 0.5rem -->
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="expenses.html" class="nav-link">
+                <i class="fas fa-receipt"></i> <span>Expenses</span>
+            </a>
+            <a href="groups.html" class="nav-link">
+                <i class="fas fa-users"></i> <span>Groups</span>
+            </a>
+            <a href="reports.html" class="nav-link active">
+                <i class="fas fa-chart-bar"></i> <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Notification Button at Bottom -->
+        <div class="mt-auto">
+            <div class="nav-link notification-bell" id="notificationBellBtn">
+                <i class="fas fa-bell"></i> <span>Notifications</span>
+                <span class="notification-badge" id="notificationBadge"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Notification Overlay -->
+    <div class="notification-overlay" id="notificationOverlay"></div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3><i class="fas fa-bell me-2"></i>Notifications</h3>
+            <button class="close-btn" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-actions-bar">
+            <button class="btn-mark-all" id="markAllReadBtn">
+                <i class="fas fa-check-double me-1"></i>Mark All Read
+            </button>
+            <button class="btn-clear-all" id="clearAllBtn">
+                <i class="fas fa-trash me-1"></i>Clear All
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Page header moved to main-content for visibility with new topnav -->
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+
+            <!-- Page Title Bar -->
+            <div class="sw-page-titlebar">
+                <div class="sw-page-titlebar-left">
+                    <h2><i class="fas fa-chart-line"></i>Reports &amp; Analytics</h2>
+                </div>
+                <div class="sw-page-titlebar-right">
+                    <button class="btn btn-primary sw-action-btn" onclick="showExportModal('pdf')">
+                        <i class="fas fa-file-pdf"></i>Export PDF
+                    </button>
+                    <button class="btn btn-success sw-action-btn" onclick="showExportModal('excel')">
+                        <i class="fas fa-file-excel"></i>Export Excel
+                    </button>
+                </div>
+            </div>
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #667eea;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Total Expenses</h6>
+                        <h2 id="totalExpenses" class="mb-0"><span class="amount-value">0</span></h2>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #1cc88a;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); color: white;">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Total Amount</h6>
+                        <h2 id="totalAmount" class="mb-0"><span class="currency-symbol">?</span>0</h2>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #f6c23e;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); color: white;">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">This Month</h6>
+                        <h2 id="thisMonth" class="mb-0"><span class="currency-symbol">?</span>0</h2>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #36b9cc;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Average Expense</h6>
+                        <h2 id="avgExpense" class="mb-0"><span class="currency-symbol">?</span>0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="row">
+                <div class="col-12 col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="chart-title mb-3"><i class="fas fa-chart-pie me-2"></i>Expenses by Category</h5>
+                        <div style="position: relative; height: 400px; width: 100%;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+
+                        <!-- Filter Options for Category Chart -->
+                        <div class="mt-3 pt-3" style="border-top: 2px solid #e9ecef;">
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="categoryFilter" id="categoryFilterMonth"
+                                    value="month" checked>
+                                <label class="btn btn-outline-primary btn-sm" for="categoryFilterMonth"
+                                    style="border-radius: 10px 0 0 10px; font-size: 0.85rem;">
+                                    <i class="fas fa-calendar-day me-1"></i>Month
+                                </label>
+
+                                <input type="radio" class="btn-check" name="categoryFilter" id="categoryFilterYear"
+                                    value="year">
+                                <label class="btn btn-outline-primary btn-sm" for="categoryFilterYear"
+                                    style="font-size: 0.85rem;">
+                                    <i class="fas fa-calendar-alt me-1"></i>Year
+                                </label>
+
+                                <input type="radio" class="btn-check" name="categoryFilter" id="categoryFilterAll"
+                                    value="all">
+                                <label class="btn btn-outline-primary btn-sm" for="categoryFilterAll"
+                                    style="border-radius: 0 10px 10px 0; font-size: 0.85rem;">
+                                    <i class="fas fa-infinity me-1"></i>All
+                                </label>
+                            </div>
+
+                            <!-- Year Selector for Category Chart -->
+                            <div class="mt-2" id="categoryYearSelectorRow" style="display: none;">
+                                <select class="form-select form-select-sm" id="categoryYearSelect"
+                                    style="border-radius: 10px;">
+                                    <!-- Years will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mb-4">
+                    <div class="chart-container">
+                        <h5 class="chart-title mb-3"><i class="fas fa-chart-line me-2"></i>Spending Trend</h5>
+                        <div style="position: relative; height: 400px; width: 100%;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+
+                        <!-- Filter Options for Trend Chart -->
+                        <div class="mt-3 pt-3" style="border-top: 2px solid #e9ecef;">
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="trendFilter" id="trendFilterMonth"
+                                    value="month" checked>
+                                <label class="btn btn-outline-success btn-sm" for="trendFilterMonth"
+                                    style="border-radius: 10px 0 0 10px; font-size: 0.85rem;">
+                                    <i class="fas fa-calendar-day me-1"></i>Month
+                                </label>
+
+                                <input type="radio" class="btn-check" name="trendFilter" id="trendFilterYear"
+                                    value="year">
+                                <label class="btn btn-outline-success btn-sm" for="trendFilterYear"
+                                    style="font-size: 0.85rem;">
+                                    <i class="fas fa-calendar-alt me-1"></i>Year
+                                </label>
+
+                                <input type="radio" class="btn-check" name="trendFilter" id="trendFilterAll"
+                                    value="all">
+                                <label class="btn btn-outline-success btn-sm" for="trendFilterAll"
+                                    style="border-radius: 0 10px 10px 0; font-size: 0.85rem;">
+                                    <i class="fas fa-infinity me-1"></i>All
+                                </label>
+                            </div>
+
+                            <!-- Year Selector for Trend Chart -->
+                            <div class="mt-2" id="trendYearSelectorRow" style="display: none;">
+                                <select class="form-select form-select-sm" id="trendYearSelect"
+                                    style="border-radius: 10px;">
+                                    <!-- Years will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses Table -->
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Expenses</h5>
+                    <span class="badge bg-primary" id="expenseCount">0</span>
+                </div>
+
+                <!-- Filter Options for Table -->
+                <div class="mb-3">
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="tableFilter" id="tableFilterAll" value="all"
+                            checked>
+                        <label class="btn btn-outline-primary btn-sm" for="tableFilterAll"
+                            style="border-radius: 10px 0 0 10px;">
+                            <i class="fas fa-list me-1"></i>All Expenses
+                        </label>
+
+                        <input type="radio" class="btn-check" name="tableFilter" id="tableFilterPersonal"
+                            value="personal">
+                        <label class="btn btn-outline-info btn-sm" for="tableFilterPersonal">
+                            <i class="fas fa-user me-1"></i>Personal Only
+                        </label>
+
+                        <input type="radio" class="btn-check" name="tableFilter" id="tableFilterGroup" value="group">
+                        <label class="btn btn-outline-warning btn-sm" for="tableFilterGroup"
+                            style="border-radius: 0 10px 10px 0;">
+                            <i class="fas fa-users me-1"></i>Group Only
+                        </label>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Source</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody">
+                            <!-- Expenses will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="mb-0">&copy; 2026 SplitWise. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Export Date Range Modal -->
+    <div class="modal fade" id="exportDateRangeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="border-radius: 25px; border: none; box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3); overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 2rem 2rem 1.5rem; position: relative;">
+                    <div>
+                        <div
+                            style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                            <i class="fas fa-calendar-alt" style="font-size: 28px;"></i>
+                        </div>
+                        <h5 class="modal-title mb-1" style="font-weight: 700; font-size: 1.5rem;">
+                            <span id="exportModalTitle">Select Date Range</span>
+                        </h5>
+                        <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">Choose the period for your report</p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        style="position: absolute; top: 20px; right: 20px;"></button>
+                </div>
+                <div class="modal-body" style="padding: 2rem 2rem 1.5rem; background: #f8f9fc;">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-3" style="color: #2c3e50; font-size: 1.1rem;">
+                            <i class="fas fa-filter me-2" style="color: #667eea;"></i>Select Period
+                        </label>
+                        <div class="d-grid gap-2 mb-3">
+                            <input type="radio" class="btn-check" name="exportDateRange" id="exportAll" value="all"
+                                checked>
+                            <label class="btn btn-outline-primary text-start" for="exportAll"
+                                style="border-radius: 15px; border: 2px solid #e0e0e0; padding: 1rem 1.5rem; transition: all 0.3s; background: white;">
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                        <i class="fas fa-infinity" style="color: white; font-size: 20px;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: #2c3e50; font-size: 1rem;">All Time</div>
+                                        <small style="color: #7f8c8d;">Include all your expenses</small>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <input type="radio" class="btn-check" name="exportDateRange" id="exportMonth" value="month">
+                            <label class="btn btn-outline-primary text-start" for="exportMonth"
+                                style="border-radius: 15px; border: 2px solid #e0e0e0; padding: 1rem 1.5rem; transition: all 0.3s; background: white;">
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #36b9cc 0%, #2c9faf 100%); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                        <i class="fas fa-calendar-day" style="color: white; font-size: 20px;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: #2c3e50; font-size: 1rem;">This Month</div>
+                                        <small style="color: #7f8c8d;">Current month expenses only</small>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <input type="radio" class="btn-check" name="exportDateRange" id="exportYear" value="year">
+                            <label class="btn btn-outline-primary text-start" for="exportYear"
+                                style="border-radius: 15px; border: 2px solid #e0e0e0; padding: 1rem 1.5rem; transition: all 0.3s; background: white;">
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                        <i class="fas fa-calendar" style="color: white; font-size: 20px;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: #2c3e50; font-size: 1rem;">This Year</div>
+                                        <small style="color: #7f8c8d;">Current year expenses only</small>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <input type="radio" class="btn-check" name="exportDateRange" id="exportCustom"
+                                value="custom">
+                            <label class="btn btn-outline-primary text-start" for="exportCustom"
+                                style="border-radius: 15px; border: 2px solid #e0e0e0; padding: 1rem 1.5rem; transition: all 0.3s; background: white;">
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                        <i class="fas fa-calendar-alt" style="color: white; font-size: 20px;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: #2c3e50; font-size: 1rem;">Custom Range
+                                        </div>
+                                        <small style="color: #7f8c8d;">Select your own date range</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Custom Date Range -->
+                    <div id="customDateRange" style="display: none; animation: fadeIn 0.3s;">
+                        <div class="card"
+                            style="border-radius: 15px; border: 2px solid #667eea; background: white; padding: 1.5rem; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold" style="color: #2c3e50;">
+                                        <i class="fas fa-calendar-day me-2" style="color: #667eea;"></i>From Date
+                                    </label>
+                                    <input type="date" class="form-control" id="exportFromDate"
+                                        style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 0.75rem; font-size: 0.95rem;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold" style="color: #2c3e50;">
+                                        <i class="fas fa-calendar-check me-2" style="color: #667eea;"></i>To Date
+                                    </label>
+                                    <input type="date" class="form-control" id="exportToDate"
+                                        style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 0.75rem; font-size: 0.95rem;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border: none; padding: 1.5rem 2rem 2rem; background: #f8f9fc;">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                        style="border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; border: 2px solid #e0e0e0;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmExportBtn"
+                        style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);">
+                        <i class="fas fa-download me-2"></i>Download Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #exportDateRangeModal .btn-check:checked+label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border-color: #667eea !important;
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        #exportDateRangeModal .btn-check:checked+label small {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        #exportDateRangeModal .btn-check:checked+label .d-flex>div:first-child {
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        #exportDateRangeModal label:hover {
+            transform: translateX(5px);
+            border-color: #667eea !important;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        #exportDateRangeModal input[type="date"]:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+        }
+
+        #exportDateRangeModal .modal-content {
+            animation: modalSlideIn 0.4s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #confirmExportBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5) !important;
+        }
+
+        #confirmExportBtn:active {
+            transform: translateY(0);
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+        console.log('? Reports page JavaScript started!');
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+
+                notification.innerHTML = `
+                    <i class="fas fa-${icon} me-2"></i>
+                    <p class="mb-0 ms-1">${message}</p>
+                `;
+
+            container.appendChild(notification);
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Get user data and currency
+        const userData = localStorage.getItem('user');
+        let userEmail = 'guest';
+        let preferredCurrency = 'INR';
+
+        // Currency symbol mapping
+        const currencySymbols = {
+            'INR': '?',
+            'USD': '$',
+            'EUR': '?',
+            'GBP': '?',
+            'JPY': '?',
+            'AUD': 'A$'
+        };
+
+        // ROOT CAUSE FIX: Get currency symbol dynamically
+        function getCurrencySymbol() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const currency = user.preferredCurrency || 'INR';
+            return currencySymbols[currency] || '?';
+        }
+
+        if (userData) {
+            const user = JSON.parse(userData);
+            userEmail = user.email || 'guest';
+            preferredCurrency = user.preferredCurrency || 'INR';
+            console.log('?? User Email:', userEmail);
+            console.log('?? Preferred Currency:', preferredCurrency);
+        }
+
+        // Store expenses in memory after fetching from API
+        let cachedExpenses = null;
+        // Cache for group ID to group name mapping
+        let groupNameMap = {};
+
+        // Fetch groups to get group names
+        async function fetchGroupsForMapping() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    return {};
+                }
+
+                const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+                const response = await fetch(`${API_BASE}/groups`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success && data.data && data.data.items) {
+                    const groupMap = {};
+                    data.data.items.forEach(group => {
+                        // Handle both _id and id formats
+                        const groupId = group._id?.toString() || group.id?.toString();
+                        if (groupId && group.name) {
+                            groupMap[groupId] = group.name;
+                        }
+                    });
+                    console.log('? Fetched groups for mapping:', Object.keys(groupMap).length);
+                    return groupMap;
+                }
+
+                return {};
+            } catch (error) {
+                console.error('Error fetching groups for mapping:', error);
+                return {};
+            }
+        }
+
+        // Fetch group name for a specific group ID
+        async function getGroupName(groupId) {
+            if (!groupId) return 'Unknown Group';
+
+            const groupIdStr = groupId.toString();
+
+            // Check cache first
+            if (groupNameMap[groupIdStr]) {
+                return groupNameMap[groupIdStr];
+            }
+
+            // If cache is empty, fetch all groups
+            if (Object.keys(groupNameMap).length === 0) {
+                groupNameMap = await fetchGroupsForMapping();
+                if (groupNameMap[groupIdStr]) {
+                    return groupNameMap[groupIdStr];
+                }
+            }
+
+            // If still not found, try to fetch this specific group
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+                    const response = await fetch(`${API_BASE}/groups/${groupIdStr}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.data && data.data.name) {
+                            groupNameMap[groupIdStr] = data.data.name;
+                            return data.data.name;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching group name:', error);
+            }
+
+            return 'Unknown Group';
+        }
+
+        // Fetch expenses from backend API (includes both personal and group expenses)
+        async function fetchExpensesFromAPI() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.warn('No auth token, using localStorage fallback');
+                    return getAllExpensesFromLocalStorage();
+                }
+
+                const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success && data.data && data.data.items) {
+                    // Pre-fetch groups for mapping
+                    groupNameMap = await fetchGroupsForMapping();
+
+                    // Transform API expenses to match local format
+                    const transformedExpenses = await Promise.all(
+                        data.data.items.map(async (exp) => {
+                            // Handle both personal and group expenses
+                            const isGroup = exp.type === 'group';
+                            const date = exp.spent_at || exp.date || new Date().toISOString();
+
+                            // Get group name if this is a group expense
+                            let groupName = 'Group';
+                            if (isGroup && exp.group_id) {
+                                groupName = await getGroupName(exp.group_id);
+                            } else if (isGroup && exp.category && exp.category.startsWith('Group: ')) {
+                                // Fallback: try to extract group ID from category and look it up
+                                const categoryGroupId = exp.category.replace('Group: ', '').trim();
+                                groupName = await getGroupName(categoryGroupId);
+                            }
+
+                            // ROOT CAUSE FIX: For group expenses, calculate user's share instead of full amount
+                            let displayAmount = parseFloat(exp.amount) || 0;
+                            if (isGroup) {
+                                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                                const userName = user.name || 'You';
+                                const splitData = exp.split_data || exp.splitData || {};
+                                const userShare = parseFloat(splitData[userName]) || 0;
+                                displayAmount = userShare; // Use user's share instead of full expense amount
+                            }
+
+                            return {
+                                id: exp._id || exp.id,
+                                title: exp.title || exp.description || '',
+                                description: exp.description || exp.title || '',
+                                amount: displayAmount, // ROOT CAUSE FIX: Use user's share for group expenses
+                                currency: exp.currency || 'INR', // ROOT CAUSE FIX: Include currency field
+                                category: isGroup ? `Group: ${groupName}` : (exp.category || 'Other'),
+                                date: date,
+                                spent_at: date,
+                                source: isGroup ? groupName : 'Personal',
+                                sourceType: isGroup ? 'group' : 'personal',
+                                notes: exp.notes || (isGroup ? `Paid by: ${exp.paid_by || 'Unknown'}` : ''),
+                                type: exp.type || 'personal',
+                                paid_by: exp.paid_by || null
+                            };
+                        })
+                    );
+
+                    console.log('? Fetched expenses from API:', transformedExpenses.length);
+                    cachedExpenses = transformedExpenses;
+                    return transformedExpenses;
+                }
+
+                return [];
+            } catch (error) {
+                console.error('Error fetching expenses from API:', error);
+                // Fallback to localStorage
+                return getAllExpensesFromLocalStorage();
+            }
+        }
+
+        // Load all expenses from localStorage (fallback)
+        function getAllExpensesFromLocalStorage() {
+            const allExpenses = [];
+
+            // Personal expenses
+            const expensesKey = `expenses_${userEmail}`;
+            console.log('?? Looking for:', expensesKey);
+            const expensesData = localStorage.getItem(expensesKey);
+            if (expensesData) {
+                const expenses = JSON.parse(expensesData);
+                console.log('? Found personal expenses:', expenses.length);
+                // Mark as personal
+                expenses.forEach(exp => {
+                    exp.source = 'Personal';
+                    exp.sourceType = 'personal';
+                    exp.type = 'personal';
+                    if (!exp.date && exp.spent_at) exp.date = exp.spent_at;
+                });
+                allExpenses.push(...expenses);
+            }
+
+            // Group expenses - ROOT CAUSE FIX: Only include expenses where user is involved in split
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userName = user.name || 'You';
+            const groupsKey = `groups_${userEmail}`;
+            const groupsData = localStorage.getItem(groupsKey);
+            if (groupsData) {
+                const groups = JSON.parse(groupsData);
+                console.log('? Found groups:', groups.length);
+                groups.forEach(group => {
+                    const groupExpKey = `group_expenses_${group.id}`;
+                    const groupExpData = localStorage.getItem(groupExpKey);
+                    if (groupExpData) {
+                        const groupExp = JSON.parse(groupExpData);
+                        console.log(`? Group "${group.name}":`, groupExp.length);
+                        // ROOT CAUSE FIX: Filter to only include expenses where user is involved
+                        const filteredGroupExp = groupExp.filter(exp => {
+                            const splitData = exp.splitData || exp.split_data || {};
+                            const userShare = parseFloat(splitData[userName]) || 0;
+                            return userShare > 0;
+                        });
+                        console.log(`? Filtered "${group.name}" expenses (user involved):`, filteredGroupExp.length);
+                        // Mark with group name and update amount to user's share
+                        filteredGroupExp.forEach(exp => {
+                            // ROOT CAUSE FIX: Calculate and store user's share amount instead of full expense amount
+                            const splitData = exp.splitData || exp.split_data || {};
+                            const userShare = parseFloat(splitData[userName]) || 0;
+                            exp.amount = userShare; // Update to user's share
+                            exp.source = group.name;
+                            exp.sourceType = 'group';
+                            exp.type = 'group';
+                            if (!exp.date && exp.spent_at) exp.date = exp.spent_at;
+                        });
+                        allExpenses.push(...filteredGroupExp);
+                    }
+                });
+            }
+
+            console.log('?? Total expenses loaded from localStorage:', allExpenses.length);
+            return allExpenses;
+        }
+
+        // Load all expenses (fetch from API if available, else localStorage)
+        function getAllExpenses() {
+            // If cached, return cached expenses
+            if (cachedExpenses !== null && cachedExpenses.length > 0) {
+                console.log('?? Using cached expenses:', cachedExpenses.length);
+                return cachedExpenses;
+            }
+
+            // Otherwise use localStorage (will be updated on page load)
+            const localExpenses = getAllExpensesFromLocalStorage();
+            console.log('?? Using localStorage expenses:', localExpenses.length);
+            return localExpenses;
+        }
+
+        // Filter expenses based on selected period for category chart
+        function filterCategoryExpenses(expenses) {
+            const filterType = document.querySelector('input[name="categoryFilter"]:checked').value;
+            const now = new Date();
+
+            if (filterType === 'month') {
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+                });
+            } else if (filterType === 'year') {
+                const selectedYear = parseInt(document.getElementById('categoryYearSelect').value);
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate.getFullYear() === selectedYear;
+                });
+            } else {
+                return expenses;
+            }
+        }
+
+        // Filter expenses based on selected period for trend chart
+        function filterTrendExpenses(expenses) {
+            const filterType = document.querySelector('input[name="trendFilter"]:checked').value;
+            const now = new Date();
+
+            if (filterType === 'month') {
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+                });
+            } else if (filterType === 'year') {
+                const selectedYear = parseInt(document.getElementById('trendYearSelect').value);
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate.getFullYear() === selectedYear;
+                });
+            } else {
+                return expenses;
+            }
+        }
+
+        // Initialize year selectors
+        function initializeYearSelectors() {
+            const expenses = getAllExpenses();
+
+            // Get unique years from expenses
+            const years = new Set();
+            expenses.forEach(exp => {
+                const expDate = new Date(exp.date || exp.spent_at);
+                if (!isNaN(expDate.getTime())) {
+                    const year = expDate.getFullYear();
+                    years.add(year);
+                }
+            });
+
+            // If no years, add current year
+            if (years.size === 0) {
+                years.add(new Date().getFullYear());
+            }
+
+            // Sort years in descending order
+            const sortedYears = Array.from(years).sort((a, b) => b - a);
+
+            // Populate both year selectors
+            const categoryYearSelect = document.getElementById('categoryYearSelect');
+            const trendYearSelect = document.getElementById('trendYearSelect');
+
+            [categoryYearSelect, trendYearSelect].forEach(yearSelect => {
+                yearSelect.innerHTML = '';
+                sortedYears.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    if (year === new Date().getFullYear()) {
+                        option.selected = true;
+                    }
+                    yearSelect.appendChild(option);
+                });
+            });
+        }
+
+        // Update category chart independently
+        function updateCategoryChart() {
+            const allExpenses = getAllExpenses();
+            const filteredExpenses = filterCategoryExpenses(allExpenses);
+
+            console.log('?? Category chart expenses:', filteredExpenses.length);
+
+            // ROOT CAUSE FIX: Always create chart, even with no data (show empty state)
+            if (filteredExpenses.length > 0) {
+                createCategoryChart(filteredExpenses);
+            } else {
+                // ROOT CAUSE FIX: Create empty chart instead of destroying
+                createCategoryChart([]);
+            }
+        }
+
+        // Update trend chart independently
+        function updateTrendChart() {
+            const allExpenses = getAllExpenses();
+            const filteredExpenses = filterTrendExpenses(allExpenses);
+
+            console.log('?? Trend chart expenses:', filteredExpenses.length);
+
+            // ROOT CAUSE FIX: Always create chart, even with no data (show empty state)
+            if (filteredExpenses.length > 0) {
+                createTrendChart(filteredExpenses);
+            } else {
+                // ROOT CAUSE FIX: Create empty chart instead of destroying
+                createTrendChart([]);
+            }
+        }
+
+        // Update all reports (stats and table)
+        function updateReports() {
+            const allExpenses = getAllExpenses();
+            console.log('?? updateReports - Total expenses:', allExpenses.length);
+            console.log('?? updateReports - Expense breakdown:', {
+                personal: allExpenses.filter(e => e.sourceType === 'personal' || e.type === 'personal').length,
+                group: allExpenses.filter(e => e.sourceType === 'group' || e.type === 'group').length,
+                total: allExpenses.length
+            });
+
+            const stats = calculateStats(allExpenses);
+            console.log('?? Calculated stats:', stats);
+
+            updateStats(stats);
+            createExpensesTable(allExpenses);
+
+            // ROOT CAUSE FIX: Update both charts simultaneously (in parallel) for same loading time
+            // Call both chart updates immediately without any delay - they will process in parallel
+            updateCategoryChart();
+            updateTrendChart();
+        }
+
+        // ROOT CAUSE FIX: Calculate statistics with currency conversion
+        function calculateStats(expenses) {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            // ROOT CAUSE FIX: Get currency conversion rates
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            let totalAmount = 0;
+            let monthAmount = 0;
+
+            expenses.forEach(exp => {
+                const amount = parseFloat(exp.amount) || 0;
+                const expenseCurrency = exp.currency || 'INR'; // ROOT CAUSE FIX: Get expense currency
+                const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+                totalAmount += convertedAmount;
+
+                const expDate = new Date(exp.date || exp.spent_at);
+                if (!isNaN(expDate.getTime()) && expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear) {
+                    monthAmount += convertedAmount;
+                }
+            });
+
+            return {
+                count: expenses.length,
+                total: totalAmount,
+                month: monthAmount,
+                average: expenses.length > 0 ? totalAmount / expenses.length : 0
+            };
+        }
+
+        // Update stats cards
+        function updateStats(stats) {
+            // ROOT CAUSE FIX: Get dynamic currency symbol
+            const currencySymbol = getCurrencySymbol();
+
+            // Format numbers with proper locale formatting
+            const formatNumber = (num) => {
+                // Format with commas for thousands and 2 decimal places
+                const formatted = parseFloat(num).toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                // Insert zero-width space after commas to allow breaking at comma boundaries only
+                // This prevents breaking within number groups but allows breaking between groups
+                return formatted.replace(/,/g, ',\u200B'); // Zero-width space after comma
+            };
+
+            // Format count as integer without decimals or currency symbol
+            const formatCount = (num) => {
+                return Math.round(parseFloat(num)).toLocaleString('en-IN');
+            };
+
+            // ROOT CAUSE FIX: Update all currency symbols dynamically
+            document.querySelectorAll('.currency-symbol').forEach(span => {
+                span.textContent = currencySymbol;
+            });
+
+            // Total Expenses = COUNT of transactions (no currency symbol, just the number)
+            // Total Amount = SUM of all expense amounts (with currency symbol)
+            document.getElementById('totalExpenses').innerHTML = `<span class="amount-value">${formatCount(stats.count)}</span>`;
+            document.getElementById('totalAmount').innerHTML = `<span class="currency-symbol">${currencySymbol}</span><span class="amount-value">${formatNumber(stats.total)}</span>`;
+            document.getElementById('thisMonth').innerHTML = `<span class="currency-symbol">${currencySymbol}</span><span class="amount-value">${formatNumber(stats.month)}</span>`;
+            document.getElementById('avgExpense').innerHTML = `<span class="currency-symbol">${currencySymbol}</span><span class="amount-value">${formatNumber(stats.average)}</span>`;
+        }
+
+        // Create category chart
+        let categoryChartInstance = null;
+        function createCategoryChart(expenses) {
+            // ROOT CAUSE FIX: Get currency conversion rates
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+            const currencySymbol = getCurrencySymbol();
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            const categoryData = {};
+
+            // ROOT CAUSE FIX: Handle empty expenses array - optimize for faster processing
+            if (expenses && expenses.length > 0) {
+                // ROOT CAUSE FIX: Use for loop for better performance (slightly faster than forEach)
+                const expensesLength = expenses.length;
+                for (let i = 0; i < expensesLength; i++) {
+                    const exp = expenses[i];
+                    let cat = exp.category || 'Other';
+
+                    // Combine all group expenses into a single "Group" category
+                    if (exp.sourceType === 'group' || (cat && cat.startsWith('Group:'))) {
+                        cat = 'Group';
+                    }
+
+                    // ROOT CAUSE FIX: Convert amounts before adding
+                    const amount = parseFloat(exp.amount) || 0;
+                    const expenseCurrency = exp.currency || 'INR';
+                    const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+                    categoryData[cat] = (categoryData[cat] || 0) + convertedAmount;
+                }
+            }
+
+            // ROOT CAUSE FIX: If no data, show empty state
+            if (Object.keys(categoryData).length === 0) {
+                categoryData['No Data'] = 1;
+            }
+
+            // ROOT CAUSE FIX: Get chart canvas and container
+            const categoryCanvas = document.getElementById('categoryChart');
+            if (!categoryCanvas) {
+                console.error('? categoryChart canvas not found!');
+                return;
+            }
+
+            const ctx = categoryCanvas.getContext('2d');
+            const chartWrapper = categoryCanvas.parentElement;
+
+            // ROOT CAUSE FIX: Get current viewport width for responsive sizing
+            const isMobile = window.innerWidth <= 767;
+            const isTablet = window.innerWidth > 767 && window.innerWidth <= 1024;
+
+            // ROOT CAUSE FIX: Set explicit height on wrapper
+            if (chartWrapper) {
+                const height = isMobile ? '350px' : (isTablet ? '380px' : '400px');
+                chartWrapper.style.height = height;
+                chartWrapper.style.minHeight = height;
+                chartWrapper.style.maxHeight = height;
+                chartWrapper.style.position = 'relative';
+                chartWrapper.style.width = '100%';
+            }
+
+            // ROOT CAUSE FIX: Destroy existing chart if it exists - do this before data processing
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+                categoryChartInstance = null; // Clear reference immediately
+            }
+
+            // ROOT CAUSE FIX: Prepare chart data - optimize for faster rendering
+            const chartLabels = Object.keys(categoryData);
+            const chartData = Object.values(categoryData);
+
+            // ROOT CAUSE FIX: Create chart immediately without any delays
+            categoryChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#4facfe',
+                            '#43e97b', '#fa709a', '#fee140', '#30cfd0'
+                        ].slice(0, Math.max(chartLabels.length, 1)) // ROOT CAUSE FIX: Match colors to labels
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // ROOT CAUSE FIX: Must be false for fixed height container
+                    animation: {
+                        duration: 0 // ROOT CAUSE FIX: Disable animation for instant rendering (same as trend chart)
+                    },
+                    layout: {
+                        padding: {
+                            top: isMobile ? 10 : 20,
+                            bottom: isMobile ? 10 : 20,
+                            left: isMobile ? 10 : 20,
+                            right: isMobile ? 10 : 20
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: isMobile ? 11 : (isTablet ? 12 : 12),
+                                    family: "'Nunito', sans-serif"
+                                },
+                                padding: isMobile ? 10 : 15,
+                                boxWidth: isMobile ? 12 : 15,
+                                boxHeight: isMobile ? 12 : 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    // ROOT CAUSE FIX: Handle "No Data" case
+                                    if (context.label === 'No Data' || total === 0) {
+                                        return 'No expenses found';
+                                    }
+                                    const percentage = Math.round((value / total) * 100);
+                                    // ROOT CAUSE FIX: Use dynamic currency symbol and decimals
+                                    return `${context.label}: ${currencySymbol}${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${percentage}%)`;
+                                }
+                            },
+                            titleFont: {
+                                size: isMobile ? 12 : 14,
+                                family: "'Nunito', sans-serif"
+                            },
+                            bodyFont: {
+                                size: isMobile ? 11 : 13,
+                                family: "'Nunito', sans-serif"
+                            },
+                            padding: isMobile ? 10 : 12
+                        }
+                    }
+                }
+            });
+
+            // ROOT CAUSE FIX: Ensure chart is visible and properly sized - immediate execution
+            // Use requestAnimationFrame for next frame (faster than setTimeout, same as trend chart)
+            requestAnimationFrame(() => {
+                if (categoryChartInstance && ctx.canvas) {
+                    ctx.canvas.style.display = 'block';
+                    ctx.canvas.style.width = '100%';
+                    ctx.canvas.style.height = '100%';
+                    // Force chart resize immediately
+                    categoryChartInstance.resize();
+                }
+            });
+        }
+
+        // Create trend chart
+        let trendChartInstance = null;
+        function createTrendChart(expenses) {
+            // ROOT CAUSE FIX: Get currency conversion rates
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+            const currencySymbol = getCurrencySymbol();
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            // ROOT CAUSE FIX: Handle empty expenses array
+            let sortedExpenses = [];
+            let dates = [];
+            let amounts = [];
+
+            if (expenses && expenses.length > 0) {
+                sortedExpenses = expenses
+                    .filter(exp => {
+                        const date = new Date(exp.date || exp.spent_at);
+                        return !isNaN(date.getTime());
+                    })
+                    .sort((a, b) => {
+                        const dateA = new Date(a.date || a.spent_at);
+                        const dateB = new Date(b.date || b.spent_at);
+                        return dateA - dateB;
+                    });
+                dates = sortedExpenses.map(exp => {
+                    const date = new Date(exp.date || exp.spent_at);
+                    return date.toLocaleDateString();
+                });
+                // ROOT CAUSE FIX: Convert amounts before mapping
+                amounts = sortedExpenses.map(exp => {
+                    const amount = parseFloat(exp.amount || 0);
+                    const expenseCurrency = exp.currency || 'INR';
+                    return convertAmount(amount, expenseCurrency, userCurrency);
+                });
+            }
+
+            // ROOT CAUSE FIX: If no data, show empty state
+            if (dates.length === 0) {
+                dates = ['No Data'];
+                amounts = [0];
+            }
+
+            // ROOT CAUSE FIX: Get chart canvas and container
+            const trendCanvas = document.getElementById('trendChart');
+            if (!trendCanvas) {
+                console.error('? trendChart canvas not found!');
+                return;
+            }
+
+            const ctx = trendCanvas.getContext('2d');
+            const chartWrapper = trendCanvas.parentElement;
+
+            // ROOT CAUSE FIX: Get current viewport width for responsive sizing
+            const isMobileTrend = window.innerWidth <= 767;
+            const isTabletTrend = window.innerWidth > 767 && window.innerWidth <= 1024;
+
+            // ROOT CAUSE FIX: Set explicit height on wrapper
+            if (chartWrapper) {
+                const height = isMobileTrend ? '350px' : (isTabletTrend ? '380px' : '400px');
+                chartWrapper.style.height = height;
+                chartWrapper.style.minHeight = height;
+                chartWrapper.style.maxHeight = height;
+                chartWrapper.style.position = 'relative';
+                chartWrapper.style.width = '100%';
+            }
+
+            // ROOT CAUSE FIX: Destroy existing chart if it exists - do this before data processing
+            if (trendChartInstance) {
+                trendChartInstance.destroy();
+                trendChartInstance = null; // Clear reference immediately
+            }
+
+            // ROOT CAUSE FIX: Create chart immediately without any delays
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Amount',
+                        data: amounts,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: isMobileTrend ? 2 : 3,
+                        pointRadius: isMobileTrend ? 3 : 4,
+                        pointHoverRadius: isMobileTrend ? 5 : 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // ROOT CAUSE FIX: Must be false for fixed height container
+                    animation: {
+                        duration: 0 // ROOT CAUSE FIX: Disable animation for instant rendering (same as category chart)
+                    },
+                    layout: {
+                        padding: {
+                            top: isMobileTrend ? 10 : 20,
+                            bottom: isMobileTrend ? 10 : 20,
+                            left: isMobileTrend ? 10 : 20,
+                            right: isMobileTrend ? 10 : 20
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    // ROOT CAUSE FIX: Use dynamic currency symbol and decimals
+                                    return `${currencySymbol}${context.parsed.y.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                }
+                            },
+                            titleFont: {
+                                size: isMobileTrend ? 12 : 14,
+                                family: "'Nunito', sans-serif"
+                            },
+                            bodyFont: {
+                                size: isMobileTrend ? 11 : 13,
+                                family: "'Nunito', sans-serif"
+                            },
+                            padding: isMobileTrend ? 10 : 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: isMobileTrend ? 10 : (isTabletTrend ? 11 : 12),
+                                    family: "'Nunito', sans-serif"
+                                },
+                                maxRotation: isMobileTrend ? 45 : (isTabletTrend ? 30 : 0),
+                                minRotation: isMobileTrend ? 45 : (isTabletTrend ? 30 : 0),
+                                padding: isMobileTrend ? 5 : 10
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: isMobileTrend ? 10 : (isTabletTrend ? 11 : 12),
+                                    family: "'Nunito', sans-serif"
+                                },
+                                padding: isMobileTrend ? 5 : 10,
+                                callback: function (value) {
+                                    // ROOT CAUSE FIX: Use dynamic currency symbol and decimals
+                                    return currencySymbol + value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                }
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // ROOT CAUSE FIX: Ensure chart is visible and properly sized - immediate execution
+            // Use requestAnimationFrame for next frame (faster than setTimeout)
+            requestAnimationFrame(() => {
+                if (trendChartInstance && ctx.canvas) {
+                    ctx.canvas.style.display = 'block';
+                    ctx.canvas.style.width = '100%';
+                    ctx.canvas.style.height = '100%';
+                    // Force chart resize immediately
+                    trendChartInstance.resize();
+                }
+            });
+        }
+
+        // Filter expenses for table based on source
+        function filterTableExpenses(expenses) {
+            const filterType = document.querySelector('input[name="tableFilter"]:checked').value;
+
+            if (filterType === 'personal') {
+                return expenses.filter(exp => exp.sourceType === 'personal');
+            } else if (filterType === 'group') {
+                return expenses.filter(exp => exp.sourceType === 'group');
+            } else {
+                return expenses; // all
+            }
+        }
+
+        // Create expenses table
+        function createExpensesTable(expenses) {
+            // ROOT CAUSE FIX: Get currency conversion rates
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+            const currencySymbol = getCurrencySymbol();
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            const filteredExpenses = filterTableExpenses(expenses);
+            const tbody = document.getElementById('expensesTableBody');
+            const expenseTableCard = tbody ? tbody.closest('.card') : null;
+
+            // ROOT CAUSE FIX: Update count immediately (badge can be visible)
+            const expenseCountEl = document.getElementById('expenseCount');
+            if (expenseCountEl) {
+                expenseCountEl.textContent = filteredExpenses.length;
+            }
+
+                // ROOT CAUSE FIX: Clear any existing table content immediately
+                if (tbody) {
+                    tbody.innerHTML = '';
+                }
+                window.pendingTableData = expenses; // Store full expenses, not filtered
+                console.log('Storing table data for later');
+                return; // Data stored, will render after
+            }
+
+            // ROOT CAUSE FIX: Clear pending data flag since we're populating now
+            if (tbody) {
+            }
+
+            if (filteredExpenses.length === 0) {
+                const filterType = document.querySelector('input[name="tableFilter"]:checked').value;
+                let message = 'No expenses found';
+                if (filterType === 'personal') {
+                    message = 'No personal expenses found';
+                } else if (filterType === 'group') {
+                    message = 'No group expenses found';
+                }
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3 mb-0">${message}</p>
+                            <p class="text-muted mt-2"><small>Add some expenses to see your reports!</small></p>
+                            <a href="expenses.html" class="btn btn-primary mt-3" style="border-radius: 15px;">
+                                <i class="fas fa-plus me-2"></i>Add Expense
+                            </a>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            // Sort by date (newest first)
+            filteredExpenses.sort((a, b) => {
+                const dateA = new Date(a.date || a.spent_at);
+                const dateB = new Date(b.date || b.spent_at);
+                return dateB - dateA;
+            });
+
+            filteredExpenses.forEach((exp, index) => {
+                const row = document.createElement('tr');
+                // Ensure body is visible before adding animation class
+                if (!document.body.classList.contains('ready')) {
+                    document.body.classList.add('ready');
+                }
+                row.className = 'expense-row-animate';
+                row.style.animationDelay = `${index * 0.05}s`;
+                // Force animation to start
+                void row.offsetWidth; // Trigger reflow
+
+                const expDate = new Date(exp.date || exp.spent_at);
+                const formattedDate = !isNaN(expDate.getTime())
+                    ? expDate.toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    })
+                    : 'Invalid Date';
+
+                // Determine source badge style
+                const isPersonal = exp.sourceType === 'personal';
+                const sourceBadgeStyle = isPersonal
+                    ? 'background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;'
+                    : 'background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); color: white;';
+                const sourceIcon = isPersonal ? 'fa-user' : 'fa-users';
+
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-alt me-2" style="color: #667eea;"></i>
+                            <span>${formattedDate}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold">${exp.description || exp.title || 'N/A'}</div>
+                        ${exp.notes ? `<small class="text-muted"><i class="fas fa-sticky-note me-1"></i>${exp.notes}</small>` : ''}
+                        ${exp.paidBy ? `<br><small class="text-muted"><i class="fas fa-hand-holding-usd me-1"></i>Paid by: ${exp.paidBy}</small>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge" style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px;">
+                            ${exp.category || 'Other'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge" style="${sourceBadgeStyle} padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600;">
+                            <i class="fas ${sourceIcon} me-1"></i>${exp.source || 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="color: #1cc88a; font-size: 1.1rem;">${(() => {
+                        // ROOT CAUSE FIX: Convert amount to user's currency
+                        const amount = parseFloat(exp.amount || 0);
+                        const expenseCurrency = exp.currency || 'INR';
+                        const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+                        return currencySymbol + convertedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    })()}</strong>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Global variable to store export type
+        let currentExportType = 'pdf';
+
+        // Show export modal
+        function showExportModal(type) {
+            currentExportType = type;
+            const modal = new bootstrap.Modal(document.getElementById('exportDateRangeModal'));
+            const title = type === 'pdf' ? 'Export PDF Report' : 'Export Excel Report';
+            document.getElementById('exportModalTitle').innerHTML = `<i class="fas fa-calendar-alt me-2"></i>${title}`;
+            modal.show();
+        }
+
+        // Toggle custom date range visibility
+        document.querySelectorAll('input[name="exportDateRange"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const customDateRange = document.getElementById('customDateRange');
+                if (this.value === 'custom') {
+                    customDateRange.style.display = 'block';
+                } else {
+                    customDateRange.style.display = 'none';
+                }
+            });
+        });
+
+        // Filter expenses by date range
+        function filterExpensesByDateRange(expenses) {
+            const rangeType = document.querySelector('input[name="exportDateRange"]:checked').value;
+            const now = new Date();
+
+            if (rangeType === 'all') {
+                return expenses;
+            } else if (rangeType === 'month') {
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+                });
+            } else if (rangeType === 'year') {
+                const currentYear = now.getFullYear();
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate.getFullYear() === currentYear;
+                });
+            } else if (rangeType === 'custom') {
+                const fromDate = document.getElementById('exportFromDate').value;
+                const toDate = document.getElementById('exportToDate').value;
+
+                if (!fromDate || !toDate) {
+                    showNotification('Please select both from and to dates', 'error');
+                    return null;
+                }
+
+                const from = new Date(fromDate);
+                const to = new Date(toDate);
+                to.setHours(23, 59, 59, 999); // Include entire end date
+
+                if (from > to) {
+                    showNotification('From date must be before to date', 'error');
+                    return null;
+                }
+
+                return expenses.filter(exp => {
+                    const expDate = new Date(exp.date || exp.spent_at);
+                    return !isNaN(expDate.getTime()) && expDate >= from && expDate <= to;
+                });
+            }
+
+            return expenses;
+        }
+
+        // Get date range text for report
+        function getDateRangeText() {
+            const rangeType = document.querySelector('input[name="exportDateRange"]:checked').value;
+            const now = new Date();
+
+            if (rangeType === 'all') {
+                return 'All Time';
+            } else if (rangeType === 'month') {
+                return now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+            } else if (rangeType === 'year') {
+                return now.getFullYear().toString();
+            } else if (rangeType === 'custom') {
+                const fromDate = document.getElementById('exportFromDate').value;
+                const toDate = document.getElementById('exportToDate').value;
+
+                if (fromDate && toDate) {
+                    const from = new Date(fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const to = new Date(toDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    return `${from} to ${to}`;
+                }
+            }
+
+            return 'All Time';
+        }
+
+        // Confirm export button handler
+        document.getElementById('confirmExportBtn').addEventListener('click', function () {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('exportDateRangeModal'));
+            modal.hide();
+
+            // Call the appropriate export function
+            setTimeout(() => {
+                if (currentExportType === 'pdf') {
+                    exportToPDF();
+                } else {
+                    exportToExcel();
+                }
+            }, 300);
+        });
+
+        // Export to PDF (generates professional invoice-style PDF)
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const allExpenses = getAllExpenses();
+
+            // Filter expenses by date range
+            const filteredExpenses = filterExpensesByDateRange(allExpenses);
+
+            if (filteredExpenses === null) {
+                return; // Validation error already shown
+            }
+
+            if (filteredExpenses.length === 0) {
+                showNotification('No expenses found in the selected date range', 'warning');
+                return;
+            }
+
+            const expenses = filteredExpenses;
+            const stats = calculateStats(expenses);
+            const dateRangeText = getDateRangeText();
+
+            // Get current date and time for report generation
+            const now = new Date();
+            const reportDateTime = now.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            const fileName = 'Expense-Report-' + now.getFullYear() + '-' +
+                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                String(now.getDate()).padStart(2, '0') + '-' +
+                String(now.getHours()).padStart(2, '0') + '-' +
+                String(now.getMinutes()).padStart(2, '0') + '-' +
+                String(now.getSeconds()).padStart(2, '0');
+
+            // ROOT CAUSE FIX: Get dynamic currency
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const currentUserCurrency = user.preferredCurrency || 'INR';
+
+            // Currency display mapping for PDF (use ASCII-safe symbols)
+            const currencySymbolMap = {
+                'INR': 'Rs.',
+                'USD': '$',
+                'EUR': 'EUR',
+                'GBP': 'GBP',
+                'JPY': 'JPY',
+                'AUD': 'A$'
+            };
+
+            const currencyNameMap = {
+                'INR': 'INR (Rs.)',
+                'USD': 'USD ($)',
+                'EUR': 'EUR',
+                'GBP': 'GBP',
+                'JPY': 'JPY',
+                'AUD': 'AUD (A$)'
+            };
+
+            const currencyDisplay = currencyNameMap[currentUserCurrency] || currentUserCurrency;
+            const currencyForAmount = currencySymbolMap[currentUserCurrency] || currentUserCurrency; // Use ASCII-safe symbols
+
+            // ROOT CAUSE FIX: Get exchange rates for conversion
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            // Design system colors: Primary #6C63FF (108,99,255), Secondary #00D4AA (0,212,170)
+            const primaryColor = [108, 99, 255];
+            const secondaryColor = [0, 212, 170];
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const margin = 12;
+            const contentWidth = pageWidth - (margin * 2);
+
+            // Outer border - styled frame
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(1);
+            doc.roundedRect(margin - 2, 5, contentWidth + 4, pageHeight - 10, 3, 3, 'S');
+
+            // Header background - gradient effect matching website
+            doc.setFillColor(...primaryColor);
+            doc.rect(margin, margin, contentWidth, 42, 'F');
+
+            // Company name
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.text('SplitWise', pageWidth / 2, 22, { align: 'center' });
+
+            // Document title
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text('EXPENSE REPORT', pageWidth / 2, 32, { align: 'center' });
+
+            doc.setFontSize(8);
+            doc.setTextColor(230, 230, 255);
+            doc.text('Professional Financial Statement', pageWidth / 2, 48, { align: 'center' });
+
+            // Truncate long text to prevent overflow
+            const safeEmail = (userEmail || 'guest').length > 35 ? (userEmail || 'guest').substring(0, 32) + '...' : (userEmail || 'guest');
+            const safeDateRange = (dateRangeText || 'All Time').length > 28 ? (dateRangeText || 'All Time').substring(0, 25) + '...' : (dateRangeText || 'All Time');
+            const safeCurrency = (currencyDisplay || 'INR').length > 20 ? (currencyDisplay || 'INR').substring(0, 17) + '...' : (currencyDisplay || 'INR');
+
+            const infoStartY = 58;
+            const boxHeight = 32;
+            const box1Width = 88;
+            const box2Width = 88;
+            const gap = 9;
+
+            // Report Information Box
+            doc.setFillColor(248, 249, 252);
+            doc.roundedRect(margin, infoStartY, box1Width, boxHeight, 3, 3, 'F');
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(margin, infoStartY, box1Width, boxHeight, 3, 3, 'S');
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...primaryColor);
+            doc.text('REPORT INFORMATION', margin + 4, infoStartY + 7);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(8);
+            doc.text('Generated:', margin + 4, infoStartY + 14);
+            doc.text(reportDateTime, margin + 4, infoStartY + 19);
+
+            doc.text('User:', margin + 4, infoStartY + 25);
+            doc.text(safeEmail, margin + 4, infoStartY + 30, { maxWidth: box1Width - 8 });
+
+            // Date Range Box
+            doc.setFillColor(248, 249, 252);
+            doc.roundedRect(margin + box1Width + gap, infoStartY, box2Width, boxHeight, 3, 3, 'F');
+            doc.roundedRect(margin + box1Width + gap, infoStartY, box2Width, boxHeight, 3, 3, 'S');
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...primaryColor);
+            doc.text('REPORT PERIOD', margin + box1Width + gap + 4, infoStartY + 7);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(8);
+            doc.text('Date Range:', margin + box1Width + gap + 4, infoStartY + 14);
+            doc.text(safeDateRange, margin + box1Width + gap + 4, infoStartY + 19, { maxWidth: box2Width - 8 });
+            doc.text('Currency:', margin + box1Width + gap + 4, infoStartY + 25);
+            doc.text(safeCurrency, margin + box1Width + gap + 4, infoStartY + 30, { maxWidth: box2Width - 8 });
+
+            // Summary Section header
+            const summaryHeaderY = infoStartY + boxHeight + 8;
+            doc.setFillColor(...primaryColor);
+            doc.roundedRect(margin, summaryHeaderY, contentWidth, 10, 2, 2, 'F');
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.text('FINANCIAL SUMMARY', pageWidth / 2, summaryHeaderY + 6.5, { align: 'center' });
+
+            // Summary boxes - 4 equal boxes with proper spacing
+            const summaryY = summaryHeaderY + 14;
+            const boxCount = 4;
+            const summaryBoxWidth = (contentWidth - (boxCount - 1) * 4) / boxCount;
+            const summaryBoxHeight = 20;
+
+            const totalAmountStr = currencyForAmount + ' ' + stats.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const monthStr = currencyForAmount + ' ' + stats.month.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const avgStr = currencyForAmount + ' ' + stats.average.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            const summaryLabels = ['Total Expenses', 'Total Amount', 'This Month', 'Average'];
+            const summaryValues = [String(stats.count), totalAmountStr, monthStr, avgStr];
+            const summaryColors = [primaryColor, secondaryColor, [54, 185, 204], [246, 194, 62]];
+
+            for (let i = 0; i < boxCount; i++) {
+                const x = margin + i * (summaryBoxWidth + 4);
+                doc.setFillColor(255, 255, 255);
+                doc.setDrawColor(...primaryColor);
+                doc.setLineWidth(0.3);
+                doc.rect(x, summaryY, summaryBoxWidth, summaryBoxHeight, 'FD');
+                doc.setFontSize(7);
+                doc.setTextColor(100, 100, 100);
+                doc.setFont('helvetica', 'normal');
+                doc.text(summaryLabels[i], x + summaryBoxWidth / 2, summaryY + 6, { align: 'center', maxWidth: summaryBoxWidth - 2 });
+                doc.setFontSize(i === 0 ? 11 : 9);
+                doc.setTextColor(...summaryColors[i]);
+                doc.setFont('helvetica', 'bold');
+                doc.text(summaryValues[i], x + summaryBoxWidth / 2, summaryY + 15, { align: 'center', maxWidth: summaryBoxWidth - 2 });
+            }
+
+            // Expense Details Section
+            const tableStartY = summaryY + summaryBoxHeight + 12;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...primaryColor);
+            doc.text('EXPENSE DETAILS', margin, tableStartY - 4);
+
+            // Sort expenses by date (newest first)
+            const sortedExpenses = expenses.sort((a, b) => {
+                const dateA = new Date(a.date || a.spent_at);
+                const dateB = new Date(b.date || b.spent_at);
+                return dateB - dateA;
+            });
+
+            // Prepare table data - keep descriptions reasonable length for clean layout
+            const tableData = [];
+            sortedExpenses.forEach((exp, index) => {
+                const expDate = new Date(exp.date || exp.spent_at);
+                const expenseDate = !isNaN(expDate.getTime())
+                    ? expDate.toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    })
+                    : 'Invalid Date';
+
+                const description = (exp.description || exp.title || 'N/A').substring(0, 40);
+                const category = (exp.category || 'Other').substring(0, 14);
+                const source = (exp.source || 'Personal').substring(0, 12);
+                // ROOT CAUSE FIX: Convert amount to user's currency
+                const amount = parseFloat(exp.amount || 0);
+                const expenseCurrency = exp.currency || 'INR';
+                const convertedAmount = convertAmount(amount, expenseCurrency, currentUserCurrency);
+                const amountDisplay = currencyForAmount + ' ' + convertedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                tableData.push([String(index + 1), expenseDate, description, category, source, amountDisplay]);
+            });
+
+            // Column widths: # (7) | Date (24) | Description (74) | Category (24) | Source (24) | Amount (33) = 186
+            const colWidths = [7, 24, 74, 24, 24, 33];
+
+            // Add expenses table with overflow handling to prevent text overlap
+            doc.autoTable({
+                startY: tableStartY,
+                head: [['#', 'Date', 'Description', 'Category', 'Source', 'Amount']],
+                body: tableData,
+                theme: 'grid',
+                tableWidth: contentWidth,
+                margin: { left: margin, right: margin },
+                headStyles: {
+                    fillColor: primaryColor,
+                    textColor: [255, 255, 255],
+                    fontSize: 9,
+                    fontStyle: 'bold',
+                    halign: 'center',
+                    cellPadding: 3,
+                    lineWidth: 0.2,
+                    lineColor: primaryColor
+                },
+                bodyStyles: {
+                    fontSize: 7.5,
+                    cellPadding: { top: 3, bottom: 3, left: 2.5, right: 2.5 },
+                    textColor: [50, 50, 50],
+                    lineWidth: 0.1,
+                    lineColor: [220, 220, 220],
+                    overflow: 'linebreak',
+                    minCellHeight: 10
+                },
+                alternateRowStyles: {
+                    fillColor: [250, 250, 252]
+                },
+                columnStyles: {
+                    0: { cellWidth: colWidths[0], halign: 'center', textColor: primaryColor, fontStyle: 'bold' },
+                    1: { cellWidth: colWidths[1], halign: 'center' },
+                    2: { cellWidth: colWidths[2], overflow: 'linebreak' },
+                    3: { cellWidth: colWidths[3], halign: 'center' },
+                    4: { cellWidth: colWidths[4], halign: 'center' },
+                    5: { cellWidth: colWidths[5], halign: 'right', fontStyle: 'bold', textColor: secondaryColor }
+                },
+                showHead: 'firstPage',
+                didDrawPage: function (data) {
+                    // Header on subsequent pages
+                    if (data.pageNumber > 1) {
+                        doc.setFillColor(...primaryColor);
+                        doc.rect(margin, margin, contentWidth, 16, 'F');
+                        doc.setFontSize(11);
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('SplitWise - Expense Report', pageWidth / 2, margin + 11, { align: 'center' });
+                    }
+                }
+            });
+
+            // Grand Total Bar - add new page if table ends too close to footer
+            const finalY = doc.lastAutoTable.finalY;
+            const footerTop = pageHeight - 22;
+
+            if (finalY + 18 > footerTop) {
+                doc.addPage();
+            }
+            const grandTotalY = (finalY + 18 > footerTop) ? margin + 15 : finalY + 5;
+
+            doc.setFillColor(...primaryColor);
+            doc.roundedRect(margin, grandTotalY, contentWidth, 12, 2, 2, 'F');
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.text('GRAND TOTAL:', margin + 10, grandTotalY + 8);
+            doc.setFontSize(11);
+            const grandTotalStr = currencyForAmount + ' ' + stats.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            doc.text(grandTotalStr, margin + contentWidth - 10, grandTotalY + 8, { align: 'right' });
+
+            // Footer on all pages - ensure no overlap
+            const pageCount = doc.internal.getNumberOfPages();
+            const footerY = pageHeight - 12;
+            const footerLineY = pageHeight - 16;
+
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+
+                // Footer line
+                doc.setDrawColor(220, 220, 220);
+                doc.setLineWidth(0.3);
+                doc.line(margin, footerLineY, margin + contentWidth, footerLineY);
+
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(120, 120, 120);
+                doc.text('Generated: ' + reportDateTime, margin, footerY);
+                doc.text('Page ' + i + ' of ' + pageCount, pageWidth / 2, footerY, { align: 'center' });
+                doc.text('SplitWise - Track smarter. Split easily.', margin + contentWidth, footerY, { align: 'right' });
+            }
+
+            // Save PDF
+            doc.save(fileName + '.pdf');
+            showNotification('PDF downloaded successfully!', 'success');
+        }
+
+        // Export to Excel (properly formatted XLSX-compatible CSV)
+        function exportToExcel() {
+            const allExpenses = getAllExpenses();
+
+            // Filter expenses by date range
+            const filteredExpenses = filterExpensesByDateRange(allExpenses);
+
+            if (filteredExpenses === null) {
+                return; // Validation error already shown
+            }
+
+            if (filteredExpenses.length === 0) {
+                showNotification('No expenses found in the selected date range', 'warning');
+                return;
+            }
+
+            const expenses = filteredExpenses;
+            const dateRangeText = getDateRangeText();
+
+            // Get current date and time for report generation
+            const now = new Date();
+            const reportDateTime = now.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            const fileName = `Expenses-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+
+            // Calculate stats
+            const stats = calculateStats(expenses);
+
+            // ROOT CAUSE FIX: Get dynamic currency
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const currentUserCurrency = user.preferredCurrency || 'INR';
+            const currentCurrencySymbol = getCurrencySymbol();
+
+            // Currency display mapping for Excel
+            const currencyNameMap = {
+                'INR': 'INR (?)',
+                'USD': 'USD ($)',
+                'EUR': 'EUR (?)',
+                'GBP': 'GBP (?)',
+                'JPY': 'JPY (?)',
+                'AUD': 'AUD (A$)'
+            };
+
+            const currencyDisplay = currencyNameMap[currentUserCurrency] || currentUserCurrency;
+            const currencyForAmount = currentCurrencySymbol; // Use symbol for amounts
+
+            // ROOT CAUSE FIX: Get exchange rates for conversion
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            // Build CSV with professional Excel formatting - matches SplitWise website design
+            // UTF-8 BOM for Excel compatibility
+            let csv = '\uFEFF';
+
+            // SplitWise Brand Header
+            csv += 'SPLITWISE - EXPENSE REPORT\n';
+            csv += 'Professional Financial Statement\n';
+            csv += '\n';
+
+            // Report Information Section
+            csv += 'REPORT INFORMATION\n';
+            csv += 'Generated,By,Period,Currency\n';
+            csv += '"' + reportDateTime.replace(/"/g, '""') + '","' + (userEmail || 'guest').replace(/"/g, '""') + '","' + (dateRangeText || 'All Time').replace(/"/g, '""') + '","' + (currencyDisplay || 'INR').replace(/"/g, '""') + '"\n';
+            csv += '\n';
+
+            // Financial Summary Section
+            csv += 'FINANCIAL SUMMARY\n';
+            csv += 'Metric,Value\n';
+            csv += 'Total Expenses,' + stats.count + '\n';
+            csv += 'Total Amount,"' + (currencyForAmount + ' ' + stats.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })).replace(/"/g, '""') + '"\n';
+            csv += 'This Month,"' + (currencyForAmount + ' ' + stats.month.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })).replace(/"/g, '""') + '"\n';
+            csv += 'Average Expense,"' + (currencyForAmount + ' ' + stats.average.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })).replace(/"/g, '""') + '"\n';
+            csv += '\n';
+
+            // Expense Details Section
+            csv += 'DETAILED EXPENSE BREAKDOWN\n';
+            csv += '#,Date,Description,Category,Source,Amount,Notes\n';
+
+            // Sort expenses by date (newest first)
+            const sortedExpenses = expenses.sort((a, b) => {
+                const dateA = new Date(a.date || a.spent_at);
+                const dateB = new Date(b.date || b.spent_at);
+                return dateB - dateA;
+            });
+
+            // Add expense rows
+            sortedExpenses.forEach((exp, index) => {
+                const expDate = new Date(exp.date || exp.spent_at);
+                const expenseDate = !isNaN(expDate.getTime())
+                    ? expDate.toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    })
+                    : 'Invalid Date';
+
+                // Escape values for CSV (handle commas, quotes, newlines)
+                const description = (exp.description || exp.title || 'N/A').replace(/"/g, '""').substring(0, 50);
+                const category = (exp.category || 'Other').replace(/"/g, '""');
+                const source = (exp.source || 'Personal').replace(/"/g, '""');
+                // ROOT CAUSE FIX: Convert amount to user's currency
+                const amount = parseFloat(exp.amount || 0);
+                const expenseCurrency = exp.currency || 'INR';
+                const convertedAmount = convertAmount(amount, expenseCurrency, currentUserCurrency);
+                const amountDisplay = currencyForAmount + ' ' + convertedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const notes = (exp.notes || '').replace(/"/g, '""').replace(/\n/g, ' ').substring(0, 100);
+
+                csv += (index + 1) + ',"' + expenseDate + '","' + description + '","' + category + '","' + source + '","' + amountDisplay + '","' + notes + '"\n';
+            });
+
+            // Totals Section
+            csv += '\n';
+            csv += 'SUMMARY\n';
+            csv += 'Total Transactions,' + stats.count + '\n';
+            csv += 'Grand Total,"' + (currencyForAmount + ' ' + stats.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })).replace(/"/g, '""') + '"\n';
+            csv += '\n';
+
+            // Footer
+            csv += '---\n';
+            csv += 'SplitWise - Track smarter. Split easily.\n';
+            csv += 'Generated: ' + reportDateTime + '\n';
+
+            // Create download link with proper MIME type
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${fileName}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+
+            showNotification('Excel file downloaded successfully!', 'success');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function () {
+            console.log('?? Initializing Reports...');
+            const hasCachedData = cachedExpenses !== null && cachedExpenses.length > 0;
+
+            // Fetch expenses from API first
+            try {
+                const expenses = await fetchExpensesFromAPI();
+                console.log('? Loaded expenses from API:', expenses.length);
+
+                // Count personal vs group expenses
+                const personalCount = expenses.filter(e => e.sourceType === 'personal' || e.type === 'personal').length;
+                const groupCount = expenses.filter(e => e.sourceType === 'group' || e.type === 'group').length;
+                console.log('?? Expense breakdown - Personal:', personalCount, 'Group:', groupCount, 'Total:', expenses.length);
+
+                // Update cached expenses
+                if (expenses && expenses.length > 0) {
+                    cachedExpenses = expenses;
+                    console.log('? Cached expenses updated:', cachedExpenses.length);
+                } else {
+                    console.warn('?? No expenses from API, will use localStorage');
+                }
+            } catch (error) {
+                console.error('Error loading expenses from API:', error);
+                console.log('?? Falling back to localStorage');
+            }
+
+            // Initialize year selectors
+            initializeYearSelectors();
+            // Use requestAnimationFrame to ensure DOM is updated
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    // Load initial reports (this will use cached expenses or localStorage)
+                    updateReports();
+                });
+            });
+
+                    // Check if charts are visible
+                    const chartsUpdated = charts && charts.length >= 2 &&
+                        Array.from(charts).every(chart => {
+                            return chart.style.opacity !== '0' && chart.style.visibility !== 'hidden';
+                        });
+                    const hasRealRows = expenseTableBody && (
+                        expenseTableBody.querySelectorAll('tr').length > 0 ||
+                        expenseTableBody.querySelector('td[colspan="5"]')
+                    );
+                    if (window.pendingTableData !== undefined && window.pendingTableData !== null) {
+                        const pendingExpenses = window.pendingTableData;
+
+                        // ROOT CAUSE FIX: Set bypass flag to allow table population
+                        if (expenseTableBody) {
+                            createExpensesTable(pendingExpenses);
+                        }
+
+                        // ROOT CAUSE FIX: Reset bypass flag and clear pending data (EXACTLY like expenses page)
+                        window.pendingTableData = null;
+                    }
+
+                    // Re-check after potential population
+                    const hasRealRowsAfter = expenseTableBody && (
+                        expenseTableBody.querySelectorAll('tr').length > 0 ||
+                        expenseTableBody.querySelector('td[colspan="5"]')
+                    );
+                    const tableUpdated = hasRealRowsAfter;
+                    if (statsUpdated && chartsUpdated && tableUpdated {
+                        setTimeout(() => {
+                            console.log('All content loaded');
+                        }, 150);
+                    } else if (checkAttempts >= maxAttempts) {
+                        setTimeout(() => {
+                            console.log('All content loaded');
+                        }, 150);
+                    } else {
+                        // Keep checking
+                    }
+                };
+
+                // Start checking after a short delay to allow initial render
+            }
+
+            // ROOT CAUSE FIX: Function to update chart container heights based on screen size
+            function updateChartHeights() {
+                const isMobile = window.innerWidth <= 767;
+                const isTablet = window.innerWidth > 767 && window.innerWidth <= 1024;
+
+                // Update category chart wrapper
+                const categoryCanvas = document.getElementById('categoryChart');
+                if (categoryCanvas) {
+                    const categoryWrapper = categoryCanvas.parentElement;
+                    if (categoryWrapper && categoryWrapper.style.position === 'relative') {
+                        const height = isMobile ? '350px' : (isTablet ? '380px' : '400px');
+                        categoryWrapper.style.height = height;
+                        categoryWrapper.style.minHeight = height;
+                        categoryWrapper.style.maxHeight = height;
+                        categoryWrapper.style.position = 'relative';
+                        categoryWrapper.style.width = '100%';
+                    }
+                }
+
+                // Update trend chart wrapper
+                const trendCanvas = document.getElementById('trendChart');
+                if (trendCanvas) {
+                    const trendWrapper = trendCanvas.parentElement;
+                    if (trendWrapper && trendWrapper.style.position === 'relative') {
+                        const height = isMobile ? '350px' : (isTablet ? '380px' : '400px');
+                        trendWrapper.style.height = height;
+                        trendWrapper.style.minHeight = height;
+                        trendWrapper.style.maxHeight = height;
+                        trendWrapper.style.position = 'relative';
+                        trendWrapper.style.width = '100%';
+                    }
+                }
+
+                // ROOT CAUSE FIX: Resize charts if they exist and ensure visibility
+                if (typeof categoryChartInstance !== 'undefined' && categoryChartInstance) {
+                    setTimeout(() => {
+                        categoryChartInstance.resize();
+                        if (categoryCanvas) {
+                            categoryCanvas.style.display = 'block';
+                            categoryCanvas.style.visibility = 'visible';
+                            categoryCanvas.style.opacity = '1';
+                        }
+                    }, 100);
+                }
+                if (typeof trendChartInstance !== 'undefined' && trendChartInstance) {
+                    setTimeout(() => {
+                        trendChartInstance.resize();
+                        if (trendCanvas) {
+                            trendCanvas.style.display = 'block';
+                            trendCanvas.style.visibility = 'visible';
+                            trendCanvas.style.opacity = '1';
+                        }
+                    }, 100);
+                }
+            }
+
+            // ROOT CAUSE FIX: Update chart heights after charts are created
+            setTimeout(() => {
+                updateChartHeights();
+            }, 1000);
+
+            // ROOT CAUSE FIX: Update chart heights on window resize
+            let chartResizeTimeout;
+            window.addEventListener('resize', function () {
+                clearTimeout(chartResizeTimeout);
+                chartResizeTimeout = setTimeout(() => {
+                    updateChartHeights();
+                }, 250);
+            });
+
+            // Debug: Log stats after update
+            setTimeout(() => {
+                const allExpenses = getAllExpenses();
+                const stats = calculateStats(allExpenses);
+                console.log('?? Final Stats:', {
+                    count: stats.count,
+                    total: stats.total,
+                    month: stats.month,
+                    average: stats.average
+                });
+                console.log('?? Total Expenses (count):', stats.count, '- This is the NUMBER of transactions');
+                console.log('?? Total Amount (sum):', stats.total, '- This is the SUM of all amounts');
+            }, 1000);
+
+            // Add event listeners for Category Chart filters
+            document.querySelectorAll('input[name="categoryFilter"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const yearSelectorRow = document.getElementById('categoryYearSelectorRow');
+
+                    // Show/hide year selector based on selection
+                    if (this.value === 'year') {
+                        yearSelectorRow.style.display = 'block';
+                    } else {
+                        yearSelectorRow.style.display = 'none';
+                    }
+
+                    // Update category chart only
+                    updateCategoryChart();
+                    // ROOT CAUSE FIX: Update chart heights after chart update
+                    setTimeout(() => updateChartHeights(), 300);
+                });
+            });
+
+            // Add event listener for Category Chart year selector
+            document.getElementById('categoryYearSelect').addEventListener('change', function () {
+                updateCategoryChart();
+                // ROOT CAUSE FIX: Update chart heights after chart update
+                setTimeout(() => updateChartHeights(), 300);
+            });
+
+            // Add event listeners for Trend Chart filters
+            document.querySelectorAll('input[name="trendFilter"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const yearSelectorRow = document.getElementById('trendYearSelectorRow');
+
+                    // Show/hide year selector based on selection
+                    if (this.value === 'year') {
+                        yearSelectorRow.style.display = 'block';
+                    } else {
+                        yearSelectorRow.style.display = 'none';
+                    }
+
+                    // Update trend chart only
+                    updateTrendChart();
+                    // ROOT CAUSE FIX: Update chart heights after chart update
+                    setTimeout(() => updateChartHeights(), 300);
+                });
+            });
+
+            // Add event listener for Trend Chart year selector
+            document.getElementById('trendYearSelect').addEventListener('change', function () {
+                updateTrendChart();
+                // ROOT CAUSE FIX: Update chart heights after chart update
+                setTimeout(() => updateChartHeights(), 300);
+            });
+
+            // Add event listeners for Table filters
+            document.querySelectorAll('input[name="tableFilter"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    // Refresh table with filtered expenses
+                    const allExpenses = getAllExpenses();
+                    createExpensesTable(allExpenses);
+                });
+            });
+
+            // ROOT CAUSE FIX: Listen for currency changes and refresh reports
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'user' || e.key === 'preferredCurrency' || e.key === 'exchangeRates') {
+                    console.log('?? Currency changed, refreshing reports...');
+                    // Clear cache to force recalculation
+                    cachedExpenses = null;
+                    // Reload and update all reports
+                    updateReports();
+                }
+            });
+
+            // Also monitor localStorage changes in the same page
+            const originalSetItem = Storage.prototype.setItem;
+            Storage.prototype.setItem = function (key, value) {
+                originalSetItem.apply(this, [key, value]);
+                if (key === 'user' || key === 'exchangeRates') {
+                    setTimeout(() => {
+                        console.log('?? Currency updated locally, refreshing reports...');
+                        cachedExpenses = null;
+                        updateReports();
+                    }, 100);
+                }
+            };
+        });
+    </script>
+
+    <script src="js/prevent-auto-scroll.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="js/sidebar-toggle.js"></script>
+    <script src="js/currency.js"></script>
+    <script src="js/notifications-manager.js"></script>
+    <script src="js/notification-panel.js" defer></script>
+    <script>
+        // ROOT CAUSE FIX: Desktop navigation toggle button handler (same as expenses.html)
+        document.addEventListener('DOMContentLoaded', function () {
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebar = document.querySelector('.sidebar');
+
+            // ROOT CAUSE FIX: Store scroll position before locking body
+            let bodyScrollPosition = 0;
+
+            // ROOT CAUSE FIX: Function to lock body scroll
+            function lockBodyScroll() {
+                bodyScrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${bodyScrollPosition}px`;
+                document.body.style.width = '100%';
+                document.body.style.height = '100%';
+                document.body.classList.add('sidebar-open');
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = 'hidden';
+                    mainContent.style.position = 'fixed';
+                }
+            }
+
+            // ROOT CAUSE FIX: Function to unlock body scroll
+            function unlockBodyScroll() {
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+                document.body.classList.remove('sidebar-open');
+                window.scrollTo(0, bodyScrollPosition);
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = '';
+                    mainContent.style.position = '';
+                }
+            }
+
+            // ROOT CAUSE FIX: Mobile menu toggle function with proper scroll locking
+            function toggleMobileMenu() {
+                if (!sidebar) return;
+                const isOpening = !sidebar.classList.contains('show');
+                sidebar.classList.toggle('show');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('show');
+                    if (isOpening) {
+                        sidebarOverlay.style.display = 'block';
+                    } else {
+                        sidebarOverlay.style.display = 'none';
+                    }
+                }
+                if (sidebar.classList.contains('show')) {
+                    lockBodyScroll();
+                } else {
+                    unlockBodyScroll();
+                }
+            }
+
+            // Mobile menu button handler
+            if (mobileMenuBtn) {
+                const newMobileBtn = mobileMenuBtn.cloneNode(true);
+                mobileMenuBtn.parentNode.replaceChild(newMobileBtn, mobileMenuBtn);
+                newMobileBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Close mobile menu when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleMobileMenu);
+            }
+
+            // Sidebar close button
+            const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+            if (sidebarCloseBtn) {
+                const newCloseBtn = sidebarCloseBtn.cloneNode(true);
+                sidebarCloseBtn.parentNode.replaceChild(newCloseBtn, sidebarCloseBtn);
+                newCloseBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    if (sidebar) {
+                        sidebar.classList.remove('show');
+                        if (sidebarOverlay) {
+                            sidebarOverlay.classList.remove('show');
+                            sidebarOverlay.style.display = 'none';
+                        }
+                        unlockBodyScroll();
+                    }
+                });
+            }
+
+            // FIXED: Close mobile menu when clicking navigation links (same as expenses.html)
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            if (navLinks && navLinks.length > 0) {
+                navLinks.forEach(link => {
+                    // Remove any existing mobile click handlers to avoid duplicates
+                    const newLink = link.cloneNode(true);
+                    link.parentNode.replaceChild(newLink, link);
+
+                    newLink.addEventListener('click', function () {
+                        // FIXED: Include tablets (1024px) in mobile breakpoint
+                        const isNowMobile = window.innerWidth <= 1024;
+                        if (isNowMobile && sidebar && sidebar.classList.contains('show')) {
+                            sidebar.classList.remove('show');
+                            if (sidebarOverlay) {
+                                sidebarOverlay.classList.remove('show');
+                                sidebarOverlay.style.display = 'none';
+                            }
+                            unlockBodyScroll();
+                            console.log('? Sidebar closed after navigation link click');
+                        }
+                    });
+                });
+                console.log('? Navigation links handler attached - will close sidebar on mobile');
+            }
+
+            if (desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Check if mobile - use mobile menu toggle
+                    if (window.innerWidth <= 767) {
+                        toggleMobileMenu();
+                        return;
+                    }
+
+                    // Use the global toggleSidebar function if available
+                    if (typeof globalToggleSidebar === 'function') {
+                        globalToggleSidebar();
+                    } else {
+                        // Fallback: manually toggle sidebar
+                        document.body.classList.toggle('sidebar-collapsed');
+                        if (sidebar) {
+                            sidebar.classList.toggle('collapsed');
+                            // Save state
+                            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                        }
+                    }
+                });
+                console.log('? Desktop nav toggle button handler attached');
+            }
+        });
+
+        // FIXED: Optimized mobile header actions function (same as expenses.html)
+        let resizeTimeout;
+        function moveHeaderActionsToMobile() {
+            // Clear any existing timeout
+            clearTimeout(resizeTimeout);
+
+            // Debounce resize events
+            resizeTimeout = setTimeout(function () {
+                const isMobile = window.innerWidth <= 1024;
+                const headerActions = document.querySelector('.page-header-fixed .header-actions');
+                const mobileContainer = document.querySelector('.header-actions-mobile');
+
+                if (isMobile) {
+                    // Mobile view: Hide in header, show below
+                    if (headerActions) {
+                        // Hide header actions in header
+                        headerActions.style.display = 'none';
+                        headerActions.style.visibility = 'hidden';
+                        headerActions.style.opacity = '0';
+
+                        // Create mobile container if it doesn't exist
+                        if (!mobileContainer) {
+                            const newMobileContainer = document.createElement('div');
+                            newMobileContainer.className = 'header-actions-mobile';
+
+                            // FIXED: Clone and modify the buttons to ensure proper stacking and match tile width
+                            const exportButtonsContainer = headerActions.querySelector('.export-buttons-container');
+                            if (exportButtonsContainer) {
+                                const buttons = exportButtonsContainer.querySelectorAll('.btn');
+                                if (buttons.length > 0) {
+                                    const buttonWrapper = document.createElement('div');
+                                    buttonWrapper.className = 'd-flex flex-column gap-2';
+                                    buttonWrapper.style.width = '100%';
+                                    buttonWrapper.style.boxSizing = 'border-box';
+
+                                    buttons.forEach(btn => {
+                                        const clonedBtn = btn.cloneNode(true);
+                                        clonedBtn.style.width = '100%';
+                                        clonedBtn.style.maxWidth = '100%';
+                                        clonedBtn.style.margin = '0';
+                                        clonedBtn.style.marginBottom = '0';
+                                        clonedBtn.style.flex = '1 1 100%';
+                                        clonedBtn.style.boxSizing = 'border-box';
+                                        buttonWrapper.appendChild(clonedBtn);
+                                    });
+
+                                    newMobileContainer.appendChild(buttonWrapper);
+                                } else {
+                                    newMobileContainer.innerHTML = exportButtonsContainer.innerHTML;
+                                }
+                            } else {
+                                newMobileContainer.innerHTML = headerActions.innerHTML;
+                            }
+
+                            // FIXED: Ensure container matches tile width
+                            newMobileContainer.style.width = '100%';
+                            newMobileContainer.style.maxWidth = '100%';
+                            newMobileContainer.style.boxSizing = 'border-box';
+
+                            // Insert before first child of main-content
+                            const mainContent = document.querySelector('.main-content');
+                            if (mainContent && mainContent.firstChild) {
+                                mainContent.insertBefore(newMobileContainer, mainContent.firstChild);
+                            } else if (mainContent) {
+                                mainContent.appendChild(newMobileContainer);
+                            }
+                        } else {
+                            // FIXED: Update existing container to ensure buttons are full width and match tile width
+                            const buttons = mobileContainer.querySelectorAll('.btn');
+                            buttons.forEach(btn => {
+                                btn.style.width = '100%';
+                                btn.style.maxWidth = '100%';
+                                btn.style.margin = '0';
+                                btn.style.marginBottom = '0';
+                                btn.style.flex = '1 1 100%';
+                                btn.style.boxSizing = 'border-box';
+                            });
+
+                            const containers = mobileContainer.querySelectorAll('.d-flex');
+                            containers.forEach(container => {
+                                container.style.flexDirection = 'column';
+                                container.style.width = '100%';
+                                container.style.maxWidth = '100%';
+                                container.style.boxSizing = 'border-box';
+                            });
+
+                            // FIXED: Ensure container matches tile width
+                            mobileContainer.style.width = '100%';
+                            mobileContainer.style.maxWidth = '100%';
+                            mobileContainer.style.boxSizing = 'border-box';
+                        }
+                    }
+                } else {
+                    // Desktop view: Show in header, remove mobile container
+                    if (headerActions) {
+                        headerActions.style.display = '';
+                        headerActions.style.visibility = 'visible';
+                        headerActions.style.opacity = '1';
+                    }
+
+                    // FIXED: Remove mobile container immediately to prevent buttons going behind header
+                    if (mobileContainer) {
+                        mobileContainer.style.display = 'none';
+                        mobileContainer.style.visibility = 'hidden';
+                        mobileContainer.style.opacity = '0';
+                        // Remove from DOM after a brief delay to ensure smooth transition
+                        setTimeout(() => {
+                            if (mobileContainer && mobileContainer.parentNode) {
+                                mobileContainer.remove();
+                            }
+                        }, 50);
+                    }
+                }
+            }, 100); // 100ms debounce
+        }
+
+        // Call on load and resize with debouncing
+        let resizeHandler;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeHandler);
+            resizeHandler = setTimeout(moveHeaderActionsToMobile, 150);
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', moveHeaderActionsToMobile);
+        } else {
+            moveHeaderActionsToMobile();
+        }
+
+        // Show page and trigger animations after DOM is ready
+        function initPageAnimations() {
+            document.body.classList.add('ready');
+
+            // Force animation restart on rows that may have been created before body became visible
+            setTimeout(() => {
+                const animatedRows = document.querySelectorAll('.expense-row-animate');
+                animatedRows.forEach((row, index) => {
+                    // Restart animation by removing and re-adding class
+                    row.classList.remove('expense-row-animate');
+                    // Force reflow
+                    void row.offsetWidth;
+                    row.classList.add('expense-row-animate');
+                    row.style.animationDelay = `${index * 0.05}s`;
+                });
+            }, 100);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPageAnimations);
+        } else {
+            initPageAnimations();
+        }
+    </script>
+    <script src="js/topnav.js" defer></script>
+    <script src="js/navigation-init.js" defer></script>
+    <script src="js/sw-engine.js" defer></script>
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support Dashboard — SplitWise</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="ico">🎫</div>
+      <div><div class="nm">SplitWise</div><div class="sb">Support Portal</div></div>
+    </div>
+    <nav>
+      <div class="nav-section">Tickets</div>
+      <a class="nav-link active" onclick="setFilter('')"><i class="fas fa-ticket-alt"></i> All Tickets</a>
+      <a class="nav-link" onclick="setFilter('open')"><i class="fas fa-circle-dot" style="color:#60a5fa"></i> Open <span class="nav-badge" id="nb-open" style="background:#3b82f6">0</span></a>
+      <a class="nav-link" onclick="setFilter('in_progress')"><i class="fas fa-hourglass-half" style="color:#fbbf24"></i> In Progress <span class="nav-badge" id="nb-inprog" style="background:#d97706">0</span></a>
+      <a class="nav-link" onclick="setFilter('closed')"><i class="fas fa-check-circle" style="color:var(--muted)"></i> Closed</a>
+      <a class="nav-link" onclick="setFilter('urgent')"><i class="fas fa-fire" style="color:var(--red)"></i> Urgent</a>
+      <a class="nav-link" onclick="setFilter('mine')"><i class="fas fa-user"></i> My Tickets</a>
+      <a class="nav-link" onclick="setFilter('unassigned')"><i class="fas fa-inbox"></i> Unassigned</a>
+      <div class="nav-section">Admin</div>
+      <a class="nav-link" onclick="showCreateToken()"><i class="fas fa-key"></i> Create Agent Token</a>
+      <a class="nav-link" id="navCreateAdmin" style="display:none" onclick="showCreateAdmin()"><i class="fas fa-shield-halved" style="color:#fc8181"></i> Create Admin</a>
+    </nav>
+    <div class="sb-agent">
+      <div class="sb-av" id="sbAv" style="background:#667eea">A</div>
+      <div><div class="nm" id="sbNm">Agent</div><div class="role" id="sbRole">support_agent</div></div>
+      <button class="logout-btn" title="Logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="ham-btn" id="hamBtn" onclick="toggleSidebar()" title="Menu"><i class="fas fa-bars"></i></button>
+      <h2 id="pageTitle">All Tickets</h2>
+      <div class="search-box"><i class="fas fa-search"></i>
+        <input type="text" id="searchInp" placeholder="Search by ID, name, email, subject…" oninput="debSearch()">
+      </div>
+      <button class="search-mobile-btn icon-btn" onclick="toggleMobileSearch()" title="Search"><i class="fas fa-search"></i></button>
+      <button class="icon-btn" onclick="refresh()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+    </div>
+    <div class="mobile-search-bar" id="mobileSearch">
+      <div class="search-box"><i class="fas fa-search"></i>
+        <input type="text" id="searchInpMobile" placeholder="Search tickets…" oninput="debSearch()">
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat" onclick="setFilter('')"><div class="lbl">Open</div><div class="val" id="st-open">—</div></div>
+      <div class="stat" onclick="setFilter('in_progress')"><div class="lbl">In Progress</div><div class="val" id="st-ip" style="color:#fbbf24">—</div></div>
+      <div class="stat" onclick="setFilter('closed')"><div class="lbl">Closed</div><div class="val" id="st-cl" style="color:var(--muted)">—</div></div>
+      <div class="stat" onclick="setFilter('urgent')"><div class="lbl">🔥 Urgent</div><div class="val" id="st-urg" style="color:var(--red)">—</div></div>
+      <div class="stat"><div class="lbl">Avg Days</div><div class="val" id="st-avg">—</div></div>
+    </div>
+
+    <div class="content-area">
+      <!-- LIST -->
+      <div class="list-wrap">
+        <div class="filter-bar">
+          <select class="fsel" id="fSt" onchange="loadTickets()"><option value="">Status: All</option><option value="open">Open</option><option value="in_progress">In Progress</option><option value="closed">Closed</option></select>
+          <select class="fsel" id="fPr" onchange="loadTickets()"><option value="">Priority: All</option><option value="urgent">Urgent</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+          <select class="fsel" id="fAg" onchange="loadTickets()"><option value="">Agent: All</option><option value="unassigned">Unassigned</option></select>
+          <select class="fsel" id="fSo" onchange="loadTickets()"><option value="-createdAt">Newest First</option><option value="createdAt">Oldest First</option><option value="-priority">Priority ↓</option></select>
+          <button class="fbtn" onclick="resetFilters()"><i class="fas fa-times"></i> Reset</button>
+          <span class="fcount" id="fCount"></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Ticket ID</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Assigned</th><th>Days</th><th>Date</th>
+          </tr></thead>
+          <tbody id="tBody"><tr><td colspan="8" class="spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading…</td></tr></tbody>
+        </table>
+        <div class="pager" id="pager" style="display:none">
+          <button class="pg-btn" id="pgPrev" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+          <div id="pgNums" style="display:flex;gap:4px"></div>
+          <button class="pg-btn" id="pgNext" onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+          <span class="pi" id="pgInfo"></span>
+        </div>
+      </div>
+
+      <!-- DETAIL -->
+      <div class="detail" id="detail">
+        <div class="dp-hd">
+          <i class="fas fa-ticket-alt" style="color:var(--purple)"></i>
+          <span class="tid-large" id="dpTid"></span>
+          <span id="dpBadge" class="badge"></span>
+          <button class="dp-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="dp-body" id="dpBody"></div>
+        <div class="reply-area" id="replyArea" style="display:none">
+          <div class="rtabs">
+            <button class="rtab active" onclick="switchTab('reply',this)"><i class="fas fa-reply"></i> Reply</button>
+            <button class="rtab" onclick="switchTab('note',this)"><i class="fas fa-lock"></i> Internal Note</button>
+          </div>
+          <textarea class="rtextarea" id="rtxt" placeholder="Type your reply to the user…"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendReply()"><i class="fas fa-paper-plane"></i> Send Reply Email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar overlay -->
+<div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Create Token Modal -->
+<div id="tokenModal" style="display:none;position:fixed;inset:0;background:rgba(102,126,234,.18);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border:1.5px solid rgba(102,126,234,.2);border-radius:22px;padding:28px;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(102,126,234,.18);max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h3 style="font-size:17px;font-weight:900;display:flex;align-items:center;gap:8px;color:#1e293b"><i class="fas fa-key" style="color:#667eea"></i> Create Agent Token</h3>
+      <button onclick="document.getElementById('tokenModal').style.display='none'" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:18px;line-height:1"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Auto-generate section -->
+    <div style="background:linear-gradient(135deg,rgba(102,126,234,.08),rgba(118,75,162,.08));border:1.5px solid rgba(102,126,234,.2);border-radius:14px;padding:16px;margin-bottom:18px">
+      <p style="font-size:13px;color:#667eea;font-weight:800;margin-bottom:4px">⚡ Auto-Generate (Recommended)</p>
+      <p style="font-size:12px;color:#64748b;margin-bottom:14px">System creates a random secure token + 12-character password. Share the credentials with the agent.</p>
+      <button onclick="autoGenerate()" id="autoGenBtn" style="width:100%;padding:11px;border:none;border-radius:11px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s">
+        <i class="fas fa-wand-magic-sparkles"></i> Generate Agent Credentials
+      </button>
+    </div>
+
+    <!-- Generated result -->
+    <div id="genResult" style="display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:14px;padding:16px;margin-bottom:18px">
+      <p style="font-size:12px;font-weight:800;color:#059669;margin-bottom:12px">✓ Credentials Generated — Share with agent:</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #d1fae5">
+        <span style="font-size:12px;color:#64748b;font-weight:700">Access Token</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <code id="genToken" style="font-size:14px;font-weight:800;color:#6C63FF;background:#ede9fe;padding:3px 10px;border-radius:6px"></code>
+          <button onclick="copyText('genToken','tok')" id="cp-tok" style="background:#e0e7ff;border:1px solid #c7d2fe;border-radius:6px;color:#6C63FF;cursor:pointer;padding:4px 10px;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;transition:.15s">Copy</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+        <span style="font-size:12px;color:#64748b;font-weight:700">Temp Password</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <code id="genPass" style="font-size:14px;font-weight:800;color:#6C63FF;background:#ede9fe;padding:3px 10px;border-radius:6px"></code>
+          <button onclick="copyText('genPass','pw')" id="cp-pw" style="background:#e0e7ff;border:1px solid #c7d2fe;border-radius:6px;color:#6C63FF;cursor:pointer;padding:4px 10px;font-size:11px;font-weight:800;font-family:'Nunito',sans-serif;transition:.15s">Copy</button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#64748b;margin-top:10px"><i class="fas fa-info-circle"></i> Agent logs in at <strong style="color:#1e293b">support-login.html</strong> → first login forces password change &amp; profile setup.</p>
+    </div>
+
+    <!-- Divider -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="flex:1;height:1px;background:#e2e8f0"></div>
+      <span style="font-size:11px;color:#64748b;font-weight:700">OR ENTER MANUALLY</span>
+      <div style="flex:1;height:1px;background:#e2e8f0"></div>
+    </div>
+
+    <!-- Manual section -->
+    <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Agent Name *</label>
+    <input id="newTokId" type="text" placeholder="e.g. Priya Sharma" style="width:100%;background:#f8faff;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;color:#1e293b;font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:10px;transition:.2s" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+    <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Email (optional)</label>
+    <input id="newTokPw" type="email" placeholder="agent@example.com" style="width:100%;background:#f8faff;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;color:#1e293b;font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:14px;transition:.2s" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+    <button onclick="createToken()" style="width:100%;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px">Create Agent Token</button>
+    <div id="tokResult" style="margin-top:12px;font-size:13px;display:none;padding:10px;border-radius:8px;background:#f0f9f4"></div>
+  </div>
+</div>
+
+
+
+<div class="toast" id="toast"></div>
+
+
+<!-- Create Admin Modal -->
+<div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(102,126,234,.18);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border:1.5px solid rgba(102,126,234,.2);border-radius:22px;padding:28px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(102,126,234,.18)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h3 style="font-size:17px;font-weight:900;display:flex;align-items:center;gap:8px;color:#1e293b"><i class="fas fa-shield-halved" style="color:#c53030"></i> Create Admin Account</h3>
+      <button onclick="document.getElementById('adminModal').style.display='none'" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:18px;line-height:1"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#c53030">
+      <i class="fas fa-triangle-exclamation"></i> This creates a full <strong>admin</strong> account with the next sequential token (ADMIN-002, etc.). Use with caution.
+    </div>
+    <div id="adminResult" style="display:none;margin-bottom:14px;font-size:13px"></div>
+    <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Full Name *</label>
+    <input id="adName" type="text" placeholder="e.g. Rahul" style="width:100%;background:#f8faff;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;color:#1e293b;font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:12px;transition:.2s" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+    <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Email (for OTP recovery)</label>
+    <input id="adEmail" type="email" placeholder="rahul@email.com" style="width:100%;background:#f8faff;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;color:#1e293b;font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:12px;transition:.2s" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+    <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Password (min 8 chars)</label>
+    <input id="adPw" type="password" placeholder="Min 8 characters" style="width:100%;background:#f8faff;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;color:#1e293b;font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:18px;transition:.2s" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+    <button id="adBtn" onclick="doCreateAdmin()" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,#c53030,#e53e3e);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s">
+      <i class="fas fa-shield-halved"></i> Create Admin Account
+    </button>
+    <div id="adCreated" style="display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:14px">
+      <p style="font-size:12px;font-weight:800;color:#059669;margin-bottom:10px">✓ Admin Created — Save these credentials:</p>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #d1fae5"><span style="font-size:12px;color:#64748b;font-weight:700">Token</span><code id="adResToken" style="font-size:13px;font-weight:800;color:#c53030"></code></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#64748b;font-weight:700">Role</span><span style="font-size:13px;font-weight:700;color:#059669">🛡️ Admin</span></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<script>
+const API = (()=>{
+  const h = window.location.hostname;
+  if(h==='localhost'||h==='127.0.0.1') return 'http://localhost:4000/api';
+  return `${window.location.protocol}//${h.replace('5500','4000')}/api`;
+})();
+
+let JWT = sessionStorage.getItem('support_jwt');
+let AGENT_DATA = null;
+let selId = null, curTab = 'reply', curPage = 1, totPages = 1, debTmr = null;
+const ADMIN_TOKEN = sessionStorage.getItem('support_jwt'); // use JWT for all admin calls
+
+// ── Auth guard ─────────────────────────────────────────────────────────────────
+if (!JWT) { window.location.href = 'support-login.html'; }
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+async function boot() {
+  try {
+    const d = await api('/auth/me', 'GET');
+    if (!d.success) { logout(); return; }
+    AGENT_DATA = d.data;
+    document.getElementById('sbNm').textContent    = d.data.name || d.data.accessToken;
+    document.getElementById('sbRole').textContent  = (d.data.role||'').replace('_',' ');
+    document.getElementById('sbAv').textContent    = (d.data.name||'A')[0].toUpperCase();
+    document.getElementById('sbAv').style.background = d.data.avatarColor||'#667eea';
+    // Show admin-only items
+    if (d.data.role === 'admin') {
+      const el = document.getElementById('navCreateAdmin');
+      if (el) el.style.display = '';
+    }
+    loadStats(); loadTickets(); loadAgents();
+  } catch { logout(); }
+}
+boot();
+
+function logout() { sessionStorage.clear(); window.location.href = 'support-portal.html'; }
+
+// ── API wrapper ────────────────────────────────────────────────────────────────
+async function api(path, method='GET', body=null) {
+  const opts = { method, headers: { 'Content-Type':'application/json', Authorization:`Bearer ${JWT}` } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(`${API}/support${path}`, opts);
+  return r.json();
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+async function loadStats() {
+  const d = await api('/stats');
+  if(!d.success) return;
+  const s = d.data;
+  document.getElementById('st-open').textContent = s.open;
+  document.getElementById('st-ip').textContent   = s.inProgress;
+  document.getElementById('st-cl').textContent   = s.closed;
+  document.getElementById('st-urg').textContent  = s.urgent;
+  document.getElementById('st-avg').textContent  = s.avgDays + 'd';
+  document.getElementById('nb-open').textContent   = s.open;
+  document.getElementById('nb-inprog').textContent = s.inProgress;
+}
+
+// ── Agents ─────────────────────────────────────────────────────────────────────
+async function loadAgents() {
+  const d = await api('/agents');
+  if(!d.success) return;
+  const sel = document.getElementById('fAg');
+  d.data.forEach(a => {
+    const o = document.createElement('option');
+    o.value = a.name; o.textContent = a.name; sel.appendChild(o);
+  });
+}
+
+// ── Tickets ────────────────────────────────────────────────────────────────────
+async function loadTickets() {
+  document.getElementById('tBody').innerHTML = `<tr><td colspan="8" class="spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading…</td></tr>`;
+  const q = new URLSearchParams({
+    status: document.getElementById('fSt').value,
+    priority: document.getElementById('fPr').value,
+    assignedTo: document.getElementById('fAg').value,
+    search: document.getElementById('searchInp').value,
+    sort: document.getElementById('fSo').value,
+    page: curPage, limit: 30,
+  });
+  const d = await api(`/tickets?${q}`);
+  if(!d.success){ document.getElementById('tBody').innerHTML='<tr><td colspan="8" class="spinner" style="color:var(--red)">Failed to load</td></tr>'; return; }
+  renderRows(d.data.tickets);
+  totPages = d.data.pagination.pages||1;
+  document.getElementById('fCount').textContent = `${d.data.pagination.total} tickets`;
+  renderPager(d.data.pagination);
+}
+
+function renderRows(tickets) {
+  const tb = document.getElementById('tBody');
+  if(!tickets.length){ tb.innerHTML='<tr><td colspan="8" class="empty"><i class="fas fa-inbox"></i>No tickets match your filters</td></tr>'; return; }
+  const now = Date.now();
+  tb.innerHTML = tickets.map(t => {
+    const d = t.daysOpen ?? +((now - new Date(t.createdAt).getTime())/86400000).toFixed(1);
+    const dc = d<3?'d-ok':d<7?'d-warn':'d-hot';
+    const ag = t.assignedTo
+      ? `<span class="av-sm" style="background:${AGENT_DATA?.avatarColor||'#667eea'}">${t.assignedTo[0].toUpperCase()}</span>${esc(t.assignedTo)}`
+      : `<span style="color:var(--muted);font-style:italic;font-size:12px">— unassigned</span>`;
+    const dt = new Date(t.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+    return `<tr class="${t.ticketId===selId?'sel':''}" onclick="openDetail('${t.ticketId}')">
+      <td><span class="tid">${t.ticketId}</span></td>
+      <td><div class="tuser">${esc(t.name)}</div><div class="temail">${esc(t.email)}</div></td>
+      <td style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.subject)}</td>
+      <td><span class="badge b-${t.priority}">${t.priority}</span></td>
+      <td><span class="badge b-${t.status}">${t.status.replace('_',' ')}</span></td>
+      <td style="display:flex;align-items:center">${ag}</td>
+      <td><span class="days-ch ${dc}">${d}d</span></td>
+      <td style="color:var(--muted);font-size:12px">${dt}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPager(p) {
+  const bar = document.getElementById('pager');
+  bar.style.display = p.pages>1?'flex':'none';
+  if(p.pages<=1) return;
+  document.getElementById('pgPrev').disabled = p.page<=1;
+  document.getElementById('pgNext').disabled = p.page>=p.pages;
+  document.getElementById('pgInfo').textContent = `Page ${p.page} of ${p.pages}`;
+  const nums = document.getElementById('pgNums'); nums.innerHTML='';
+  for(let i=1;i<=Math.min(p.pages,8);i++){
+    const b=document.createElement('button');
+    b.className='pg-btn'+(i===p.page?' active':'');
+    b.textContent=i; b.onclick=()=>{curPage=i;loadTickets();}; nums.appendChild(b);
+  }
+}
+
+function changePage(d){ curPage=Math.max(1,Math.min(totPages,curPage+d)); loadTickets(); }
+function debSearch(){ clearTimeout(debTmr); debTmr=setTimeout(()=>{curPage=1;loadTickets();},350); }
+
+function setFilter(f) {
+  curPage=1;
+  document.getElementById('fSt').value='';
+  document.getElementById('fPr').value='';
+  document.getElementById('fAg').value='';
+  if(f==='open') document.getElementById('fSt').value='open';
+  else if(f==='in_progress') document.getElementById('fSt').value='in_progress';
+  else if(f==='closed') document.getElementById('fSt').value='closed';
+  else if(f==='urgent') document.getElementById('fPr').value='urgent';
+  else if(f==='mine') document.getElementById('fAg').value=AGENT_DATA?.name||'';
+  else if(f==='unassigned') document.getElementById('fAg').value='unassigned';
+  loadTickets();
+}
+function resetFilters(){ ['fSt','fPr','fAg'].forEach(id=>document.getElementById(id).value=''); document.getElementById('searchInp').value=''; curPage=1; loadTickets(); }
+function refresh(){ loadStats(); loadTickets(); if(selId) refreshDetail(); }
+
+// ── Detail panel ───────────────────────────────────────────────────────────────
+async function openDetail(id) {
+  selId = id;
+  document.querySelectorAll('#tBody tr').forEach(r=>r.classList.toggle('sel',r.onclick?.toString().includes(`'${id}'`)));
+  document.getElementById('detail').classList.add('open');
+  document.getElementById('dpBody').innerHTML='<div class="spinner"><i class="fas fa-circle-notch fa-spin"></i> Loading…</div>';
+  document.getElementById('replyArea').style.display='none';
+  const d = await api(`/tickets/${id}`);
+  if(!d.success){ document.getElementById('dpBody').innerHTML='<p style="padding:20px;color:var(--red)">Failed to load ticket.</p>'; return; }
+  renderDetail(d.data);
+}
+function closeDetail(){ document.getElementById('detail').classList.remove('open'); selId=null; }
+async function refreshDetail(){ if(selId) { const d=await api(`/tickets/${selId}`); if(d.success) renderDetail(d.data); } }
+
+function renderDetail(t) {
+  document.getElementById('dpTid').textContent = t.ticketId;
+  const db = document.getElementById('dpBadge');
+  db.className=`badge b-${t.status}`; db.textContent=t.status.replace('_',' ');
+
+  const now = Date.now(), days = +((((t.closedAt?new Date(t.closedAt).getTime():now) - new Date(t.createdAt).getTime())/86400000).toFixed(1));
+  const created = new Date(t.createdAt).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'});
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(t.email)}&su=${encodeURIComponent(`[${t.ticketId}] Re: ${t.subject}`)}&body=${encodeURIComponent(`Hi ${t.name},\n\n\n\n---\n${AGENT_DATA?.name||'Support'}\nSplitWise Support Team`)}`;
+
+  const agentNames = (JSON.parse(sessionStorage.getItem('agents')||'[]')).map(a=>`<option value="${a.name}"${a.name===t.assignedTo?' selected':''}>${a.name}</option>`).join('');
+  const myName = AGENT_DATA?.name||'';
+
+  document.getElementById('dpBody').innerHTML = `
+    <!-- Quick Actions -->
+    <div class="dp-sec">⚡ Quick Actions</div>
+    <div class="acts-row">
+      <button class="act-btn" onclick="assignMe('${t.ticketId}')"><i class="fas fa-user-check"></i> Assign to Me</button>
+      <button class="act-btn" onclick="window.open('${gmailUrl}','_blank')"><i class="fab fa-google"></i> Gmail</button>
+      ${t.status!=='closed'
+        ?`<button class="act-btn danger" onclick="patchTicket('${t.ticketId}',{status:'closed'})"><i class="fas fa-lock"></i> Close</button>`
+        :`<button class="act-btn success" onclick="patchTicket('${t.ticketId}',{status:'open'})"><i class="fas fa-lock-open"></i> Reopen</button>`}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <select class="isel" onchange="patchTicket('${t.ticketId}',{priority:this.value})">
+        ${['low','medium','high','urgent'].map(p=>`<option value="${p}"${t.priority===p?' selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)} Priority</option>`).join('')}
+      </select>
+      <select class="isel" onchange="patchTicket('${t.ticketId}',{assignedTo:this.value})">
+        <option value="">— Assign Agent</option>
+        ${agentNames||`<option value="${myName}"${t.assignedTo===myName?' selected':''}>${myName}</option>`}
+      </select>
+    </div>
+
+    <!-- Status Actions -->
+    ${t.status==='open'?`<button class="act-btn" style="width:100%;margin-bottom:14px" onclick="patchTicket('${t.ticketId}',{status:'in_progress'})"><i class="fas fa-hourglass-half"></i> Mark as In Progress</button>`:''}
+
+    <!-- Meta -->
+    <div class="dp-sec">👤 Ticket Details</div>
+    <div class="meta-card">
+      <div class="meta-row"><span class="l">User</span><span class="r">${esc(t.name)}</span></div>
+      <div class="meta-row"><span class="l">Email</span><span class="r" style="color:var(--purple)">${esc(t.email)}</span></div>
+      <div class="meta-row"><span class="l">Subject</span><span class="r">${esc(t.subject)}</span></div>
+      <div class="meta-row"><span class="l">Source</span><span class="r">${t.source}</span></div>
+      <div class="meta-row"><span class="l">Created</span><span class="r" style="color:var(--muted)">${created}</span></div>
+      <div class="meta-row"><span class="l">Days Open</span><span class="r" style="color:${days>7?'var(--red)':days>3?'var(--amber)':'var(--green)'}">${days}d</span></div>
+      ${t.assignedTo?`<div class="meta-row"><span class="l">Assigned To</span><span class="r">${esc(t.assignedTo)}</span></div>`:''}
+    </div>
+
+    <!-- Original message -->
+    <div class="dp-sec">📩 Original Message</div>
+    <div class="orig-msg">${esc(t.message)}</div>
+
+    <!-- Conversation -->
+    <div class="dp-sec">💬 Conversation (${(t.replies||[]).length})</div>
+    ${!(t.replies||[]).length ? '<div style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">No replies yet</div>' :
+      t.replies.map(r=>`<div class="msg msg-${r.from}">
+        <div class="bubble">${esc(r.text)}</div>
+        <div class="msg-meta">${r.agent?`<strong>${esc(r.agent)}</strong> · `:''}${new Date(r.sentAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}</div>
+      </div>`).join('')}
+
+    <!-- Internal notes -->
+    ${(t.internalNotes||[]).length?`<div class="dp-sec">🔒 Internal Notes (${t.internalNotes.length})</div>
+      ${t.internalNotes.map(n=>`<div class="note-item"><div class="note-hd"><i class="fas fa-lock"></i> ${esc(n.agent)} · ${new Date(n.sentAt).toLocaleDateString('en-IN',{dateStyle:'medium'})}</div>${esc(n.text)}</div>`).join('')}`:''}
+
+    <!-- Activity log -->
+    ${(t.activityLog||[]).length?`<div class="dp-sec">📋 Activity Log (${t.activityLog.length})</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px">
+        ${t.activityLog.slice(-10).reverse().map(a=>`<div class="act-item">
+          <div class="act-dot"><i class="fas fa-${a.action==='replied'?'reply':a.action==='assigned'||a.action==='transferred'?'user-check':'circle-dot'}" style="font-size:9px"></i></div>
+          <div class="act-body"><strong>${esc(a.agent)}</strong> — ${esc(a.detail)}<div class="detail-txt">${new Date(a.at).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}</div></div>
+        </div>`).join('')}
+      </div>`:''}
+  `;
+  document.getElementById('replyArea').style.display = t.status!=='closed'?'block':'none';
+}
+
+// ── Ticket actions ─────────────────────────────────────────────────────────────
+async function patchTicket(id, body) {
+  const d = await api(`/tickets/${id}`, 'PATCH', { ...body, agent: AGENT_DATA?.name||'Agent' });
+  if(d.success){ toast(body.status?`Status → ${body.status}`:'Updated','success'); loadStats(); loadTickets(); refreshDetail(); }
+  else toast(d.error||'Failed','error');
+}
+async function assignMe(id){
+  await patchTicket(id,{assignedTo:AGENT_DATA?.name||'Me'});
+}
+
+// ── Reply ──────────────────────────────────────────────────────────────────────
+let replyMode = 'reply';
+function switchTab(tab, btn) {
+  replyMode = tab;
+  document.querySelectorAll('.rtab').forEach((b,i)=>b.classList.toggle('active',(tab==='reply'&&i===0)||(tab==='note'&&i===1)));
+  const area = document.getElementById('rtxt'), sbtn = document.getElementById('sendBtn');
+  if(tab==='reply'){ area.placeholder='Type your reply to the user…'; sbtn.innerHTML='<i class="fas fa-paper-plane"></i> Send Reply Email'; sbtn.style.background=''; }
+  else { area.placeholder='Internal note (only visible to agents)…'; sbtn.innerHTML='<i class="fas fa-lock"></i> Save Note'; sbtn.style.background='linear-gradient(135deg,#d97706,#92400e)'; }
+  area.value='';
+}
+
+async function sendReply() {
+  const txt = document.getElementById('rtxt').value.trim();
+  if(!txt){ toast('Please write something','error'); return; }
+  const btn = document.getElementById('sendBtn'); btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  let d;
+  if(replyMode==='reply') d = await api(`/tickets/${selId}/reply`,'POST',{message:txt,agent:AGENT_DATA?.name||'Agent'});
+  else d = await api(`/tickets/${selId}/note`,'POST',{text:txt,agent:AGENT_DATA?.name||'Agent'});
+  btn.disabled=false;
+  btn.innerHTML = replyMode==='reply'?'<i class="fas fa-paper-plane"></i> Send Reply Email':'<i class="fas fa-lock"></i> Save Note';
+  btn.style.background = replyMode==='note'?'linear-gradient(135deg,#d97706,#92400e)':'';
+  if(d.success){ document.getElementById('rtxt').value=''; toast(replyMode==='reply'?'Reply sent ✓':'Note saved ✓','success'); loadStats(); loadTickets(); refreshDetail(); }
+  else toast(d.error||'Failed','error');
+}
+
+// ── Create agent token ─────────────────────────────────────────────────────────
+function showCreateToken(){
+  document.getElementById('tokenModal').style.display='flex';
+  document.getElementById('genResult').style.display='none';
+}
+
+async function autoGenerate(){
+  const btn=document.getElementById('autoGenBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Generating…';
+  try{
+    const d = await api('/admin/gen-agent','POST',{});
+    if(d.success){
+      document.getElementById('genToken').textContent=d.data.accessToken;
+      document.getElementById('genPass').textContent=d.data.tempPassword;
+      document.getElementById('genResult').style.display='block';
+      toast('Credentials generated!','success');
+    } else {
+      toast(d.error||'Failed — admin role required','error');
+    }
+  }catch{toast('Server error','error');}
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-wand-magic-sparkles"></i> Generate Agent Credentials';
+}
+
+function copyText(id,key){
+  const txt=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.getElementById(`cp-${key}`);
+    const orig=btn.textContent; btn.textContent='✓ Copied!'; btn.style.color='#10b981';
+    setTimeout(()=>{btn.textContent=orig;btn.style.color='';},2000);
+  });
+}
+
+async function createToken(){
+  const name=document.getElementById('newTokId').value.trim();
+  const email=document.getElementById('newTokPw').value.trim();
+  if(!name){toast('Enter agent name','error');return;}
+  const d = await api('/admin/gen-agent','POST',{name,email});
+  const res=document.getElementById('tokResult');
+  res.style.display='block';
+  if(d.success){
+    res.style.color='var(--green)'; 
+    res.innerHTML=`✅ Token: <strong>${d.data.accessToken}</strong> | Temp PW: <strong>${d.data.tempPassword}</strong>`;
+    toast('Agent token created!','success');
+  } else { res.style.color='var(--red)'; res.textContent=d.error||'Failed'; toast(d.error||'Failed','error'); }
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+function toast(msg,type='info'){ const e=document.getElementById('toast'); e.textContent=msg; e.className=`toast ${type} show`; setTimeout(()=>e.classList.remove('show'),3000); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+// ── Create Admin (admin-only) ──────────────────────────────────────────────────
+function showCreateAdmin() {
+  document.getElementById('adminModal').style.display='flex';
+  document.getElementById('adminResult').style.display='none';
+  document.getElementById('adCreated').style.display='none';
+  ['adName','adEmail','adPw'].forEach(id=>{const el=document.getElementById(id); if(el)el.value='';});
+}
+async function doCreateAdmin() {
+  const name = document.getElementById('adName').value.trim();
+  const email = document.getElementById('adEmail').value.trim();
+  const pw = document.getElementById('adPw').value;
+  if (!name || pw.length < 8) { toast('Name required and password must be 8+ chars','error'); return; }
+  const btn = document.getElementById('adBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Creating…';
+  try {
+    const d = await api('/admin/create-admin','POST',{name,email,password:pw});
+    if (d.success) {
+      document.getElementById('adResToken').textContent = d.data.accessToken;
+      document.getElementById('adCreated').style.display='block';
+      toast(`Admin ${name} created — Token: ${d.data.accessToken}`,'success');
+    } else {
+      toast(d.error||'Failed to create admin','error');
+    }
+  } catch { toast('Server error','error'); }
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-shield-halved"></i> Create Admin Account';
+}
+
+
+// ── Cache agents for detail panel ─────────────────────────────────────────────
+api('/agents').then(d=>{ if(d.success) sessionStorage.setItem('agents',JSON.stringify(d.data)); });
+
+// ── Mobile sidebar toggle ──────────────────────────────────────────────────────
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar'), ov=document.getElementById('sbOverlay');
+  const open=sb.classList.toggle('open');
+  ov.classList.toggle('show',open);
+}
+// Close sidebar on nav-link click (mobile)
+document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>{
+  if(window.innerWidth<=768){document.querySelector('.sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show');}
+}));
+
+// ── Mobile search toggle ───────────────────────────────────────────────────────
+function toggleMobileSearch(){
+  const bar=document.getElementById('mobileSearch');
+  bar.classList.toggle('show');
+  if(bar.classList.contains('show')) document.getElementById('searchInpMobile').focus();
+}
+// Sync mobile search input with main search
+document.getElementById('searchInpMobile')?.addEventListener('input',e=>{
+  document.getElementById('searchInp').value=e.target.value;
+  clearTimeout(debTmr); debTmr=setTimeout(()=>{curPage=1;loadTickets();},350);
+});
+
+// ── Close detail with back-gesture or Escape ───────────────────────────────────
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeDetail(); document.querySelector('.sidebar')?.classList.remove('open'); document.getElementById('sbOverlay')?.classList.remove('show'); } });
+</script>
+</body>
+</html>

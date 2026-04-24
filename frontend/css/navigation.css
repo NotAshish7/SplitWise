@@ -1,0 +1,662 @@
+/* ================================================================
+   SPLITWISE — PREMIUM NAVIGATION REDESIGN
+   Sidebar + Top Header — Desktop / Tablet / Mobile
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   NAV TOKENS
+   ---------------------------------------------------------------- */
+:root {
+  --nav-sidebar-w:       260px;
+  --nav-sidebar-w-col:   72px;
+  --nav-header-h:        64px;
+  --nav-bg:              linear-gradient(160deg, #1a1545 0%, #2d2760 55%, #1e1b47 100%);
+  --nav-accent:          #6C63FF;
+  --nav-accent-2:        #00D4AA;
+  --nav-text:            rgba(255,255,255,0.82);
+  --nav-text-active:     #ffffff;
+  --nav-hover-bg:        rgba(255,255,255,0.10);
+  --nav-active-bg:       rgba(108,99,255,0.30);
+  --nav-border:          rgba(255,255,255,0.07);
+  --nav-shadow:          4px 0 30px rgba(0,0,0,0.35);
+  --header-bg-light:     rgba(255,255,255,0.92);
+  --header-bg-dark:      rgba(15,12,35,0.92);
+  --header-border-light: rgba(108,99,255,0.12);
+  --header-border-dark:  rgba(108,99,255,0.20);
+  --header-shadow:       0 2px 24px rgba(108,99,255,0.10);
+}
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+
+.sidebar {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  height: 100vh !important;
+  width: var(--nav-sidebar-w) !important;
+  background: var(--nav-bg) !important;
+  box-shadow: var(--nav-shadow) !important;
+  border-right: 1px solid var(--nav-border) !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1), left 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+  /* Glass shimmer overlay */
+  isolation: isolate;
+}
+
+/* Subtle top-edge highlight */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6C63FF, #00D4AA, #6C63FF);
+  background-size: 200% 100%;
+  animation: sw-shimmer-nav 4s linear infinite;
+  z-index: 10;
+}
+
+@keyframes sw-shimmer-nav {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Sidebar Header ─── */
+.sidebar-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 1.1rem !important;
+  height: var(--nav-header-h) !important;
+  min-height: var(--nav-header-h) !important;
+  border-bottom: 1px solid var(--nav-border) !important;
+  background: rgba(0,0,0,0.12) !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-header h5 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.7rem !important;
+  color: #fff !important;
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+}
+
+.sidebar-header h5 i {
+  font-size: 1.4rem !important;
+  background: linear-gradient(135deg, #6C63FF, #00D4AA) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-header h5 .brand-text {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #E8E6FF, #B8F5EE) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ─── Nav Links ─── */
+.sidebar .nav {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0.75rem 0.75rem !important;
+  scrollbar-width: none !important;
+}
+.sidebar .nav::-webkit-scrollbar { display: none; }
+
+.sidebar .nav-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.85rem !important;
+  padding: 0.8rem 1rem !important;
+  margin-bottom: 0.2rem !important;
+  border-radius: 12px !important;
+  color: var(--nav-text) !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  text-decoration: none !important;
+  transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  opacity: 1 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.sidebar .nav-link i {
+  font-size: 1.05rem !important;
+  width: 22px !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+
+.sidebar .nav-link:hover {
+  background: var(--nav-hover-bg) !important;
+  color: var(--nav-text-active) !important;
+  transform: translateX(4px) !important;
+}
+
+.sidebar .nav-link:hover i {
+  transform: scale(1.2) !important;
+}
+
+.sidebar .nav-link.active {
+  background: var(--nav-active-bg) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 20px rgba(108,99,255,0.3) !important;
+  border: 1px solid rgba(108,99,255,0.3) !important;
+}
+
+/* Active left accent */
+.sidebar .nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: linear-gradient(180deg, #6C63FF, #00D4AA);
+  border-radius: 0 3px 3px 0;
+}
+
+.sidebar .nav-link.active i {
+  color: #a09dff !important;
+}
+
+/* ─── Bottom area (notification bell) ─── */
+.sidebar .mt-auto {
+  padding: 0.75rem !important;
+  border-top: 1px solid var(--nav-border) !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar .notification-bell {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.85rem !important;
+  padding: 0.8rem 1rem !important;
+  border-radius: 12px !important;
+  color: var(--nav-text) !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer !important;
+  transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid var(--nav-border) !important;
+  width: 100% !important;
+  text-decoration: none !important;
+  letter-spacing: -0.01em !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.sidebar .notification-bell:hover {
+  background: var(--nav-hover-bg) !important;
+  color: #fff !important;
+  transform: translateX(4px) !important;
+}
+
+.sidebar .notification-bell i {
+  font-size: 1.05rem !important;
+  width: 22px !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
+  color: #FFD700 !important;
+}
+
+/* ─── Collapsed sidebar  ─── */
+body.sidebar-collapsed .sidebar {
+  width: var(--nav-sidebar-w-col) !important;
+}
+
+body.sidebar-collapsed .sidebar-header h5 .brand-text { opacity: 0 !important; width: 0 !important; }
+body.sidebar-collapsed .sidebar .nav-link span        { opacity: 0 !important; width: 0 !important; overflow: hidden !important; }
+body.sidebar-collapsed .sidebar .notification-bell span:not(.notification-badge) { opacity: 0 !important; width: 0 !important; overflow: hidden !important; }
+body.sidebar-collapsed .sidebar .nav-link             { justify-content: center !important; padding: 0.8rem !important; }
+body.sidebar-collapsed .sidebar .notification-bell    { justify-content: center !important; padding: 0.8rem !important; }
+body.sidebar-collapsed .sidebar .nav-link i,
+body.sidebar-collapsed .sidebar .notification-bell i  { margin: 0 !important; }
+
+/* ================================================================
+   TOP PAGE HEADER
+   ================================================================ */
+.page-header-fixed {
+  position: fixed !important;
+  top: 0 !important;
+  left: var(--nav-sidebar-w) !important;
+  right: 0 !important;
+  height: var(--nav-header-h) !important;
+  min-height: var(--nav-header-h) !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 1.5rem 0 0.75rem !important;
+  gap: 0.75rem !important;
+  background: var(--header-bg-light) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid var(--header-border-light) !important;
+  box-shadow: var(--header-shadow) !important;
+  z-index: 999 !important;
+  transition: left 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+body.sidebar-collapsed .page-header-fixed {
+  left: var(--nav-sidebar-w-col) !important;
+}
+
+body.dark-theme .page-header-fixed {
+  background: var(--header-bg-dark) !important;
+  border-bottom-color: var(--header-border-dark) !important;
+}
+
+/* Collapse toggle button */
+.desktop-nav-toggle {
+  width: 40px !important; height: 40px !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  background: linear-gradient(135deg, #6C63FF, #9D78E8) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 12px rgba(108,99,255,0.35) !important;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
+  flex-shrink: 0 !important;
+}
+.desktop-nav-toggle:hover { transform: scale(1.08) !important; box-shadow: 0 5px 18px rgba(108,99,255,0.5) !important; }
+.desktop-nav-toggle:active { transform: scale(0.95) !important; }
+
+.page-header-fixed h2 {
+  flex: 1 !important;
+  margin: 0 !important;
+  font-size: clamp(1rem, 2.2vw, 1.4rem) !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* ================================================================
+   MAIN CONTENT
+   ================================================================ */
+.main-content {
+  margin-left: var(--nav-sidebar-w) !important;
+  padding-top: calc(var(--nav-header-h) + 1.5rem) !important;
+  padding-left: 1.75rem !important;
+  padding-right: 1.75rem !important;
+  padding-bottom: 2rem !important;
+  transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+  min-height: 100vh !important;
+}
+
+body.sidebar-collapsed .main-content {
+  margin-left: var(--nav-sidebar-w-col) !important;
+}
+
+/* Footer */
+footer {
+  margin-left: var(--nav-sidebar-w) !important;
+  transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+}
+body.sidebar-collapsed footer { margin-left: var(--nav-sidebar-w-col) !important; }
+
+/* ================================================================
+   TABLET (768px – 1024px) — Overlay drawer
+   ================================================================ */
+@media (max-width: 1024px) {
+
+  :root {
+    --nav-sidebar-w: 270px;
+  }
+
+  .sidebar {
+    left: calc(-1 * var(--nav-sidebar-w)) !important;
+    width: var(--nav-sidebar-w) !important;
+    transition: left 0.32s cubic-bezier(0.4,0,0.2,1) !important;
+  }
+
+  .sidebar.show {
+    left: 0 !important;
+    box-shadow: 6px 0 40px rgba(0,0,0,0.45) !important;
+  }
+
+  /* Header spans full width */
+  .page-header-fixed {
+    left: 0 !important;
+    width: 100% !important;
+    padding: 0 1rem !important;
+  }
+
+  body.sidebar-collapsed .page-header-fixed { left: 0 !important; }
+
+  /* Main content full width */
+  .main-content,
+  footer {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  body.sidebar-collapsed .main-content,
+  body.sidebar-collapsed footer { margin-left: 0 !important; }
+
+  /* Desktop toggle hidden; mobile btn shown */
+  .desktop-nav-toggle { display: none !important; }
+  .mobile-menu-btn {
+    display: flex !important;
+    width: 40px !important; height: 40px !important;
+    align-items: center !important; justify-content: center !important;
+    background: linear-gradient(135deg, #6C63FF, #9D78E8) !important;
+    color: white !important; border: none !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 12px rgba(108,99,255,0.35) !important;
+    cursor: pointer !important;
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
+    flex-shrink: 0 !important;
+  }
+  .mobile-menu-btn:hover { transform: scale(1.08) !important; }
+
+  /* Overlay backdrop */
+  .sidebar-overlay {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(10,8,30,0.55) !important;
+    backdrop-filter: blur(3px) !important;
+    z-index: 999 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  }
+  .sidebar-overlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Lock body scroll when drawer is open */
+  body.sidebar-open {
+    overflow: hidden !important;
+  }
+}
+
+/* ================================================================
+   MOBILE (max-width: 767px) — Bottom nav bar
+   ================================================================ */
+@media (max-width: 767px) {
+
+  /* Hide the left sidebar completely */
+  .sidebar { display: none !important; }
+  .sidebar.show {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: min(82vw, 280px) !important;
+    height: 100vh !important;
+    z-index: 1001 !important;
+  }
+
+  /* Header at top */
+  .page-header-fixed {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    padding: 0 1rem !important;
+  }
+
+  /* Main content with bottom nav space */
+  .main-content {
+    margin-left: 0 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-bottom: 80px !important; /* space for bottom nav */
+  }
+
+  footer {
+    margin-left: 0 !important;
+    padding-bottom: 80px !important;
+  }
+
+  /* ─── BOTTOM NAVIGATION BAR ─── */
+  .sw-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important; left: 0 !important; right: 0 !important;
+    height: 64px !important;
+    background: linear-gradient(160deg, #1a1545 0%, #2d2760 100%) !important;
+    border-top: 1px solid rgba(255,255,255,0.08) !important;
+    z-index: 1000 !important;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0) !important;
+  }
+
+  .sw-bottom-nav a {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: rgba(255,255,255,0.55) !important;
+    text-decoration: none !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    gap: 3px !important;
+    padding: 8px 4px !important;
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+    border-top: 2px solid transparent !important;
+    letter-spacing: 0.02em !important;
+    position: relative !important;
+  }
+
+  .sw-bottom-nav a i {
+    font-size: 1.2rem !important;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
+  }
+
+  .sw-bottom-nav a.active {
+    color: #a09dff !important;
+    border-top-color: #6C63FF !important;
+    background: rgba(108,99,255,0.12) !important;
+  }
+
+  .sw-bottom-nav a.active i {
+    transform: translateY(-2px) scale(1.2) !important;
+    color: #a09dff !important;
+  }
+
+  .sw-bottom-nav a:hover {
+    color: rgba(255,255,255,0.85) !important;
+  }
+
+  /* Notification badge on bottom nav bell */
+  .sw-bottom-nav .sw-bottom-badge {
+    position: absolute !important;
+    top: 4px !important; right: 10px !important;
+    background: #FF6B6B !important;
+    color: white !important;
+    border-radius: 50% !important;
+    font-size: 0.6rem !important;
+    font-weight: 900 !important;
+    width: 16px !important; height: 16px !important;
+    display: flex !important;
+    align-items: center !important; justify-content: center !important;
+    border: 1.5px solid #1a1545 !important;
+  }
+
+  /* Desktop toggle hidden on mobile */
+  .desktop-nav-toggle { display: none !important; }
+}
+
+/* ================================================================
+   NOTIFICATION PANEL — Centered modal style
+   ================================================================ */
+.notification-panel {
+  position: fixed !important;
+  top: 50% !important; left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.88) !important;
+  width: min(92vw, 520px) !important;
+  max-height: 80vh !important;
+  background: #fff !important;
+  border-radius: 24px !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3) !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.notification-panel.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+body.dark-theme .notification-panel {
+  background: #1a1733 !important;
+  color: #e8e6ff !important;
+}
+
+/* ================================================================
+   DARK THEME SIDEBAR — same variables, just ensure override
+   ================================================================ */
+body.dark-theme .sidebar {
+  background: linear-gradient(160deg, #0d0b1e 0%, #1a1545 55%, #0f0d24 100%) !important;
+}
+
+body.dark-theme .page-header-fixed {
+  background: rgba(13,11,30,0.92) !important;
+  border-bottom-color: rgba(108,99,255,0.2) !important;
+}
+
+/* ================================================================
+   SIDEBAR CLOSE BUTTON (tablet & mobile drawer)
+   ================================================================ */
+.sidebar-close-btn,
+.sw-sidebar-close {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 34px !important;
+  height: 34px !important;
+  flex-shrink: 0 !important;
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  border-radius: 9px !important;
+  color: rgba(255,255,255,0.85) !important;
+  cursor: pointer !important;
+  font-size: 0.95rem !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.sidebar-close-btn:hover,
+.sw-sidebar-close:hover {
+  background: rgba(255,255,255,0.22) !important;
+  color: white !important;
+  transform: rotate(90deg) scale(1.08) !important;
+}
+
+/* Hide on desktop (desktop uses hamburger toggle in header) */
+@media (min-width: 1025px) {
+  .sidebar-close-btn, .sw-sidebar-close { display: none !important; }
+}
+
+/* ================================================================
+   MOBILE MENU BTN — base hide (shown only via tablet media query)
+   ================================================================ */
+.mobile-menu-btn {
+  display: none !important; /* shown in tablet @media above */
+}
+
+.mobile-menu-btn i, .desktop-nav-toggle i {
+  font-size: 1rem !important;
+}
+
+/* ================================================================
+   NEUTRALIZE CONFLICTS FROM collapsible-sidebar.css
+   (That file uses .sidebar.collapsed — we use body.sidebar-collapsed)
+   ================================================================ */
+
+/* Prevent old .sidebar.collapsed rules from activating */
+.sidebar.collapsed:not([data-old]) {
+  /* Selectively reduce specificity — let navigation.css win */
+  width: var(--nav-sidebar-w) !important;
+}
+
+/* Old body:has(.sidebar.collapsed) rules — override back */
+body:has(.sidebar.collapsed) .main-content {
+  margin-left: var(--nav-sidebar-w) !important;
+}
+body:has(.sidebar.collapsed) .page-header-fixed {
+  left: var(--nav-sidebar-w) !important;
+}
+body:has(.sidebar.collapsed) footer {
+  margin-left: var(--nav-sidebar-w) !important;
+  width: calc(100% - var(--nav-sidebar-w)) !important;
+}
+
+/* But if body.sidebar-collapsed is present, honor it */
+body.sidebar-collapsed:has(.sidebar.collapsed) .main-content {
+  margin-left: var(--nav-sidebar-w-col) !important;
+}
+body.sidebar-collapsed .page-header-fixed {
+  left: var(--nav-sidebar-w-col) !important;
+}
+
+/* Stop old collapsible-sidebar from overriding transition-property */
+.main-content * {
+  transition-property: transform, box-shadow, opacity, background-color, color, border-color, border !important;
+}
+
+/* Tooltip on collapsed nav — reuse from collapsible-sidebar, but improve */
+body.sidebar-collapsed .sidebar .nav-link {
+  position: relative !important;
+}
+body.sidebar-collapsed .sidebar .nav-link[title]::after {
+  content: attr(title) !important;
+  position: absolute !important;
+  left: calc(var(--nav-sidebar-w-col) + 4px) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: rgba(15,12,35,0.92) !important;
+  color: #e8e6ff !important;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 8px !important;
+  white-space: nowrap !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  z-index: 1100 !important;
+  border: 1px solid rgba(108,99,255,0.25) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+}
+body.sidebar-collapsed .sidebar .nav-link:hover[title]::after {
+  opacity: 1 !important;
+}
+
+/* ================================================================
+   RESPONSIVE: Main content padding adjustment on very small screens
+   ================================================================ */
+@media (max-width: 479px) {
+  .main-content {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}

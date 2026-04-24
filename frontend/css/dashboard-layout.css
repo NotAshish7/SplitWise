@@ -1,0 +1,584 @@
+
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #2c3e50;
+            --body-color: #ffffff;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+            --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --sidebar-width: 240px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--body-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* ROOT CAUSE FIX: Hide body content by default until authentication is confirmed */
+        body:not(.authenticated) {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        body.authenticated {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ROOT CAUSE FIX: Show loading indicator while checking authentication */
+        body.auth-checking::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .page-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .page-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        body.ready {
+            opacity: 1;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--navbar-bg);
+            box-shadow: var(--shadow);
+            padding: 0.5rem 0.875rem 1.25rem 0.875rem;
+            /* ROOT CAUSE FIX: Minimal top padding to align with header */
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0.5rem 0.75rem;
+            /* ROOT CAUSE FIX: Minimal padding to align with main header */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 0.75rem;
+            /* ROOT CAUSE FIX: Reduced margin to bring nav links closer */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the content (wallet icon + SEM) */
+            /* ROOT CAUSE FIX: Calculate height to align border with page header (64px total - 0.5rem sidebar padding = ~56px) */
+            min-height: calc(64px - 0.5rem);
+            /* Match page header height minus sidebar top padding */
+            height: calc(64px - 0.5rem);
+        }
+
+        .sidebar-header h5 {
+            font-weight: 800;
+            font-size: 1.35rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0;
+            margin-left: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            margin-right: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the icon and text */
+        }
+
+        .sidebar-header h5 .me-2 {
+            margin-right: 0.25rem !important;
+            /* ROOT CAUSE FIX: Override Bootstrap me-2 (0.5rem) to reduce spacing */
+        }
+
+        .nav-link {
+            color: white !important;
+            opacity: 0.85;
+            padding: 0.875rem 0.875rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            opacity: 1;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link i {
+            width: 22px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Fixed Page Header */
+        .page-header-fixed {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            padding: 0.75rem 2.5rem;
+            /* ROOT CAUSE FIX: Reduced top/bottom padding to match sidebar border */
+            padding-left: 1.5rem;
+            /* Space for button (44px button + 10px gap = ~54px) */
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            height: 64px;
+            /* ROOT CAUSE FIX: Fixed height to align with sidebar border (smaller header) */
+            min-height: 64px;
+        }
+
+        body.sidebar-collapsed .page-header-fixed {
+            left: 80px;
+        }
+
+        .page-header-fixed h2 {
+            margin: 0;
+            margin-left: 3.5rem;
+            /* Space for button (44px) + gap (10px) = ~54px */
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .header-actions .btn {
+            white-space: nowrap;
+        }
+
+        /* Desktop Navigation Toggle Button */
+        .desktop-nav-toggle {
+            position: absolute;
+            left: 0.75rem;
+            /* Positioned inside header, fully visible */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        body.sidebar-collapsed .desktop-nav-toggle {
+            left: 0.75rem;
+            /* Same position when sidebar is collapsed */
+        }
+
+        .desktop-nav-toggle:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .desktop-nav-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem;
+            padding-top: calc(2.5rem + 64px);
+            /* ROOT CAUSE FIX: Updated to match new header height (64px) */
+            animation: fadeIn 0.6s ease-out;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 80px;
+        }
+
+        .card,
+        .panel {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            margin-bottom: 2rem;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--navbar-bg);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 15px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--navbar-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            background: #d62e1f;
+        }
+
+        /* Filter buttons hover effects - All Expenses, By Month buttons */
+        label.btn.btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        /* Ensure all filter buttons have transition and prevent overlap */
+        label.btn.btn-outline-primary {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            box-shadow: none;
+            white-space: nowrap;
+        }
+
+        /* Filters button hover effect */
+        .btn-info:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 12px rgba(54, 185, 204, 0.4);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-info {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Prevent button group overlap on hover */
+        .btn-group {
+            position: relative;
+            display: flex;
+        }
+
+        .btn-group label.btn {
+            position: relative;
+            flex: 1;
+        }
+
+        /* Ensure hovered button appears above others without causing layout shift */
+        .btn-group label.btn:hover {
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .table {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table thead th {
+            background: var(--navbar-bg);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(to right, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .expense-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .expense-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .category-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .amount-display {
+            font-size: 1.1rem;
+            /* ROOT CAUSE FIX: Match Reports page amount font size */
+            font-weight: 800;
+            background: var(--navbar-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ROOT CAUSE FIX: Reduce amount text size in stat cards for better appearance */
+        .stat-card h2,
+        .stat-card h3 {
+            font-size: 1.5rem !important;
+            font-weight: 700;
+        }
+
+        /* ROOT CAUSE FIX: Also reduce size in month summary card */
+        .card h2 {
+            font-size: 1.5rem !important;
+            font-weight: 700;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .expense-row-animate {
+            animation: slideInRight 0.4s ease-out;
+        }
+
+        footer {
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            background: var(--light-color);
+            position: relative;
+            bottom: 0;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    

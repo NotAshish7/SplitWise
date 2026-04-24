@@ -1,0 +1,3516 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Settings - SplitWise</title>
+    <!-- Favicon - High Quality Wallet Logo -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/collapsible-sidebar.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #2c3e50;
+            --body-color: #ffffff;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+            --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --sidebar-width: 240px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--body-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .page-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .page-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .page-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        body.ready {
+            opacity: 1;
+        }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #0d1117;
+        }
+
+        body.dark-theme .sidebar {
+            background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+        }
+
+        body.dark-theme .card {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color);
+            border-color: #30363d !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-theme .form-control,
+        body.dark-theme .form-select {
+            background-color: #0d1117;
+            color: #e6edf3;
+            border-color: #30363d;
+        }
+
+        body.dark-theme .form-control::placeholder {
+            color: #8b949e;
+        }
+
+        body.dark-theme .form-control:focus,
+        body.dark-theme .form-select:focus {
+            background-color: #0d1117;
+            color: #e6edf3;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+        }
+
+        body.dark-theme .text-muted {
+            color: #8b949e !important;
+        }
+
+        body.dark-theme .modal-content {
+            background-color: #161b22 !important;
+            color: #e6edf3 !important;
+            border-color: #30363d !important;
+        }
+
+        body.dark-theme .modal-header {
+            border-bottom-color: #30363d !important;
+        }
+
+        body.dark-theme .modal-footer {
+            border-top-color: #30363d !important;
+        }
+
+        body.dark-theme .btn-close:not(.btn-close-white) {
+            filter: invert(1) brightness(1.5);
+        }
+
+        body.dark-theme .alert {
+            background-color: #161b22;
+            color: #e6edf3;
+            border-color: #30363d;
+        }
+
+        /* ROOT CAUSE FIX: Delete Account Modal Button Hover Effects */
+        #sendDeleteOtpBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 115, 223, 0.4) !important;
+        }
+
+        #sendDeleteOtpBtn:active {
+            transform: translateY(0);
+        }
+
+        #confirmDeleteAccount:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 74, 59, 0.4) !important;
+        }
+
+        #confirmDeleteAccount:active {
+            transform: translateY(0);
+        }
+
+        #resendDeleteOtpBtn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Delete Account Modal Input Focus */
+        #deleteOtpInput:focus {
+            border-color: #4e73df !important;
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25) !important;
+            outline: none;
+        }
+
+        /* ROOT CAUSE FIX: Delete Account Modal - Mobile optimizations */
+        @media (max-width: 767px) {
+            #deleteAccountModal .modal-dialog {
+                margin: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+
+            #deleteAccountModal .modal-content {
+                max-height: 85vh;
+            }
+
+            #deleteAccountModal .modal-body {
+                padding: 1.25rem !important;
+            }
+
+            #deleteAccountModal .modal-header {
+                padding: 1rem 1.25rem !important;
+            }
+
+            #deleteAccountModal .modal-footer {
+                padding: 0.875rem 1.25rem !important;
+            }
+        }
+
+        body.dark-theme .alert-warning {
+            background-color: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+            border-color: #9e6a03;
+        }
+
+        body.dark-theme .alert-danger {
+            background-color: rgba(231, 74, 59, 0.1);
+            color: #ff7b72;
+            border-color: #a02622;
+        }
+
+        body.dark-theme h1,
+        body.dark-theme h2,
+        body.dark-theme h3,
+        body.dark-theme h4,
+        body.dark-theme h5,
+        body.dark-theme h6 {
+            color: #e6edf3 !important;
+        }
+
+        body.dark-theme .profile-avatar {
+            border-color: #30363d;
+            background-color: #0d1117;
+        }
+
+        body.dark-theme .btn-outline-primary {
+            color: #58a6ff;
+            border-color: #58a6ff;
+        }
+
+        body.dark-theme .btn-outline-primary:hover {
+            background-color: #58a6ff;
+            color: #0d1117;
+        }
+
+        body.dark-theme .form-label {
+            color: #e6edf3;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--navbar-bg);
+            box-shadow: var(--shadow);
+            padding: 0.5rem 0.875rem 1.25rem 0.875rem;
+            /* ROOT CAUSE FIX: Minimal top padding to align with header */
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0.5rem 0.75rem;
+            /* ROOT CAUSE FIX: Minimal padding to align with main header */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 0.75rem;
+            /* ROOT CAUSE FIX: Reduced margin to bring nav links closer */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the content (wallet icon + SEM) */
+            /* ROOT CAUSE FIX: Calculate height to align border with page header (64px total - 0.5rem sidebar padding = ~56px) */
+            min-height: calc(64px - 0.5rem);
+            /* Match page header height minus sidebar top padding */
+            height: calc(64px - 0.5rem);
+        }
+
+        .sidebar-header h5 {
+            font-weight: 800;
+            font-size: 1.35rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0;
+            margin-left: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            margin-right: auto;
+            /* ROOT CAUSE FIX: Remove any default margins */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ROOT CAUSE FIX: Center the icon and text */
+        }
+
+        .sidebar-header h5 .me-2 {
+            margin-right: 0.25rem !important;
+            /* ROOT CAUSE FIX: Override Bootstrap me-2 (0.5rem) to reduce spacing */
+        }
+
+        .nav-link {
+            color: white !important;
+            opacity: 0.85;
+            padding: 0.875rem 0.875rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            opacity: 1;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link i {
+            width: 22px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        /* Fixed Page Header */
+        .page-header-fixed {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            padding: 0.75rem 2.5rem;
+            /* ROOT CAUSE FIX: Reduced top/bottom padding to match sidebar border */
+            padding-left: 1.5rem;
+            /* Space for button (44px button + 10px gap = ~54px) */
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            height: 64px;
+            /* ROOT CAUSE FIX: Fixed height to align with sidebar border */
+            min-height: 64px;
+        }
+
+        body.sidebar-collapsed .page-header-fixed {
+            left: 80px;
+        }
+
+        .page-header-fixed h2 {
+            margin: 0;
+            margin-left: 3.5rem;
+            /* Space for button (44px) + gap (10px) = ~54px */
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        /* Desktop Navigation Toggle Button */
+        .desktop-nav-toggle {
+            position: absolute;
+            left: 0.75rem;
+            /* Positioned inside header, fully visible */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        body.sidebar-collapsed .desktop-nav-toggle {
+            left: 0.75rem;
+            /* Same position when sidebar is collapsed */
+        }
+
+        .desktop-nav-toggle:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .desktop-nav-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem;
+            padding-top: calc(2.5rem + 64px);
+            /* ROOT CAUSE FIX: Updated to match new header height (64px) */
+            animation: none;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Prevent profile avatar from animating on page load */
+        .profile-avatar,
+        .profile-avatar * {
+            animation: none !important;
+            transition: none !important;
+            transform: none !important;
+        }
+
+        .profile-avatar:hover {
+            transform: none !important;
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 80px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--navbar-bg);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 15px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--navbar-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--navbar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: white;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            transition: none;
+            animation: none !important;
+            transform: none !important;
+        }
+
+        .profile-avatar:hover {
+            transform: none;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: none;
+            animation: none !important;
+            transform: none !important;
+        }
+
+        footer {
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            background: var(--light-color);
+            position: relative;
+            bottom: 0;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* Image Crop Modal - Professional Redesign */
+        .crop-container {
+            max-width: 100%;
+            height: 280px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1545 0%, #2d2760 100%);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(108, 99, 255, 0.15);
+        }
+
+        .crop-container img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .crop-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #6C63FF;
+            background: #f8f9fa;
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
+        }
+
+        .crop-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: rgba(248, 249, 252, 0.9);
+            border-radius: 12px;
+            border: 1px solid rgba(108, 99, 255, 0.1);
+        }
+
+        .crop-controls button {
+            min-width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            background: #fff;
+            color: #6C63FF;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(108, 99, 255, 0.08);
+        }
+
+        .crop-controls button:hover {
+            background: linear-gradient(135deg, #6C63FF 0%, #5A52D5 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.3);
+        }
+
+        .crop-controls button:active {
+            transform: translateY(0);
+        }
+    </style>
+    <link rel="stylesheet" href="css/topnav.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style id="sw-topnav-override">
+        /* SplitWise TopNav Layout Overrides */
+        .sidebar,
+        .sidebar-overlay,
+        .page-header-fixed {
+            display: none !important;
+        }
+
+        .main-content {
+            margin-left: 0 !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+
+        footer {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        body {
+            padding-top: 0 !important;
+        }
+
+        /* Ensure topnav stacks correctly */
+        body.sidebar-collapsed .main-content {
+            margin-left: 0 !important;
+        }
+
+        body.sidebar-collapsed .page-header-fixed {
+            left: 0 !important;
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="fas fa-wallet"></i><span class="brand-text">SplitWise</span></h5>
+            <button class="sidebar-close-btn sw-sidebar-close" id="sidebarCloseBtn" aria-label="Close sidebar"
+                title="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="nav flex-column">
+            <!-- ROOT CAUSE FIX: Reduced margin-top from mt-4 (1.5rem) to 0.5rem -->
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="expenses.html" class="nav-link">
+                <i class="fas fa-receipt"></i> <span>Expenses</span>
+            </a>
+            <a href="groups.html" class="nav-link">
+                <i class="fas fa-users"></i> <span>Groups</span>
+            </a>
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-chart-bar"></i> <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link active">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Notification Button at Bottom -->
+        <div class="mt-auto">
+            <div class="nav-link notification-bell" id="notificationBellBtn">
+                <i class="fas fa-bell"></i> <span>Notifications</span>
+                <span class="notification-badge" id="notificationBadge"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Overlay -->
+    <div class="notification-overlay" id="notificationOverlay"></div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3><i class="fas fa-bell me-2"></i>Notifications</h3>
+            <button class="close-btn" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-actions-bar">
+            <button class="btn-mark-all" id="markAllReadBtn">
+                <i class="fas fa-check-double me-1"></i>Mark All Read
+            </button>
+            <button class="btn-clear-all" id="clearAllBtn">
+                <i class="fas fa-trash me-1"></i>Clear All
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Fixed Page Header -->
+    <div class="page-header-fixed">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle mobile menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="desktop-nav-toggle" id="desktopNavToggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h2 class="mb-0"><i class="fas fa-cog me-2"></i>Account Settings</h2>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+
+            <!-- Profile Section -->
+            <div class="card">
+                <h5 class="mb-4"><i class="fas fa-user-circle me-2"></i>Profile Information</h5>
+                <div class="text-center mb-4">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    <button class="btn btn-outline-primary" id="changeAvatarBtn">
+                        <i class="fas fa-camera me-2"></i>Change Avatar
+                    </button>
+                    <button class="btn btn-outline-danger ms-2" id="removeAvatarBtn" style="display: none;">
+                        <i class="fas fa-times me-2"></i>Remove
+                    </button>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" value="Ashish">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" value="ashish@example.com" disabled>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label d-flex align-items-center gap-2">
+                            Phone Number
+                            <span class="badge bg-success" id="phoneVerifiedBadge" style="display:none;font-size:10px;"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                        </label>
+                        <div style="background:#f8f9fc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                                <i class="fas fa-phone" style="color:#667eea;font-size:13px;flex-shrink:0;"></i>
+                                <span id="phone" style="font-size:14px;color:#374151;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Not verified</span>
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button type="button" id="verifyPhoneBtn"
+                                    style="background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">
+                                    <i class="fas fa-mobile-alt me-1"></i>Verify Phone
+                                </button>
+                                <button type="button" id="changePhoneNumberBtn"
+                                    style="display:none;background:#fff;border:1.5px solid #e53e3e;color:#e53e3e;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">
+                                    <i class="fas fa-edit me-1"></i>Change
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted mt-2 d-block" id="phoneHelpText" style="font-size:11px;">
+                            <i class="fas fa-info-circle me-1"></i>Click "Verify Phone" to add/change your phone number
+                        </small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Preferred Currency</label>
+                        <select class="form-select" id="currency">
+                            <option value="INR">Indian Rupee - INR</option>
+                            <option value="USD">US Dollar - USD</option>
+                            <option value="EUR">Euro - EUR</option>
+                            <option value="GBP">British Pound - GBP</option>
+                            <option value="JPY">Japanese Yen - JPY</option>
+                            <option value="AUD">Australian Dollar - AUD</option>
+                        </select>
+
+                        <small class="text-muted mt-2 d-block" id="conversionRateInfo">
+                            <i class="fas fa-info-circle me-1"></i>Exchange rates update automatically
+                        </small>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;padding-top:8px;">
+                    <button id="saveProfileBtn" type="button"
+                        style="position:relative;overflow:hidden;
+                               background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+                               border:none;color:#fff;font-size:15px;font-weight:700;
+                               padding:14px 48px;border-radius:14px;cursor:pointer;
+                               box-shadow:0 6px 24px rgba(102,126,234,0.40);
+                               transition:all 0.25s ease;letter-spacing:0.3px;"
+                        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(102,126,234,0.50)';"
+                        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 24px rgba(102,126,234,0.40)';">
+                        <span id="saveProfileBtnContent" style="display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="card">
+                <h5 class="mb-4"><i class="fas fa-lock me-2"></i>Security Settings</h5>
+
+                <!-- Email Management -->
+                <div class="mb-4 p-3" style="background: #f8f9fc; border-radius: 12px; border-left: 4px solid #4e73df;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1"><i class="fas fa-envelope me-2"></i>Email Address</h6>
+                            <p class="mb-0 text-muted" id="currentEmail">ashish@example.com</p>
+                        </div>
+                        <button class="btn btn-outline-primary" id="changeEmailBtn">
+                            <i class="fas fa-edit me-2"></i>Change Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Phone Number Management -->
+                <div class="mb-4 p-3" style="background: #f8f9fc; border-radius: 12px; border-left: 4px solid #1cc88a;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">
+                                <i class="fas fa-phone me-2"></i>Phone Number
+                                <span class="badge bg-success ms-2" id="phoneVerifiedBadgeSecurity"
+                                    style="display:none;">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                            </h6>
+                            <p class="mb-0 text-muted" id="currentPhone">Not verified</p>
+                        </div>
+                        <button class="btn btn-outline-success" id="changePhoneBtn">
+                            <i class="fas fa-mobile-alt me-2"></i><span id="changePhoneBtnText">Add Phone</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Password Management -->
+                <div class="mb-3 p-3" style="background: #f8f9fc; border-radius: 12px; border-left: 4px solid #f6c23e;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1"><i class="fas fa-key me-2"></i>Password</h6>
+                            <p class="mb-0 text-muted" style="letter-spacing:3px;font-size:18px;">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</p>
+                        </div>
+                        <button class="btn btn-outline-warning" id="changePasswordBtnNew">
+                            <i class="fas fa-lock me-2"></i>Change Password
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="card">
+                <h5 class="mb-4"><i class="fas fa-database me-2"></i>Data Management</h5>
+                <p class="text-muted mb-3">Export or clear your expense data</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-info" id="exportDataBtn">
+                        <i class="fas fa-download me-2"></i>Export All Data
+                    </button>
+                    <button class="btn btn-warning" id="clearExpensesBtn">
+                        <i class="fas fa-broom me-2"></i>Clear All Expenses
+                    </button>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card border-danger">
+                <h5 class="mb-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+                <p class="text-muted mb-3">Once you delete your account, there is no going back. Please be certain.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-danger" id="deleteAccountBtn">
+                        <i class="fas fa-trash me-2"></i>Delete Account
+                    </button>
+                    <button class="btn btn-outline-danger" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency Conversion Confirmation Modal -->
+    <div class="modal fade" id="currencyConversionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exchange-alt me-2"></i>Currency Conversion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-coins" style="font-size: 3rem; color: #f6c23e;"></i>
+                    </div>
+                    <h5 class="mb-3">?? Convert All Expenses?</h5>
+                    <p class="mb-3">This will convert all your expense amounts:</p>
+                    <div class="alert alert-warning mb-3" style="border-radius: 15px;">
+                        <h4 class="mb-2"><span id="fromCurrency">INR</span> ? <span id="toCurrency">USD</span></h4>
+                        <p class="mb-0">Conversion Rate: <strong id="conversionRate">1 INR = 0.012 USD</strong></p>
+                    </div>
+                    <p class="text-muted mb-0"><small>All personal expenses and group expenses will be
+                            converted.</small></p>
+                </div>
+                <div class="modal-footer" style="border: none; justify-content: center; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; min-width: 120px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmCurrencyChange"
+                        style="border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); border: none; color: white;">
+                        <i class="fas fa-check me-2"></i>Convert
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <!-- ROOT CAUSE FIX: Delete Account Modal - Optimized to fit without scrollbar, improved button styling, removed Cancel button -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 90vh; display: flex; flex-direction: column;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); color: white; border: none; padding: 1.25rem 1.5rem; flex-shrink: 0;">
+                    <h5 class="modal-title mb-0" style="font-weight: 600; font-size: 1.25rem;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Account
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body"
+                    style="padding: 1.25rem 1.5rem; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div class="text-center mb-2">
+                            <div class="mb-2"
+                                style="display: inline-block; padding: 0.875rem; background: linear-gradient(135deg, rgba(231, 74, 59, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%); border-radius: 50%;">
+                                <i class="fas fa-trash-alt" style="font-size: 2.25rem; color: #e74a3b;"></i>
+                            </div>
+                            <h5 class="mb-2" style="font-weight: 600; color: #24292e; font-size: 1.25rem;">Permanently
+                                Delete Account?</h5>
+                        </div>
+
+                        <div class="alert alert-danger mb-2"
+                            style="border-radius: 12px; border-left: 4px solid #e74a3b; background-color: #fff5f5; padding: 0.875rem;">
+                            <p class="mb-1"
+                                style="font-weight: 600; color: #24292e; font-size: 0.9rem; margin-bottom: 0.5rem;"><i
+                                    class="fas fa-info-circle me-2" style="font-size: 0.85rem;"></i>This will delete:
+                            </p>
+                            <ul class="list-unstyled mb-0" style="line-height: 1.6; font-size: 0.85rem;">
+                                <li class="mb-0"><i class="fas fa-times-circle me-2"
+                                        style="color: #e74a3b; font-size: 0.8rem;"></i>Your profile information</li>
+                                <li class="mb-0"><i class="fas fa-times-circle me-2"
+                                        style="color: #e74a3b; font-size: 0.8rem;"></i>All expense records</li>
+                                <li class="mb-0"><i class="fas fa-times-circle me-2"
+                                        style="color: #e74a3b; font-size: 0.8rem;"></i>All group data</li>
+                                <li class="mb-0"><i class="fas fa-times-circle me-2"
+                                        style="color: #e74a3b; font-size: 0.8rem;"></i>All settings</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-warning mb-3"
+                            style="border-radius: 12px; border-left: 4px solid #ff9800; background-color: #fffbf0; padding: 0.75rem 0.875rem;">
+                            <p class="mb-0" style="font-weight: 600; color: #856404; font-size: 0.85rem;">
+                                <i class="fas fa-exclamation-triangle me-2" style="font-size: 0.85rem;"></i>This action
+                                CANNOT be undone!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Request OTP -->
+                    <div id="deleteStep1">
+                        <div class="text-center">
+                            <p class="text-muted mb-2"
+                                style="font-size: 0.875rem; line-height: 1.4; margin-bottom: 1rem !important;">We'll
+                                send a verification code to your email to confirm account deletion.</p>
+                            <button type="button" class="btn btn-primary w-100" id="sendDeleteOtpBtn"
+                                style="border-radius: 12px; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); border: none; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(78, 115, 223, 0.3); transition: all 0.3s;">
+                                <i class="fas fa-envelope me-2"></i>Send Verification Code
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Enter OTP -->
+                    <div id="deleteStep2" style="display: none;">
+                        <div class="text-center">
+                            <p class="text-muted mb-2" style="font-size: 0.875rem; margin-bottom: 1rem !important;">
+                                Enter the 6-digit code sent to your email:</p>
+                            <div class="mb-2">
+                                <input type="text" class="form-control text-center" id="deleteOtpInput"
+                                    placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*"
+                                    style="border-radius: 12px; font-size: 1.4rem; letter-spacing: 0.4rem; font-weight: 600; padding: 0.75rem 1rem; border: 2px solid #e9ecef; transition: all 0.3s;">
+                            </div>
+                            <div class="mb-0">
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="resendDeleteOtpBtn"
+                                    style="border-radius: 10px; padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                    <i class="fas fa-redo me-1"></i>Resend Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ROOT CAUSE FIX: Removed Cancel button - only show Delete Forever button when OTP is entered -->
+                <div class="modal-footer"
+                    style="border: none; justify-content: center; padding: 1rem 1.5rem; background-color: #f8f9fa; flex-shrink: 0;">
+                    <button type="button" class="btn btn-danger w-100" id="confirmDeleteAccount"
+                        style="border-radius: 12px; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); border: none; font-weight: 600; font-size: 1rem; display: none; box-shadow: 0 4px 15px rgba(231, 74, 59, 0.3); transition: all 0.3s;">
+                        <i class="fas fa-trash me-2"></i>Delete Forever
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-question-circle" style="font-size: 3.5rem; color: #f6c23e;"></i>
+                    </div>
+                    <h5 class="mb-3">Are you sure you want to logout?</h5>
+                    <p class="text-muted mb-0">You'll need to login again to access your account.</p>
+                </div>
+                <div class="modal-footer" style="border: none; justify-content: center; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; min-width: 120px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmLogout"
+                        style="border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); border: none; color: white;">
+                        <i class="fas fa-sign-out-alt me-2"></i>Yes, Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Email Modal -->
+    <div class="modal fade" id="changeEmailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-envelope me-2"></i>Change Email Address
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <!-- Step 1: Enter New Email -->
+                    <div id="emailStep1">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-envelope-open-text" style="font-size: 3rem; color: #4e73df;"></i>
+                        </div>
+                        <h6 class="text-center mb-3">Enter New Email Address</h6>
+                        <div class="mb-3">
+                            <label class="form-label">New Email</label>
+                            <input type="email" class="form-control" id="newEmailInput"
+                                placeholder="your.new.email@example.com" style="border-radius: 10px;">
+                        </div>
+                        <div class="alert alert-info" style="border-radius: 10px;">
+                            <i class="fas fa-info-circle me-2"></i>We'll send a verification code to your new email
+                            address.
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Verify OTP -->
+                    <div id="emailStep2" style="display: none;">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-shield-alt" style="font-size: 3rem; color: #1cc88a;"></i>
+                        </div>
+                        <h6 class="text-center mb-3">Verify Your New Email</h6>
+                        <p class="text-center text-muted mb-3">Enter the 6-digit code sent to<br><strong
+                                id="newEmailDisplay"></strong></p>
+                        <div class="mb-3">
+                            <label class="form-label">Verification Code</label>
+                            <input type="text" class="form-control text-center" id="emailOtpInput" placeholder="000000"
+                                maxlength="6" style="border-radius: 10px; font-size: 1.5rem; letter-spacing: 0.5rem;">
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-link" id="resendEmailOtpBtn">
+                                <i class="fas fa-redo me-1"></i>Resend Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border: none; justify-content: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; min-width: 120px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="sendEmailOtpBtn"
+                        style="border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); border: none;">
+                        <i class="fas fa-paper-plane me-2"></i>Send Code
+                    </button>
+                    <button type="button" class="btn btn-success" id="verifyEmailOtpBtn"
+                        style="display: none; border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); border: none;">
+                        <i class="fas fa-check me-2"></i>Verify Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-lock" style="font-size: 3rem; color: #f6c23e;"></i>
+                    </div>
+                    <h6 class="text-center mb-4">Update Your Password</h6>
+
+                    <!-- Current Password -->
+                    <div class="mb-3" style="position:relative">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control pe-5" id="currentPasswordModal"
+                            placeholder="Enter current password" style="border-radius:10px">
+                        <button type="button" id="toggleCurPw"
+                            style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:#6c757d;cursor:pointer;padding:0;font-size:1rem;">
+                            <i class="fas fa-eye" id="iconCurPw"></i>
+                        </button>
+                    </div>
+
+                    <!-- New Password -->
+                    <div class="mb-3" style="position:relative">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control pe-5" id="newPasswordModal"
+                            placeholder="Enter new password" style="border-radius:10px">
+                        <button type="button" id="toggleNewPw"
+                            style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:#6c757d;cursor:pointer;padding:0;font-size:1rem;">
+                            <i class="fas fa-eye" id="iconNewPw"></i>
+                        </button>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-3" style="position:relative">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control pe-5" id="confirmPasswordModal"
+                            placeholder="Confirm new password" style="border-radius:10px">
+                        <button type="button" id="toggleConfPw"
+                            style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:#6c757d;cursor:pointer;padding:0;font-size:1rem;">
+                            <i class="fas fa-eye" id="iconConfPw"></i>
+                        </button>
+                    </div>
+
+                    <!-- Password Requirements Checklist -->
+                    <div style="background:#fffbea;border:1px solid #f6c23e33;border-radius:12px;padding:12px 16px;margin-top:4px">
+                        <div style="font-size:0.72rem;font-weight:800;color:#b8860b;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">Password Requirements</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:0.8rem;color:#555">
+                            <div><i id="cpwReqLen"   class="fas fa-times me-1" style="color:#dc3545;font-size:0.7rem"></i>8+ characters</div>
+                            <div><i id="cpwReqUpper" class="fas fa-times me-1" style="color:#dc3545;font-size:0.7rem"></i>Uppercase letter</div>
+                            <div><i id="cpwReqNum"   class="fas fa-times me-1" style="color:#dc3545;font-size:0.7rem"></i>Number</div>
+                            <div><i id="cpwReqSpec"  class="fas fa-times me-1" style="color:#dc3545;font-size:0.7rem"></i>Special character</div>
+                            <div><i id="cpwReqMatch" class="fas fa-times me-1" style="color:#dc3545;font-size:0.7rem"></i>Passwords match</div>
+                            <div><i id="cpwReqDiff"  class="fas fa-times me-1" style="color:#dc3545;font-size:0.7rem"></i>Different from current</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border: none; justify-content: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; min-width: 120px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmPasswordChangeBtn"
+                        style="border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); border: none; color: white;">
+                        <i class="fas fa-check me-2"></i>Change Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phone Verification Modal -->
+    <div class="modal fade" id="phoneVerificationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-mobile-alt me-2"></i>Verify Phone Number
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <!-- Step 1: Enter Phone Number -->
+                    <div id="phoneStep1">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-phone" style="font-size: 3rem; color: #1cc88a;"></i>
+                        </div>
+                        <h6 class="text-center mb-3">Enter Your Phone Number</h6>
+                        <div class="alert alert-info" style="border-radius: 10px;">
+                            <i class="fas fa-info-circle me-2"></i>We'll send a verification code to your phone number
+                            via SMS.
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Country</label>
+                            <select class="form-select" id="countrySelect"
+                                style="border-radius: 10px; font-size: 1rem;">
+                                <option value="+93" data-country="AF" data-name="Afghanistan">Afghanistan (+93)</option>
+                                <option value="+355" data-country="AL" data-name="Albania">Albania (+355)</option>
+                                <option value="+213" data-country="DZ" data-name="Algeria">Algeria (+213)</option>
+                                <option value="+54" data-country="AR" data-name="Argentina">Argentina (+54)</option>
+                                <option value="+61" data-country="AU" data-name="Australia">Australia (+61)</option>
+                                <option value="+880" data-country="BD" data-name="Bangladesh">Bangladesh (+880)</option>
+                                <option value="+55" data-country="BR" data-name="Brazil">Brazil (+55)</option>
+                                <option value="+1" data-country="CA" data-name="Canada">Canada (+1)</option>
+                                <option value="+56" data-country="CL" data-name="Chile">Chile (+56)</option>
+                                <option value="+86" data-country="CN" data-name="China">China (+86)</option>
+                                <option value="+57" data-country="CO" data-name="Colombia">Colombia (+57)</option>
+                                <option value="+20" data-country="EG" data-name="Egypt">Egypt (+20)</option>
+                                <option value="+33" data-country="FR" data-name="France">France (+33)</option>
+                                <option value="+49" data-country="DE" data-name="Germany">Germany (+49)</option>
+                                <option value="+62" data-country="ID" data-name="Indonesia">Indonesia (+62)</option>
+                                <option value="+91" data-country="IN" data-name="India" selected>India (+91)</option>
+                                <option value="+39" data-country="IT" data-name="Italy">Italy (+39)</option>
+                                <option value="+81" data-country="JP" data-name="Japan">Japan (+81)</option>
+                                <option value="+254" data-country="KE" data-name="Kenya">Kenya (+254)</option>
+                                <option value="+82" data-country="KR" data-name="Korea">South Korea (+82)</option>
+                                <option value="+60" data-country="MY" data-name="Malaysia">Malaysia (+60)</option>
+                                <option value="+52" data-country="MX" data-name="Mexico">Mexico (+52)</option>
+                                <option value="+977" data-country="NP" data-name="Nepal">Nepal (+977)</option>
+                                <option value="+64" data-country="NZ" data-name="NewZealand">New Zealand (+64)</option>
+                                <option value="+234" data-country="NG" data-name="Nigeria">Nigeria (+234)</option>
+                                <option value="+92" data-country="PK" data-name="Pakistan">Pakistan (+92)</option>
+                                <option value="+63" data-country="PH" data-name="Philippines">Philippines (+63)</option>
+                                <option value="+7" data-country="RU" data-name="Russia">Russia (+7)</option>
+                                <option value="+966" data-country="SA" data-name="SaudiArabia">Saudi Arabia (+966)
+                                </option>
+                                <option value="+65" data-country="SG" data-name="Singapore">Singapore (+65)</option>
+                                <option value="+27" data-country="ZA" data-name="SouthAfrica">South Africa (+27)
+                                </option>
+                                <option value="+34" data-country="ES" data-name="Spain">Spain (+34)</option>
+                                <option value="+94" data-country="LK" data-name="SriLanka">Sri Lanka (+94)</option>
+                                <option value="+66" data-country="TH" data-name="Thailand">Thailand (+66)</option>
+                                <option value="+90" data-country="TR" data-name="Turkey">Turkey (+90)</option>
+                                <option value="+971" data-country="AE" data-name="UAE">UAE (+971)</option>
+                                <option value="+44" data-country="GB" data-name="UnitedKingdom">United Kingdom (+44)
+                                </option>
+                                <option value="+1" data-country="US" data-name="UnitedStates">United States (+1)
+                                </option>
+                                <option value="+84" data-country="VN" data-name="Vietnam">Vietnam (+84)</option>
+                            </select>
+
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <div style="display:flex;align-items:stretch;border:1.5px solid #dee2e6;border-radius:10px;overflow:hidden;background:#fff;transition:border-color 0.2s;" onfocusin="this.style.borderColor='#667eea';this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.15)'" onfocusout="this.style.borderColor='#dee2e6';this.style.boxShadow='none'">
+                                <span id="countryCodeDisplay"
+                                    style="display:flex;align-items:center;padding:0 14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700;font-size:14px;white-space:nowrap;flex-shrink:0;letter-spacing:0.5px;">+91</span>
+                                <input type="tel" class="form-control" id="phoneNumberInput"
+                                    placeholder="Enter your phone number"
+                                    style="border:none;border-radius:0;box-shadow:none;flex:1;padding:10px 14px;font-size:14px;background:transparent;"
+                                    maxlength="15" autocomplete="off" autocorrect="off" spellcheck="false">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Enter OTP -->
+                    <div id="phoneStep2" style="display:none;">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-shield-alt" style="font-size: 3rem; color: #1cc88a;"></i>
+                        </div>
+                        <h6 class="text-center mb-3">Verify Your Phone Number</h6>
+                        <p class="text-center text-muted mb-3">Enter the 6-digit code sent to<br><strong
+                                id="phoneDisplay"></strong></p>
+                        <div class="mb-3">
+                            <label class="form-label">Verification Code</label>
+                            <input type="text" class="form-control text-center" id="phoneOtpInput" placeholder="000000"
+                                maxlength="6" style="border-radius: 10px; font-size: 1.5rem; letter-spacing: 0.5rem;">
+                        </div>
+                        <div class="text-center mb-3">
+                            <button class="btn btn-link" id="resendPhoneOtpBtn">
+                                <i class="fas fa-redo me-1"></i>Resend Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border: none; justify-content: center;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; min-width: 120px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-success" id="sendPhoneOtpBtn"
+                        style="border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); border: none;">
+                        <i class="fas fa-paper-plane me-2"></i>Send Code
+                    </button>
+                    <button type="button" class="btn btn-success" id="verifyPhoneOtpBtn"
+                        style="display: none; border-radius: 15px; min-width: 120px; background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); border: none;">
+                        <i class="fas fa-check me-2"></i>Verify Phone
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Crop Modal - Professional Redesign -->
+    <div class="modal fade" id="cropImageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 620px;">
+            <div class="modal-content"
+                style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 24px 64px rgba(108, 99, 255, 0.2);">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%); color: white; border: none; padding: 1.25rem 1.5rem;">
+                    <h6 class="modal-title mb-0" style="font-weight: 600; font-size: 1.1rem;">
+                        <i class="fas fa-crop-alt me-2"></i>Crop Profile Picture
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <div class="row g-4">
+                        <!-- Image to crop -->
+                        <div class="col-md-8">
+                            <div class="crop-container">
+                                <img id="cropImage" src="" alt="Image to crop">
+                            </div>
+
+                            <!-- Crop Controls - Zoom uses plus/minus (not magnifying glass) for clarity -->
+                            <div class="crop-controls">
+                                <button type="button" id="zoomIn" title="Zoom In">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" id="zoomOut" title="Zoom Out">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" id="rotateLeft" title="Rotate Left">
+                                    <i class="fas fa-rotate-left"></i>
+                                </button>
+                                <button type="button" id="rotateRight" title="Rotate Right">
+                                    <i class="fas fa-rotate-right"></i>
+                                </button>
+                                <button type="button" id="flipHorizontal" title="Flip Horizontal">
+                                    <i class="fas fa-arrows-left-right"></i>
+                                </button>
+                                <button type="button" id="flipVertical" title="Flip Vertical">
+                                    <i class="fas fa-arrows-up-down"></i>
+                                </button>
+                                <button type="button" id="reset" title="Reset">
+                                    <i class="fas fa-rotate"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="col-md-4 d-flex flex-column justify-content-center">
+                            <div class="text-center">
+                                <p class="mb-3" style="font-size: 0.9rem; font-weight: 600; color: #1a1233;">Preview</p>
+                                <div class="crop-preview mx-auto" id="cropPreview"></div>
+                                <small class="text-muted d-block mt-3" style="font-size: 0.8rem; line-height: 1.4;">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Drag & zoom to adjust
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"
+                    style="border-top: 1px solid rgba(108, 99, 255, 0.1); justify-content: center; gap: 12px; padding: 1.25rem 1.5rem; background: #fafbff;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 12px; padding: 0.6rem 1.5rem; font-weight: 600;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="cropAndSave"
+                        style="border-radius: 12px; padding: 0.6rem 1.5rem; background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%); border: none; font-weight: 600; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35);">
+                        <i class="fas fa-check me-2"></i>Crop & Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Profile Picture Confirmation Modal -->
+    <div class="modal fade" id="removeAvatarConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.2);">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%); color: white; border: none; padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title" style="font-weight: 600;">
+                        <i class="fas fa-user-slash me-2"></i>Remove Profile Picture
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <div
+                            style="display: inline-block; padding: 1rem; background: linear-gradient(135deg, rgba(108, 99, 255, 0.15) 0%, rgba(0, 212, 170, 0.15) 100%); border-radius: 50%;">
+                            <i class="fas fa-image" style="font-size: 2.5rem; color: #6C63FF;"></i>
+                        </div>
+                    </div>
+                    <h5 class="mb-2" style="font-weight: 600; color: #1a1233;">Are you sure?</h5>
+                    <p class="text-muted mb-0">Your profile picture will be removed and replaced with the default
+                        avatar. You can add a new one anytime.</p>
+                </div>
+                <div class="modal-footer"
+                    style="border: none; justify-content: center; gap: 10px; padding: 1rem 1.5rem;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; min-width: 100px;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmRemoveAvatarBtn"
+                        style="border-radius: 15px; min-width: 100px;">
+                        <i class="fas fa-trash me-2"></i>Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency Conversion Confirmation Modal -->
+    <div class="modal fade" id="currencyConversionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exchange-alt me-2"></i>Confirm Currency Change
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-coins" style="font-size: 3rem; color: #667eea;"></i>
+                    </div>
+                    <h6 class="text-center mb-3">Currency Conversion</h6>
+                    <div class="alert alert-info" style="border-radius: 10px;">
+                        <p class="mb-2">
+                            <i class="fas fa-info-circle me-2"></i>You are changing your preferred currency from
+                            <strong id="fromCurrency"></strong> to <strong id="toCurrency"></strong>.
+                        </p>
+                        <p class="mb-0">
+                            <strong>Conversion Rate:</strong> <span id="conversionRate"></span>
+                        </p>
+                    </div>
+                    <div class="alert alert-warning" style="border-radius: 10px;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Note:</strong> All your existing expenses will be displayed in the new currency.
+                    </div>
+                </div>
+                <div class="modal-footer"
+                    style="border: none; justify-content: center; gap: 10px; padding: 1rem 1.5rem;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px; padding: 0.6rem 1.5rem;">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmCurrencyChange"
+                        style="border-radius: 15px; padding: 0.6rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        <i class="fas fa-check me-2"></i>Confirm Change
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="mb-0">&copy; 2026 SplitWise. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+    <script src="js/prevent-auto-scroll.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="js/sidebar-toggle.js"></script>
+    <script>
+        // Desktop navigation toggle
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show page immediately - settings page loads quickly
+            document.body.classList.add('ready');
+
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebar = document.querySelector('.sidebar');
+
+            // ROOT CAUSE FIX: Store scroll position before locking body
+            let bodyScrollPosition = 0;
+
+            // ROOT CAUSE FIX: Function to lock body scroll
+            function lockBodyScroll() {
+                bodyScrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${bodyScrollPosition}px`;
+                document.body.style.width = '100%';
+                document.body.style.height = '100%';
+                document.body.classList.add('sidebar-open');
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = 'hidden';
+                    mainContent.style.position = 'fixed';
+                }
+            }
+
+            // ROOT CAUSE FIX: Function to unlock body scroll
+            function unlockBodyScroll() {
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+                document.body.classList.remove('sidebar-open');
+                window.scrollTo(0, bodyScrollPosition);
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = '';
+                    mainContent.style.position = '';
+                }
+            }
+
+            // ROOT CAUSE FIX: Mobile menu toggle function with proper scroll locking
+            function toggleMobileMenu() {
+                if (!sidebar) return;
+                const isOpening = !sidebar.classList.contains('show');
+                sidebar.classList.toggle('show');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('show');
+                    if (isOpening) {
+                        sidebarOverlay.style.display = 'block';
+                    } else {
+                        sidebarOverlay.style.display = 'none';
+                    }
+                }
+                if (sidebar.classList.contains('show')) {
+                    lockBodyScroll();
+                } else {
+                    unlockBodyScroll();
+                }
+            }
+
+            // Mobile menu button handler
+            if (mobileMenuBtn) {
+                const newMobileBtn = mobileMenuBtn.cloneNode(true);
+                mobileMenuBtn.parentNode.replaceChild(newMobileBtn, mobileMenuBtn);
+                newMobileBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Close mobile menu when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleMobileMenu);
+            }
+
+            // Sidebar close button
+            const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+            if (sidebarCloseBtn) {
+                const newCloseBtn = sidebarCloseBtn.cloneNode(true);
+                sidebarCloseBtn.parentNode.replaceChild(newCloseBtn, sidebarCloseBtn);
+                newCloseBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    if (sidebar) {
+                        sidebar.classList.remove('show');
+                        if (sidebarOverlay) {
+                            sidebarOverlay.classList.remove('show');
+                            sidebarOverlay.style.display = 'none';
+                        }
+                        unlockBodyScroll();
+                    }
+                });
+            }
+
+            if (desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Check if mobile - use mobile menu toggle
+                    if (window.innerWidth <= 767) {
+                        toggleMobileMenu();
+                        return;
+                    }
+
+                    // Desktop: toggle sidebar collapse
+                    if (typeof globalToggleSidebar === 'function') {
+                        globalToggleSidebar();
+                    } else {
+                        document.body.classList.toggle('sidebar-collapsed');
+                        if (sidebar) {
+                            sidebar.classList.toggle('collapsed');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script>
+        // API Configuration
+        const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+            notification.innerHTML = `
+                <i class="fas fa-${icon} me-2"></i>
+                <p class="mb-0 ms-1">${message}</p>
+            `;
+
+            container.appendChild(notification);
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // ROOT CAUSE FIX: Load user data from localStorage first (for instant display)
+        // Use fallback only if localStorage is completely empty
+        const storedUser = localStorage.getItem('user');
+        let user = storedUser ? JSON.parse(storedUser) : null;
+
+        // ROOT CAUSE FIX: Only use default guest data if no user data exists at all
+        if (!user || !user.email || user.email === 'guest@example.com') {
+            // Try to get from backend first before using guest data
+            user = { name: '', email: '', phone: null, preferredCurrency: 'INR', email_verified: false };
+        }
+
+        // Function to update UI with user data
+        function updateUserUI(userData) {
+            document.getElementById('name').value = userData.name || '';
+            document.getElementById('email').value = userData.email || '';
+            document.getElementById('phone').textContent = userData.phone || 'Not verified';
+
+            // Update Security Settings display
+            document.getElementById('currentEmail').textContent = userData.email || 'No email set';
+            document.getElementById('currentPhone').textContent = userData.phone || 'Not verified';
+
+            // Update phone verification badge in security section
+            if (userData.phone) {
+                document.getElementById('phoneVerifiedBadgeSecurity').style.display = 'inline-block';
+                document.getElementById('changePhoneBtnText').textContent = 'Change Phone';
+                document.getElementById('phoneVerifiedBadge').style.display = 'inline-block';
+                document.getElementById('verifyPhoneBtn').style.display = 'none';
+                document.getElementById('changePhoneNumberBtn').style.display = 'inline-block';
+                document.getElementById('phoneHelpText').innerHTML = '<i class="fas fa-check-circle me-1" style="color: #1cc88a;"></i>Phone verified successfully';
+            } else {
+                document.getElementById('phoneVerifiedBadgeSecurity').style.display = 'none';
+                document.getElementById('changePhoneBtnText').textContent = 'Add Phone';
+                document.getElementById('phoneVerifiedBadge').style.display = 'none';
+                document.getElementById('verifyPhoneBtn').style.display = 'inline-block';
+                document.getElementById('changePhoneNumberBtn').style.display = 'none';
+                document.getElementById('phoneHelpText').innerHTML = '<i class="fas fa-info-circle"></i> Click "Verify Phone" to add/change your phone number';
+            }
+        }
+
+        // Display initial data from localStorage
+        updateUserUI(user);
+
+        // Fetch fresh user data from backend
+        async function fetchUserData() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        // ROOT CAUSE FIX: Preserve existing data if backend response is incomplete
+                        const existingUser = JSON.parse(localStorage.getItem('user') || '{}');
+                        const backendCurrency = data.data.preferred_currency;
+
+                        // ROOT CAUSE FIX: Update user object with backend data, but preserve existing fields if backend data is missing/empty
+                        // Only use backend value if it's actually a valid value (not null, undefined, or empty string for critical fields)
+                        const newUser = {
+                            name: (data.data.name && data.data.name.trim()) ? data.data.name : (existingUser.name || user.name || ''),
+                            email: (data.data.email && data.data.email.trim()) ? data.data.email : (existingUser.email || user.email || ''),
+                            phone: (data.data.phone && data.data.phone.trim()) ? data.data.phone : (existingUser.phone || user.phone || null),
+                            // ROOT CAUSE FIX: Use backend currency if available, otherwise keep existing, otherwise default to INR
+                            preferredCurrency: backendCurrency || existingUser.preferredCurrency || user.preferredCurrency || 'INR',
+                            email_verified: data.data.email_verified !== undefined ? data.data.email_verified : (existingUser.email_verified !== undefined ? existingUser.email_verified : (user.email_verified !== undefined ? user.email_verified : false)),
+                            // ROOT CAUSE FIX: Load avatar from backend (not localStorage)
+                            avatar: data.data.avatar || existingUser.avatar || user.avatar || null
+                        };
+
+                        // ROOT CAUSE FIX: Validate that we have at least email - if not, don't overwrite existing data
+                        if (!newUser.email || !newUser.email.trim()) {
+                            console.error('?? Backend returned empty email, preserving existing user data');
+                            // Revert to existing user data if backend returns invalid data
+                            user = existingUser || user;
+                        } else {
+                            user = newUser;
+                        }
+
+                        // ROOT CAUSE FIX: Load avatar from backend response
+                        // CRITICAL: Set avatar without animation to prevent movement
+                        const profileAvatarEl = document.getElementById('profileAvatar');
+                        if (profileAvatarEl) {
+                            profileAvatarEl.style.animation = 'none';
+                            profileAvatarEl.style.transition = 'none';
+                            profileAvatarEl.style.transform = 'none';
+                            if (user.avatar) {
+                                profileAvatarEl.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="animation: none !important; transition: none !important; transform: none !important;">`;
+                                document.getElementById('removeAvatarBtn').style.display = 'inline-block';
+                            } else {
+                                profileAvatarEl.innerHTML = '<i class="fas fa-user"></i>';
+                                document.getElementById('removeAvatarBtn').style.display = 'none';
+                            }
+                        }
+
+                        // Save to localStorage (for caching only, backend is source of truth)
+                        localStorage.setItem('user', JSON.stringify(user));
+
+                        // Update currency dropdown to match backend/user preference
+                        if (user.preferredCurrency) {
+                            document.getElementById('currency').value = user.preferredCurrency;
+                        }
+
+                        // Update UI with fresh data
+                        updateUserUI(user);
+
+                        console.log('? User data synced from backend:', user);
+                    } else {
+                        console.warn('?? Backend response missing data, keeping existing user data');
+                        // Keep existing user data if backend response is invalid
+                    }
+                } else {
+                    console.warn('?? Failed to fetch user data from backend (status:', response.status, '), keeping existing data');
+                    // Keep existing user data if backend fetch fails
+                }
+            } catch (error) {
+                console.error('? Failed to fetch user data:', error);
+                // ROOT CAUSE FIX: Don't clear user data on error - keep existing localStorage data
+                // Only update UI if we have valid cached data
+                if (user && user.email && user.email !== 'guest@example.com' && user.email.trim()) {
+                    console.log('?? Using existing cached user data:', user);
+                    updateUserUI(user);
+                } else {
+                    console.error('?? No valid user data found in cache. Please login again.');
+                    // Don't show error notification on initial load to avoid confusion
+                    // The auth-check.js will redirect if no token exists
+                }
+            }
+        }
+
+        // Fetch user data on page load
+        fetchUserData();
+
+        // ROOT CAUSE FIX: Load avatar from user object (fetched from backend via fetchUserData)
+        // This will be updated when fetchUserData completes, but show cached version immediately
+        // CRITICAL: Set avatar immediately without animation to prevent movement
+        const profileAvatarEl = document.getElementById('profileAvatar');
+        if (profileAvatarEl) {
+            profileAvatarEl.style.animation = 'none';
+            profileAvatarEl.style.transition = 'none';
+            profileAvatarEl.style.transform = 'none';
+            if (user.avatar) {
+                profileAvatarEl.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="animation: none !important; transition: none !important; transform: none !important;">`;
+                document.getElementById('removeAvatarBtn').style.display = 'inline-block';
+            } else {
+                profileAvatarEl.innerHTML = '<i class="fas fa-user"></i>';
+                document.getElementById('removeAvatarBtn').style.display = 'none';
+            }
+        }
+
+        // Currency symbol mapping
+        // Load preferences - prioritize backend data if available, otherwise use localStorage
+        const savedCurrency = user.preferredCurrency || user.preferred_currency || 'INR';
+        document.getElementById('currency').value = savedCurrency;
+
+        // Image Cropper Instance
+        let cropper = null;
+
+        // Change Avatar functionality
+        document.getElementById('changeAvatarBtn').addEventListener('click', () => {
+            document.getElementById('avatarInput').click();
+        });
+
+        document.getElementById('avatarInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    showNotification('Image size should be less than 5MB', 'error');
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Please select an image file', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imageData = event.target.result;
+
+                    // Show crop modal
+                    const cropModal = new bootstrap.Modal(document.getElementById('cropImageModal'));
+                    const cropImage = document.getElementById('cropImage');
+                    cropImage.src = imageData;
+
+                    // Destroy previous cropper if exists
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+
+                    // Show modal first, then initialize cropper
+                    cropModal.show();
+
+                    // Initialize cropper after modal is shown
+                    setTimeout(() => {
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 1, // Square crop for profile picture
+                            viewMode: 2,
+                            dragMode: 'move',
+                            autoCropArea: 0.8,
+                            restore: false,
+                            guides: true,
+                            center: true,
+                            highlight: false,
+                            cropBoxMovable: true,
+                            cropBoxResizable: true,
+                            toggleDragModeOnDblclick: false,
+                            ready() {
+                                // Update preview on crop
+                                updateCropPreview();
+                            },
+                            crop() {
+                                updateCropPreview();
+                            }
+                        });
+                    }, 300);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Reset input
+            e.target.value = '';
+        });
+
+        // Update crop preview
+        function updateCropPreview() {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 100,
+                height: 100,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            const preview = document.getElementById('cropPreview');
+            preview.innerHTML = '';
+            if (canvas) {
+                preview.appendChild(canvas);
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.borderRadius = '50%';
+            }
+        }
+
+        // Crop controls
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            if (cropper) cropper.zoom(0.1);
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            if (cropper) cropper.zoom(-0.1);
+        });
+
+        document.getElementById('rotateLeft').addEventListener('click', () => {
+            if (cropper) cropper.rotate(-90);
+        });
+
+        document.getElementById('rotateRight').addEventListener('click', () => {
+            if (cropper) cropper.rotate(90);
+        });
+
+        document.getElementById('flipHorizontal').addEventListener('click', () => {
+            if (cropper) {
+                const data = cropper.getData();
+                cropper.scaleX(-data.scaleX || -1);
+            }
+        });
+
+        document.getElementById('flipVertical').addEventListener('click', () => {
+            if (cropper) {
+                const data = cropper.getData();
+                cropper.scaleY(-data.scaleY || -1);
+            }
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            if (cropper) cropper.reset();
+        });
+
+        // Crop and save
+        document.getElementById('cropAndSave').addEventListener('click', async () => {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 300,
+                height: 300,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            if (canvas) {
+                const croppedImage = canvas.toDataURL('image/png');
+
+                // ROOT CAUSE FIX: Save avatar to backend instead of localStorage
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${API_BASE}/auth/profile`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            avatar: croppedImage // Base64 data URL is a valid URL format
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update local user object with new avatar
+                        user.avatar = croppedImage;
+                        localStorage.setItem('user', JSON.stringify(user));
+
+                        // Update profile avatar - CRITICAL: No animation to prevent movement
+                        const profileAvatarEl = document.getElementById('profileAvatar');
+                        if (profileAvatarEl) {
+                            profileAvatarEl.style.animation = 'none';
+                            profileAvatarEl.style.transition = 'none';
+                            profileAvatarEl.style.transform = 'none';
+                            profileAvatarEl.innerHTML = `<img src="${croppedImage}" alt="Avatar" style="animation: none !important; transition: none !important; transform: none !important;">`;
+                        }
+                        document.getElementById('removeAvatarBtn').style.display = 'inline-block';
+
+                        // Close modal
+                        const cropModal = bootstrap.Modal.getInstance(document.getElementById('cropImageModal'));
+                        cropModal.hide();
+
+                        // Destroy cropper
+                        if (cropper) {
+                            cropper.destroy();
+                            cropper = null;
+                        }
+
+                        showNotification('Profile picture updated successfully!', 'success');
+                    } else {
+                        throw new Error(data.message || 'Failed to save avatar');
+                    }
+                } catch (error) {
+                    console.error('Error saving avatar:', error);
+                    showNotification('Failed to save profile picture. Please try again.', 'error');
+
+                    // Destroy cropper even on error
+                    if (cropper) {
+                        cropper.destroy();
+                        cropper = null;
+                    }
+                }
+            }
+        });
+
+        // Clean up cropper when modal is closed
+        document.getElementById('cropImageModal').addEventListener('hidden.bs.modal', () => {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        });
+
+        // Remove Avatar - Show confirmation modal first
+        document.getElementById('removeAvatarBtn').addEventListener('click', () => {
+            const confirmModal = new bootstrap.Modal(document.getElementById('removeAvatarConfirmModal'));
+            confirmModal.show();
+        });
+
+        // Confirm Remove Avatar (executed when user clicks Remove in modal)
+        document.getElementById('confirmRemoveAvatarBtn').addEventListener('click', async () => {
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('removeAvatarConfirmModal'));
+            if (confirmModal) confirmModal.hide();
+
+            // ROOT CAUSE FIX: Remove avatar from backend by setting it to null
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/auth/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        avatar: null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update local user object
+                    user.avatar = null;
+                    delete user.avatar; // Remove the field
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    // Update UI - CRITICAL: Remove avatar without animation
+                    const profileAvatarEl = document.getElementById('profileAvatar');
+                    if (profileAvatarEl) {
+                        profileAvatarEl.style.animation = 'none';
+                        profileAvatarEl.style.transition = 'none';
+                        profileAvatarEl.style.transform = 'none';
+                        profileAvatarEl.innerHTML = '<i class="fas fa-user"></i>';
+                    }
+                    document.getElementById('removeAvatarBtn').style.display = 'none';
+
+                    showNotification('Avatar removed successfully!', 'success');
+                } else {
+                    throw new Error(data.message || 'Failed to remove avatar');
+                }
+            } catch (error) {
+                console.error('Error removing avatar:', error);
+                showNotification('Failed to remove avatar. Please try again.', 'error');
+            }
+        });
+
+        // Currency conversion rates (base: USD) - Fetched from live API
+        let exchangeRates = {
+            'USD': 1,           // Base currency
+            'INR': 83.50,       // Fallback rates
+            'EUR': 0.92,
+            'GBP': 0.79,
+            'JPY': 149.50,
+            'AUD': 1.52
+        };
+
+        let lastRateUpdate = null;
+
+        // Function to fetch live exchange rates
+        async function fetchExchangeRates() {
+            try {
+                console.log('Fetching live exchange rates...');
+
+                // Using exchangerate-api.com (free tier allows 1,500 requests/month)
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch rates');
+                }
+
+                const data = await response.json();
+
+                // Update rates
+                exchangeRates = {
+                    'USD': 1,
+                    'INR': data.rates.INR,
+                    'EUR': data.rates.EUR,
+                    'GBP': data.rates.GBP,
+                    'JPY': data.rates.JPY,
+                    'AUD': data.rates.AUD
+                };
+
+                lastRateUpdate = new Date();
+
+                // Save to localStorage with timestamp
+                localStorage.setItem('exchangeRates', JSON.stringify(exchangeRates));
+                localStorage.setItem('lastRateUpdate', lastRateUpdate.toISOString());
+
+                console.log('Exchange rates updated successfully:', exchangeRates);
+
+                return true;
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+
+                // Try to load from localStorage if available
+                const savedRates = localStorage.getItem('exchangeRates');
+                const savedUpdate = localStorage.getItem('lastRateUpdate');
+
+                if (savedRates) {
+                    exchangeRates = JSON.parse(savedRates);
+                    lastRateUpdate = savedUpdate ? new Date(savedUpdate) : null;
+                    console.log('Using cached exchange rates');
+                } else {
+                    console.log('Using default rates (offline)');
+                }
+
+                return false;
+            }
+        }
+
+
+        // Check if rates need update (older than 1 hour)
+        function shouldUpdateRates() {
+            if (!lastRateUpdate) return true;
+
+            const now = new Date();
+            const diffHours = (now - lastRateUpdate) / (1000 * 60 * 60);
+
+            return diffHours >= 1; // Update if older than 1 hour
+        }
+
+        // Initialize rates on page load
+        (async function initializeRates() {
+            // Try to load from localStorage first
+            const savedRates = localStorage.getItem('exchangeRates');
+            const savedUpdate = localStorage.getItem('lastRateUpdate');
+
+            if (savedRates) {
+                exchangeRates = JSON.parse(savedRates);
+                lastRateUpdate = savedUpdate ? new Date(savedUpdate) : null;
+            }
+
+            // Fetch new rates if needed
+            if (shouldUpdateRates()) {
+                await fetchExchangeRates();
+            }
+
+            // Set up hourly refresh
+            setInterval(() => {
+                if (shouldUpdateRates()) {
+                    fetchExchangeRates();
+                }
+            }, 60 * 60 * 1000); // Check every hour
+        })();
+
+        // Function to convert amount from one currency to another
+        function convertCurrency(amount, fromCurrency, toCurrency) {
+            // Convert to USD first (base currency)
+            const amountInUSD = amount / exchangeRates[fromCurrency];
+            // Convert from USD to target currency
+            return amountInUSD * exchangeRates[toCurrency];
+        }
+
+        // Convert all amounts when currency changes
+        // Note: Currency conversion for expenses should be handled by backend
+        // Expenses and groups are stored in backend - no localStorage writes
+        function convertAllAmounts(fromCurrency, toCurrency) {
+            if (fromCurrency === toCurrency) return;
+
+            // Note: All expense data is stored in backend
+            // Currency conversion should be done via backend API if needed
+            // For now, we just update the user's preferred currency
+            console.warn('Currency conversion: Expenses and groups are stored in backend. Conversion should be handled server-side.');
+
+            // Expenses and groups are stored in backend
+        }
+
+        // Store pending currency change
+        let pendingCurrencyChange = null;
+
+        // Save profile
+        document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+            const name        = document.getElementById('name').value.trim();
+            const newCurrency = document.getElementById('currency').value;
+            const oldCurrency = user.preferredCurrency || user.preferred_currency || 'INR';
+
+            // ── Validation BEFORE showing any spinner ───────────────────────
+            if (!name || name.length < 2) {
+                showNotification('Name must be at least 2 characters', 'error');
+                return;
+            }
+
+            // ── Currency changed → show confirmation modal, no spinner ───────
+            if (newCurrency !== oldCurrency) {
+                const rate = convertCurrency(1, oldCurrency, newCurrency).toFixed(4);
+                document.getElementById('fromCurrency').textContent = oldCurrency;
+                document.getElementById('toCurrency').textContent   = newCurrency;
+                document.getElementById('conversionRate').textContent = `1 ${oldCurrency} = ${rate} ${newCurrency}`;
+                pendingCurrencyChange = { name, oldCurrency, newCurrency };
+                new bootstrap.Modal(document.getElementById('currencyConversionModal')).show();
+                return;
+            }
+
+            // ── Nothing actually changed ─────────────────────────────────────
+            const nameChanged = name !== (user.name || '').trim();
+            if (!nameChanged) {
+                showNotification('No changes detected', 'info');
+                return;
+            }
+
+            // ── Only NOW show the loading spinner (API call is next) ─────────
+            const button      = document.getElementById('saveProfileBtn');
+            const btnContent  = document.getElementById('saveProfileBtnContent');
+            const savedContent = btnContent.innerHTML;
+            button.disabled  = true;
+            button.style.opacity = '0.8';
+            button.style.cursor  = 'not-allowed';
+            btnContent.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp;Saving...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type':  'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    user.name = name;
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    // Flash green success state on button
+                    btnContent.innerHTML = '<i class="fas fa-check-circle"></i>&nbsp;Saved!';
+                    button.style.background = 'linear-gradient(135deg,#38a169,#276749)';
+                    button.style.opacity = '1';
+                    showNotification('Profile updated successfully!', 'success');
+
+                    // Smooth fade-out then reload
+                    setTimeout(() => {
+                        document.body.style.transition = 'opacity 0.3s ease';
+                        document.body.style.opacity    = '0';
+                        setTimeout(() => window.location.reload(), 300);
+                    }, 1000);
+                } else {
+                    showNotification(data.message || 'Failed to update profile', 'error');
+                    button.disabled = false;
+                    button.style.opacity = '1';
+                    button.style.cursor  = 'pointer';
+                    btnContent.innerHTML = savedContent;
+
+                }
+            } catch (error) {
+                console.error('Update profile error:', error);
+                showNotification('Network error — please check your connection and try again.', 'error');
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.cursor  = 'pointer';
+                btnContent.innerHTML = savedContent;
+            }
+        });
+
+
+        // Confirm currency conversion
+        document.getElementById('confirmCurrencyChange').addEventListener('click', async () => {
+            if (pendingCurrencyChange) {
+                // Show loading state
+                const button = document.getElementById('confirmCurrencyChange');
+                const originalHTML = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Converting...';
+
+                try {
+                    // Convert all amounts
+                    convertAllAmounts(pendingCurrencyChange.oldCurrency, pendingCurrencyChange.newCurrency);
+
+                    // Update backend with name and currency
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${API_BASE}/auth/profile`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            name: pendingCurrencyChange.name,
+                            preferred_currency: pendingCurrencyChange.newCurrency
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update name in all localStorage groups if name changed
+                        const oldName = user.name;
+                        const newName = pendingCurrencyChange.name;
+                        const userEmail = user.email;
+
+                        if (oldName !== newName) {
+                            // Update user's groups
+                            const groupsKey = `groups_${userEmail}`;
+                            let groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+                            groups = groups.map(group => {
+                                // Update members array if old name exists
+                                if (group.members && Array.isArray(group.members)) {
+                                    group.members = group.members.map(member =>
+                                        member === oldName ? newName : member
+                                    );
+                                }
+                                // Update owner if it matches
+                                if (group.owner === oldName) {
+                                    group.owner = newName;
+                                }
+                                return group;
+                            });
+                            // Note: Groups are stored in backend - no localStorage writes needed
+                        }
+
+                        // Only update name and currency in localStorage, keep phone number unchanged
+                        user.name = pendingCurrencyChange.name;
+                        user.preferredCurrency = pendingCurrencyChange.newCurrency;
+                        // Don't touch user.phone - it should remain as is
+                        localStorage.setItem('user', JSON.stringify(user));
+
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('currencyConversionModal'));
+                        modal.hide();
+
+                        // Show success message
+                        showNotification(`Currency changed! Refreshing page...`, 'success');
+                        pendingCurrencyChange = null;
+
+                        // Smooth page refresh after a brief delay
+                        setTimeout(() => {
+                            // Add fade-out effect
+                            document.body.style.transition = 'opacity 0.3s ease';
+                            document.body.style.opacity = '0';
+
+                            // Refresh after fade-out
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 300);
+                        }, 1000);
+                    } else {
+                        showNotification(data.message || 'Failed to update currency', 'error');
+                        button.disabled = false;
+                        button.innerHTML = originalHTML;
+                    }
+                } catch (error) {
+                    console.error('Update currency error:', error);
+                    showNotification('Failed to update currency. Please try again.', 'error');
+                    button.disabled = false;
+                    button.innerHTML = originalHTML;
+                }
+            }
+        });
+
+        // Cancel currency conversion - reset dropdown
+        document.getElementById('currencyConversionModal').addEventListener('hidden.bs.modal', () => {
+            if (pendingCurrencyChange) {
+                document.getElementById('currency').value = pendingCurrencyChange.oldCurrency;
+                pendingCurrencyChange = null;
+            }
+        });
+
+        // Open Change Email Modal
+        document.getElementById('changeEmailBtn').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('changeEmailModal'));
+            document.getElementById('emailStep1').style.display = 'block';
+            document.getElementById('emailStep2').style.display = 'none';
+            document.getElementById('sendEmailOtpBtn').style.display = 'inline-block';
+            document.getElementById('verifyEmailOtpBtn').style.display = 'none';
+            document.getElementById('newEmailInput').value = '';
+            document.getElementById('emailOtpInput').value = '';
+            modal.show();
+        });
+
+        // Send OTP to new email
+        let pendingNewEmail = null;
+        document.getElementById('sendEmailOtpBtn').addEventListener('click', async () => {
+            const newEmail = document.getElementById('newEmailInput').value.trim().toLowerCase();
+
+            if (!newEmail || !newEmail.includes('@')) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+
+            // Check if it's the same as current email
+            if (newEmail === user.email.toLowerCase()) {
+                showNotification('This is already your current email address', 'error');
+                return;
+            }
+
+            const button = document.getElementById('sendEmailOtpBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Checking...';
+
+            try {
+                // First, check if email is already registered
+                console.log('Checking if email is already registered:', newEmail);
+
+                // Use the signup endpoint to check (it will return error if email exists)
+                const checkResponse = await fetch(`${API_BASE}/auth/send-email-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ email: newEmail })
+                });
+
+                console.log('Email check response status:', checkResponse.status);
+                const checkData = await checkResponse.json();
+                console.log('Email check response data:', checkData);
+
+                // Backend returns 400 if email already exists
+                if (checkResponse.status === 400 && (checkData.error?.includes('already') || checkData.message?.includes('already'))) {
+                    showNotification('?? This email is already registered! Please use a different email or login with this email.', 'error');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Code';
+                    return;
+                }
+
+                // If successful, email is available and OTP was sent
+                if (checkData.success) {
+                    pendingNewEmail = newEmail;
+                    document.getElementById('newEmailDisplay').textContent = newEmail;
+
+                    document.getElementById('emailStep1').style.display = 'none';
+                    document.getElementById('emailStep2').style.display = 'block';
+                    document.getElementById('sendEmailOtpBtn').style.display = 'none';
+                    document.getElementById('verifyEmailOtpBtn').style.display = 'inline-block';
+                    showNotification('? Email available! Verification code sent to your new email.', 'success');
+                } else {
+                    const errorMsg = checkData.error || checkData.message || 'Failed to send code';
+                    console.error('Send email OTP failed:', errorMsg);
+
+                    // Check for specific error messages
+                    if (errorMsg.toLowerCase().includes('already')) {
+                        showNotification('?? This email is already registered! Please use a different email.', 'error');
+                    } else {
+                        showNotification(errorMsg, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Send email OTP error:', error);
+                let errorMessage = 'Failed to send verification code. ';
+                if (error.message.includes('fetch')) {
+                    errorMessage += 'Please make sure the backend server is running.';
+                } else {
+                    errorMessage += error.message;
+                }
+                showNotification(errorMessage, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Code';
+            }
+        });
+
+        // Resend email OTP
+        document.getElementById('resendEmailOtpBtn').addEventListener('click', async () => {
+            if (!pendingNewEmail) {
+                showNotification('Please enter email address first', 'error');
+                return;
+            }
+
+            const button = document.getElementById('resendEmailOtpBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/send-email-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ email: pendingNewEmail })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('New code sent! Check your email.', 'success');
+
+                    // Reset button after 30 seconds cooldown
+                    let countdown = 30;
+                    button.innerHTML = `<i class="fas fa-clock me-1"></i>Resend in ${countdown}s`;
+
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            button.innerHTML = `<i class="fas fa-clock me-1"></i>Resend in ${countdown}s`;
+                        } else {
+                            clearInterval(interval);
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fas fa-redo me-1"></i>Resend Code';
+                        }
+                    }, 1000);
+                } else {
+                    showNotification(data.error || 'Failed to resend code', 'error');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-redo me-1"></i>Resend Code';
+                }
+            } catch (error) {
+                console.error('Resend email OTP error:', error);
+                showNotification('Failed to resend code. Please try again.', 'error');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-redo me-1"></i>Resend Code';
+            }
+        });
+
+        // Verify email OTP
+        document.getElementById('verifyEmailOtpBtn').addEventListener('click', async () => {
+            const otpCode = document.getElementById('emailOtpInput').value.trim();
+
+            if (!otpCode || otpCode.length !== 6) {
+                showNotification('Please enter a valid 6-digit code', 'error');
+                return;
+            }
+
+            const button = document.getElementById('verifyEmailOtpBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/verify-email-change`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        email: pendingNewEmail,
+                        code: otpCode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    user.email = pendingNewEmail;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    document.getElementById('email').value = pendingNewEmail;
+                    document.getElementById('currentEmail').textContent = pendingNewEmail;
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('changeEmailModal'));
+                    modal.hide();
+
+                    showNotification('Email changed successfully!', 'success');
+                } else {
+                    showNotification(data.error || 'Invalid verification code', 'error');
+                }
+            } catch (error) {
+                console.error('Verify email error:', error);
+                showNotification('Failed to verify email. Please try again.', 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-check me-2"></i>Verify Email';
+            }
+        });
+
+        // Open Change Phone Modal (reuse existing phone verification modal)
+        document.getElementById('changePhoneBtn').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('phoneVerificationModal'));
+            document.getElementById('phoneStep1').style.display = 'block';
+            document.getElementById('phoneStep2').style.display = 'none';
+            document.getElementById('sendPhoneOtpBtn').style.display = 'inline-block';
+            document.getElementById('verifyPhoneOtpBtn').style.display = 'none';
+            document.getElementById('countrySelect').value = '+91';
+            document.getElementById('phoneNumberInput').value = '';
+            document.getElementById('phoneOtpInput').value = '';
+            updatePhonePreview();
+            modal.show();
+        });
+
+        // Open Change Password Modal
+        document.getElementById('changePasswordBtnNew').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            document.getElementById('currentPasswordModal').value = '';
+            document.getElementById('newPasswordModal').value = '';
+            document.getElementById('confirmPasswordModal').value = '';
+            // Reset requirement icons
+            ['cpwReqLen','cpwReqUpper','cpwReqNum','cpwReqSpec','cpwReqMatch','cpwReqDiff'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.className = 'fas fa-times me-1'; el.style.color = '#dc3545'; }
+            });
+            modal.show();
+        });
+
+        // Password eye toggles
+        function setupCpwToggle(btnId, inputId, iconId) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const inp = document.getElementById(inputId);
+                const ico = document.getElementById(iconId);
+                if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fas fa-eye-slash'; }
+                else { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+            });
+        }
+        setupCpwToggle('toggleCurPw',  'currentPasswordModal',  'iconCurPw');
+        setupCpwToggle('toggleNewPw',  'newPasswordModal',       'iconNewPw');
+        setupCpwToggle('toggleConfPw', 'confirmPasswordModal',   'iconConfPw');
+
+        // Live requirements validation
+        function updateCpwReqs() {
+            const pw  = document.getElementById('newPasswordModal').value;
+            const cpw = document.getElementById('confirmPasswordModal').value;
+            const cur = document.getElementById('currentPasswordModal').value;
+            const checks = {
+                cpwReqLen:   pw.length >= 8,
+                cpwReqUpper: /[A-Z]/.test(pw),
+                cpwReqNum:   /\d/.test(pw),
+                cpwReqSpec:  /[^A-Za-z0-9]/.test(pw),
+                cpwReqMatch: pw.length > 0 && pw === cpw,
+                cpwReqDiff:  pw.length > 0 && pw !== cur
+            };
+            Object.entries(checks).forEach(([id, ok]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.className = `fas ${ok ? 'fa-check' : 'fa-times'} me-1`;
+                el.style.color = ok ? '#28a745' : '#dc3545';
+            });
+        }
+        ['newPasswordModal','confirmPasswordModal','currentPasswordModal'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updateCpwReqs);
+        });
+
+        // Confirm password change from modal
+        document.getElementById('confirmPasswordChangeBtn').addEventListener('click', async () => {
+            const current  = document.getElementById('currentPasswordModal').value;
+            const newPass  = document.getElementById('newPasswordModal').value;
+            const confirm  = document.getElementById('confirmPasswordModal').value;
+            const btn      = document.getElementById('confirmPasswordChangeBtn');
+
+            // ── Client-side validation ────────────────────────────────────────
+            if (!current || !newPass || !confirm) {
+                showNotification('Please fill in all password fields', 'error');
+                return;
+            }
+            if (newPass.length < 8) {
+                showNotification('New password must be at least 8 characters', 'error');
+                return;
+            }
+            if (!/[A-Z]/.test(newPass)) {
+                showNotification('New password must contain at least one uppercase letter', 'error');
+                return;
+            }
+            if (!/\d/.test(newPass)) {
+                showNotification('New password must contain at least one number', 'error');
+                return;
+            }
+            if (!/[^A-Za-z0-9]/.test(newPass)) {
+                showNotification('New password must contain at least one special character', 'error');
+                return;
+            }
+            if (newPass !== confirm) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+            if (newPass === current) {
+                showNotification('New password must be different from your current password', 'error');
+                return;
+            }
+
+            // ── Show loading state ────────────────────────────────────────────
+            const originalText = btn.innerHTML;
+            btn.disabled   = true;
+            btn.innerHTML  = '<i class="fas fa-spinner fa-spin me-2"></i>Changing...';
+
+            try {
+                const token    = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/auth/change-password`, {
+                    method:  'POST',
+                    headers: {
+                        'Content-Type':  'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Password changed successfully! Please log in again with your new password.', 'success');
+
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                    if (modal) modal.hide();
+
+                    // Force logout after 2 seconds so user must re-login with new password
+                    setTimeout(() => {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    // ── Specific error messages ───────────────────────────────
+                    const msg = (data.message || data.error || '').toLowerCase();
+                    if (msg.includes('incorrect') || msg.includes('wrong') || msg.includes('invalid') || msg.includes('current') || msg.includes('mismatch')) {
+                        showNotification('Current password is incorrect. Please try again.', 'error');
+                        document.getElementById('currentPasswordModal').focus();
+                    } else if (msg.includes('reuse') || msg.includes('previously') || msg.includes('used before')) {
+                        showNotification('This password was used before. Please choose a new password.', 'error');
+                    } else {
+                        showNotification(data.message || 'Failed to change password. Please try again.', 'error');
+                    }
+                    btn.disabled  = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('Change password error:', error);
+                showNotification('Network error — please try again', 'error');
+                btn.disabled  = false;
+                btn.innerHTML = originalText;
+            }
+        });
+
+
+
+        // Export all data
+        document.getElementById('exportDataBtn').addEventListener('click', () => {
+            const allData = {};
+
+            // Get all localStorage data
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                allData[key] = localStorage.getItem(key);
+            }
+
+            // Create JSON file
+            const dataStr = JSON.stringify(allData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SplitWise_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showNotification('All data exported successfully!', 'success');
+        });
+
+        // Clear all expenses
+        document.getElementById('clearExpensesBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all expenses? This will remove all personal and group expenses but keep your profile data.')) {
+                const userEmail = user.email;
+
+                // Clear personal expenses
+                localStorage.removeItem(`expenses_${userEmail}`);
+
+                // Clear all group expenses
+                const groups = JSON.parse(localStorage.getItem(`groups_${userEmail}`) || '[]');
+                groups.forEach(group => {
+                    localStorage.removeItem(`group_expenses_${group.id}`);
+                });
+
+                // Clear previous groups
+                localStorage.removeItem(`previous_groups_${userEmail}`);
+
+                showNotification('All expenses cleared successfully!', 'success');
+            }
+        });
+
+        // Logout functionality
+        // Logout Button - Show Modal
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+            logoutModal.show();
+        });
+
+        // Confirm Logout - Handle Logout
+        document.getElementById('confirmLogout').addEventListener('click', () => {
+            console.log('?? Logging out user...');
+
+            // ==================== INVALIDATE ALL SESSIONS ====================
+
+            // 1. Generate a unique logout timestamp to invalidate all other tabs
+            const logoutTimestamp = new Date().getTime();
+            localStorage.setItem('logoutEvent', logoutTimestamp);
+
+            console.log('  ? Logout event broadcast to all tabs');
+
+            // 2. Clear session data
+            sessionStorage.clear();
+            console.log('  ? sessionStorage cleared');
+
+            // 3. Remove ALL auth data (invalidates this session completely)
+            localStorage.removeItem('token');
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('user');
+            console.log('  ? All auth data removed');
+
+            // 4. Clear cookies
+            document.cookie.split(";").forEach(function (c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            console.log('  ? Cookies cleared');
+
+            // 5. Add flag to prevent back button access (permanent)
+            localStorage.setItem('justLoggedOut', 'true');
+            console.log('  ? Logout flag set');
+
+            console.log('? All sessions invalidated across all tabs');
+
+            showNotification('Logged out successfully. Redirecting...', 'success');
+
+            setTimeout(() => {
+                // Clear history and redirect to landing page
+                window.history.pushState(null, '', 'frontend.html');
+                window.location.replace('frontend.html');
+            }, 1000);
+        });
+
+        // ROOT CAUSE FIX: Delete account modal - Reset button states and modal state
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
+        const sendDeleteOtpBtn = document.getElementById('sendDeleteOtpBtn');
+        const resendDeleteOtpBtn = document.getElementById('resendDeleteOtpBtn');
+
+        // Function to reset delete account modal state
+        function resetDeleteAccountModal() {
+            // Reset to step 1
+            document.getElementById('deleteStep1').style.display = 'block';
+            document.getElementById('deleteStep2').style.display = 'none';
+            document.getElementById('confirmDeleteAccount').style.display = 'none';
+            document.getElementById('deleteOtpInput').value = '';
+
+            // ROOT CAUSE FIX: Reset send verification button state
+            sendDeleteOtpBtn.disabled = false;
+            sendDeleteOtpBtn.innerHTML = '<i class="fas fa-envelope me-2"></i>Send Verification Code';
+
+            // Reset resend button state
+            resendDeleteOtpBtn.disabled = false;
+            resendDeleteOtpBtn.innerHTML = '<i class="fas fa-redo me-1"></i>Resend Code';
+        }
+
+        // Reset modal when opened
+        deleteAccountModal.addEventListener('show.bs.modal', function () {
+            resetDeleteAccountModal();
+        });
+
+        // Reset modal when closed (backup in case show event doesn't fire)
+        deleteAccountModal.addEventListener('hidden.bs.modal', function () {
+            resetDeleteAccountModal();
+        });
+
+        // Delete account - Open Modal
+        document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(deleteAccountModal);
+            // Reset state before showing (double-check)
+            resetDeleteAccountModal();
+            modal.show();
+        });
+
+        // Send Delete OTP
+        document.getElementById('sendDeleteOtpBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('sendDeleteOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+            try {
+                console.log('Sending delete account OTP to:', user.email);
+                const response = await fetch(`${API_BASE}/auth/send-delete-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        email: user.email
+                    })
+                });
+
+                console.log('Delete OTP response status:', response.status);
+                const data = await response.json();
+                console.log('Delete OTP response data:', data);
+
+                if (response.ok && data.success) {
+                    showNotification('Verification code sent to your email!', 'success');
+                    // Show step 2
+                    document.getElementById('deleteStep1').style.display = 'none';
+                    document.getElementById('deleteStep2').style.display = 'block';
+                    document.getElementById('confirmDeleteAccount').style.display = 'inline-block';
+                } else {
+                    const errorMsg = data.error || data.message || 'Failed to send code';
+                    console.error('Send delete OTP failed:', errorMsg);
+                    showNotification(errorMsg, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-envelope me-2"></i>Send Verification Code';
+                }
+            } catch (error) {
+                console.error('Send delete OTP error:', error);
+                let errorMessage = 'Failed to send verification code. ';
+                if (error.message.includes('fetch')) {
+                    errorMessage += 'Please make sure the backend server is running.';
+                } else {
+                    errorMessage += error.message;
+                }
+                showNotification(errorMessage, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-envelope me-2"></i>Send Verification Code';
+            }
+        });
+
+        // Resend Delete OTP
+        document.getElementById('resendDeleteOtpBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('resendDeleteOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/send-delete-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        email: user.email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showNotification('Verification code resent!', 'success');
+                } else {
+                    showNotification(data.message || 'Failed to resend code', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Failed to resend code', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-redo me-1"></i>Resend Code';
+            }
+        });
+
+        // Confirm delete account with OTP
+        document.getElementById('confirmDeleteAccount').addEventListener('click', async () => {
+            const otp = document.getElementById('deleteOtpInput').value;
+
+            if (!otp || otp.length !== 6) {
+                showNotification('Please enter the 6-digit code', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('confirmDeleteAccount');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/verify-delete-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        email: user.email,
+                        otp: otp
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    console.log('? Account deletion successful - clearing all data');
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
+                    modal.hide();
+
+                    // Show final goodbye message
+                    showNotification('Account deleted permanently! All your data has been removed.', 'success');
+
+                    // Wait a moment for user to see the message
+                    setTimeout(() => {
+                        // ==================== COMPLETE DATA CLEANUP ====================
+                        console.log('??? Clearing all local data...');
+
+                        // Clear ALL localStorage
+                        localStorage.clear();
+                        console.log('  ? localStorage cleared');
+
+                        // Clear ALL sessionStorage
+                        sessionStorage.clear();
+                        console.log('  ? sessionStorage cleared');
+
+                        // Clear ALL cookies
+                        document.cookie.split(";").forEach(function (c) {
+                            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                        });
+                        console.log('  ? Cookies cleared');
+
+                        // Clear IndexedDB if used
+                        if (window.indexedDB) {
+                            indexedDB.databases().then(databases => {
+                                databases.forEach(db => indexedDB.deleteDatabase(db.name));
+                            });
+                        }
+                        console.log('  ? IndexedDB cleared');
+
+                        console.log('? All local data removed');
+                        console.log('?? Goodbye! You must create a new account to access the system.');
+
+                        // Prevent back button by replacing history
+                        // Redirect to landing page
+                        window.location.replace('frontend.html');
+
+                    }, 2000);
+                } else {
+                    const errorMsg = data.error || data.message || 'Invalid verification code';
+                    console.error('Delete account failed:', errorMsg);
+                    showNotification(errorMsg, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-trash me-2"></i>Delete Forever';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Failed to verify code', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash me-2"></i>Delete Forever';
+            }
+        });
+
+        // ROOT CAUSE FIX: Removed Cancel button - modal can be closed via X button
+        // Modal reset is handled by hidden.bs.modal event listener above
+
+        // Phone Verification
+        let pendingPhoneNumber = null;
+
+        // Update country code display
+        function updatePhonePreview() {
+            const countryCode = document.getElementById('countrySelect').value;
+            document.getElementById('countryCodeDisplay').textContent = countryCode;
+        }
+
+        // Country selection change
+        document.getElementById('countrySelect').addEventListener('change', updatePhonePreview);
+
+        // Phone number input change
+        document.getElementById('phoneNumberInput').addEventListener('input', (e) => {
+            // Only allow numbers
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Open phone verification modal
+        document.getElementById('verifyPhoneBtn').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('phoneVerificationModal'));
+            document.getElementById('phoneStep1').style.display = 'block';
+            document.getElementById('phoneStep2').style.display = 'none';
+            document.getElementById('countrySelect').value = '+91'; // Default to India
+            document.getElementById('phoneNumberInput').value = '';
+            document.getElementById('phoneOtpInput').value = '';
+            updatePhonePreview();
+            modal.show();
+        });
+
+        // Change phone number button
+        document.getElementById('changePhoneNumberBtn').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('phoneVerificationModal'));
+            document.getElementById('phoneStep1').style.display = 'block';
+            document.getElementById('phoneStep2').style.display = 'none';
+            document.getElementById('countrySelect').value = '+91'; // Default to India
+            document.getElementById('phoneNumberInput').value = '';
+            document.getElementById('phoneOtpInput').value = '';
+            updatePhonePreview();
+            modal.show();
+        });
+
+        // Send OTP to phone
+        document.getElementById('sendPhoneOtpBtn').addEventListener('click', async () => {
+            const countryCode = document.getElementById('countrySelect').value;
+            const phoneNumber = document.getElementById('phoneNumberInput').value.trim();
+
+            if (!phoneNumber || phoneNumber.length < 7) {
+                showNotification('Please enter a valid phone number', 'error');
+                return;
+            }
+
+            const fullPhoneNumber = countryCode + phoneNumber;
+            pendingPhoneNumber = fullPhoneNumber;
+            document.getElementById('phoneDisplay').textContent = fullPhoneNumber;
+
+            const button = document.getElementById('sendPhoneOtpBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/send-phone-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ phone: fullPhoneNumber })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('phoneStep1').style.display = 'none';
+                    document.getElementById('phoneStep2').style.display = 'block';
+                    document.getElementById('sendPhoneOtpBtn').style.display = 'none';
+                    document.getElementById('verifyPhoneOtpBtn').style.display = 'inline-block';
+                    showNotification('OTP sent! Check backend CMD window for the code.', 'success');
+                } else {
+                    showNotification(data.error || 'Failed to send OTP', 'error');
+                }
+            } catch (error) {
+                console.error('Send OTP error:', error);
+                showNotification('Failed to send OTP. Please try again.', 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Code';
+            }
+        });
+
+        // Resend OTP for phone verification
+        document.getElementById('resendPhoneOtpBtn').addEventListener('click', async () => {
+            if (!pendingPhoneNumber) {
+                showNotification('Please enter phone number first', 'error');
+                return;
+            }
+
+            const button = document.getElementById('resendPhoneOtpBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/send-phone-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ phone: pendingPhoneNumber })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('New OTP sent! Check backend CMD window.', 'success');
+
+                    // Reset button after 30 seconds cooldown
+                    let countdown = 30;
+                    button.innerHTML = `<i class="fas fa-clock me-1"></i>Resend in ${countdown}s`;
+
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            button.innerHTML = `<i class="fas fa-clock me-1"></i>Resend in ${countdown}s`;
+                        } else {
+                            clearInterval(interval);
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fas fa-redo me-1"></i>Resend OTP';
+                        }
+                    }, 1000);
+                } else {
+                    showNotification(data.error || 'Failed to resend OTP', 'error');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-redo me-1"></i>Resend OTP';
+                }
+            } catch (error) {
+                console.error('Resend OTP error:', error);
+                showNotification('Failed to resend OTP. Please try again.', 'error');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-redo me-1"></i>Resend OTP';
+            }
+        });
+
+        // Map country codes to currencies (for auto-suggestion only)
+        const countryToCurrency = {
+            '+1': 'USD',      // USA, Canada
+            '+44': 'GBP',     // UK
+            '+91': 'INR',     // India
+            '+86': 'USD',     // China
+            '+81': 'JPY',     // Japan
+            '+82': 'JPY',     // South Korea
+            '+65': 'USD',     // Singapore
+            '+60': 'USD',     // Malaysia
+            '+66': 'USD',     // Thailand
+            '+84': 'USD',     // Vietnam
+            '+62': 'USD',     // Indonesia
+            '+63': 'USD',     // Philippines
+            '+880': 'INR',    // Bangladesh
+            '+92': 'INR',     // Pakistan
+            '+94': 'INR',     // Sri Lanka
+            '+977': 'INR',    // Nepal
+            '+61': 'AUD',     // Australia
+            '+64': 'AUD',     // New Zealand
+            '+49': 'EUR',     // Germany
+            '+33': 'EUR',     // France
+            '+39': 'EUR',     // Italy
+            '+34': 'EUR',     // Spain
+            '+971': 'USD',    // UAE
+            '+966': 'USD',    // Saudi Arabia
+            '+27': 'USD',     // South Africa
+            '+234': 'USD',    // Nigeria
+            '+254': 'USD',    // Kenya
+            '+20': 'USD',     // Egypt
+            '+55': 'USD',     // Brazil
+            '+52': 'USD',     // Mexico
+            '+54': 'USD',     // Argentina
+            '+56': 'USD',     // Chile
+            '+57': 'USD',     // Colombia
+            '+7': 'EUR',      // Russia
+            '+90': 'EUR',     // Turkey
+            '+93': 'USD',     // Afghanistan
+            '+355': 'EUR',    // Albania
+            '+213': 'USD'     // Algeria
+        };
+
+        // Verify OTP and save phone
+        document.getElementById('verifyPhoneOtpBtn').addEventListener('click', async () => {
+            const otpCode = document.getElementById('phoneOtpInput').value.trim();
+
+            if (!otpCode || otpCode.length !== 6) {
+                showNotification('Please enter a valid 6-digit OTP', 'error');
+                return;
+            }
+
+            const button = document.getElementById('verifyPhoneOtpBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying...';
+
+            try {
+                // Verify OTP with backend
+                const response = await fetch(`${API_BASE}/auth/verify-phone`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        phone: pendingPhoneNumber,
+                        code: otpCode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    showNotification(data.error || 'Invalid OTP. Please try again.', 'error');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>Verify Phone';
+                    return;
+                }
+
+                // Save phone number after successful verification
+                user.phone = pendingPhoneNumber;
+                localStorage.setItem('user', JSON.stringify(user));
+                document.getElementById('phone').textContent = pendingPhoneNumber || 'Not verified';
+                document.getElementById('phoneVerifiedBadge').style.display = 'inline-block';
+                document.getElementById('verifyPhoneBtn').style.display = 'none';
+                document.getElementById('changePhoneNumberBtn').style.display = 'inline-block';
+                document.getElementById('phoneHelpText').innerHTML = '<i class="fas fa-check-circle me-1" style="color: #1cc88a;"></i>Phone verified successfully';
+
+                // Update Security Settings section
+                document.getElementById('currentPhone').textContent = pendingPhoneNumber;
+                document.getElementById('phoneVerifiedBadgeSecurity').style.display = 'inline-block';
+                document.getElementById('changePhoneBtnText').textContent = 'Change Phone';
+
+                // Close modal first
+                const modal = bootstrap.Modal.getInstance(document.getElementById('phoneVerificationModal'));
+                modal.hide();
+
+                // Auto-suggest currency based on country code (optional)
+                const countryCode = document.getElementById('countrySelect').value;
+                const suggestedCurrency = countryToCurrency[countryCode];
+
+                if (suggestedCurrency && suggestedCurrency !== user.preferredCurrency) {
+                    const oldCurrency = user.preferredCurrency || 'INR';
+                    const newCurrency = suggestedCurrency;
+
+                    // Currency names mapping (only for the 6 main currencies)
+                    const currencyNames = {
+                        'INR': 'Indian Rupee (?)',
+                        'USD': 'US Dollar ($)',
+                        'EUR': 'Euro (&euro;)',
+                        'GBP': 'British Pound (&pound;)',
+                        'JPY': 'Japanese Yen (&yen;)',
+                        'AUD': 'Australian Dollar (A$)'
+                    };
+
+                    const countryName = document.getElementById('countrySelect').selectedOptions[0].text.split('(')[0].trim();
+
+                    // Ask user if they want to change currency (optional, user can decline)
+                    setTimeout(() => {
+                        const changeCurrency = confirm(
+                            `? Phone Verified!\n\n` +
+                            `?? Currency Suggestion:\n\n` +
+                            `Based on ${countryName}, we suggest:\n` +
+                            `${currencyNames[newCurrency] || newCurrency}\n\n` +
+                            `Current: ${currencyNames[oldCurrency] || oldCurrency}\n\n` +
+                            `Would you like to switch?\n` +
+                            `(Amounts will be auto-converted)\n\n` +
+                            `You can always change this later in settings.`
+                        );
+
+                        if (changeCurrency) {
+                            // Only convert if user agrees
+                            document.getElementById('currency').value = newCurrency;
+                            user.preferredCurrency = newCurrency;
+                            localStorage.setItem('user', JSON.stringify(user));
+
+                            showNotification(`Currency changed to ${newCurrency}! You can change it anytime.`, 'success');
+                        } else {
+                            showNotification('Phone verified! Currency unchanged.', 'success');
+                        }
+                    }, 500);
+                } else {
+                    showNotification('Phone number verified successfully!', 'success');
+                }
+
+            } catch (error) {
+                console.error('Verify phone error:', error);
+                showNotification('Failed to verify phone. Please try again.', 'error');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-check me-2"></i>Verify Phone';
+            }
+        });
+
+        // Go back to change phone number
+        document.getElementById('changePhoneBtn').addEventListener('click', () => {
+            document.getElementById('phoneStep1').style.display = 'block';
+            document.getElementById('phoneStep2').style.display = 'none';
+
+            // Try to restore the country code and number separately
+            if (pendingPhoneNumber) {
+                // Find the country code in the number
+                const codes = ['+93', '+355', '+213', '+1', '+44', '+91', '+86', '+81', '+82', '+65',
+                    '+60', '+66', '+84', '+62', '+63', '+880', '+92', '+94', '+977', '+61',
+                    '+64', '+49', '+33', '+39', '+34', '+971', '+966', '+27', '+234', '+254',
+                    '+20', '+55', '+52', '+54', '+56', '+57', '+7', '+90'];
+
+                let foundCode = '+91';
+                let number = pendingPhoneNumber;
+
+                for (const code of codes) {
+                    if (pendingPhoneNumber.startsWith(code)) {
+                        foundCode = code;
+                        number = pendingPhoneNumber.substring(code.length);
+                        break;
+                    }
+                }
+
+                document.getElementById('countrySelect').value = foundCode;
+                document.getElementById('phoneNumberInput').value = number;
+                updatePhonePreview();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Page loaded silently - no notification needed
+        });
+    </script>
+    <script src="js/currency.js"></script>
+    <script src="js/notifications-manager.js"></script>
+    <script src="js/notification-panel.js" defer></script>
+
+    <!-- Multi-Device Currency Sync -->
+    <script>
+        // Track current currency to detect changes
+        let currentCurrency = null;
+
+        // Function to check and sync currency from server
+        async function syncCurrencyFromServer() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(`${API_BASE}/auth/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const serverCurrency = data.preferred_currency || 'USD';
+
+                    // Check if currency changed on another device
+                    if (currentCurrency && currentCurrency !== serverCurrency) {
+                        console.log(`?? Currency synced: ${currentCurrency} ? ${serverCurrency}`);
+
+                        // Update localStorage
+                        const user = JSON.parse(localStorage.getItem('user'));
+                        user.preferred_currency = serverCurrency;
+                        localStorage.setItem('user', JSON.stringify(user));
+
+                        currentCurrency = serverCurrency;
+
+                        // Update UI
+                        const currencySelect = document.getElementById('currency');
+                        if (currencySelect) currencySelect.value = serverCurrency;
+
+                        // Notify and reload
+                        if (typeof showNotification === 'function') {
+                            showNotification(`Currency synced from another device: ${serverCurrency}`, 'info');
+                        }
+                        setTimeout(() => location.reload(), 1500);
+                    }
+
+                    if (!currentCurrency) currentCurrency = serverCurrency;
+                }
+            } catch (error) {
+                console.error('Currency sync error:', error);
+            }
+        }
+
+        // Sync on window focus
+        window.addEventListener('focus', syncCurrencyFromServer);
+
+        // Periodic sync every 30 seconds when visible
+        setInterval(() => {
+            if (!document.hidden) syncCurrencyFromServer();
+        }, 30000);
+
+        // Sync on visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) syncCurrencyFromServer();
+        });
+
+        // Initial sync
+        syncCurrencyFromServer();
+    </script>
+
+    <script>
+        // Show page instantly after sidebar scripts load (prevents flash, no delay)
+        setTimeout(() => document.body.classList.add('ready'), 0);
+    </script>
+
+    <script src="js/topnav.js" defer></script>
+    <script src="js/navigation-init.js" defer></script>
+    <script src="js/sw-engine.js" defer></script>
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+</body>
+
+</html>

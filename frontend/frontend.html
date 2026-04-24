@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>SplitWise</title>
+    <!-- Favicon - High Quality Wallet Logo -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* SplitWise - Enhanced Stylesheet */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #2c3e50;
+            --body-color: #ffffff;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+            --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ── Navbar brand – always fully visible ── */
+        .navbar-brand .brand-text {
+            display: inline-block;
+            opacity: 1;
+            vertical-align: middle;
+        }
+
+        /* ── Active nav-link indicator (desktop) — box only, no underline ── */
+        .navbar-nav .nav-link.nav-active {
+            opacity: 1 !important;
+            background: rgba(255, 255, 255, 0.18) !important;
+            transform: translateY(0) !important;
+            box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.55), 0 4px 16px rgba(255, 255, 255, 0.12) !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: #667eea; /* matches navbar — top rubber-band invisible */
+            overscroll-behavior-x: none;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--body-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-color);
+            overflow-x: hidden;
+            overscroll-behavior-x: none;
+        }
+
+        /* Desktop/trackpad: block ALL rubber-band (JS touch can't reach trackpad) */
+        @media (hover: hover) and (pointer: fine) {
+          html, body { overscroll-behavior: none; }
+        }
+
+
+
+        /* Enhanced Navbar */
+        .navbar {
+            background: var(--navbar-bg);
+            box-shadow: var(--shadow);
+            transition: all 0.4s ease;
+            padding: 1rem 0;
+            backdrop-filter: blur(10px);
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 800;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand i {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-brand:hover i {
+            transform: rotate(15deg);
+        }
+
+        /* Desktop Navigation - Original Style */
+        @media (min-width: 992px) {
+            .nav-link {
+                color: white !important;
+                opacity: 0.9;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                font-weight: 600;
+                margin: 0 0.5rem;
+                padding: 0.5rem 1rem !important;
+                border-radius: 25px;
+            }
+
+            .nav-link:hover {
+                opacity: 1;
+                transform: translateY(-2px);
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+            }
+
+            .navbar-collapse {
+                background: transparent !important;
+                backdrop-filter: none !important;
+                border-radius: 0 !important;
+                margin-top: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                animation: none !important;
+                display: flex !important;
+                flex: 1 !important;
+                align-items: center !important;
+                /* Let absolute-centered group sit on top */
+                position: static !important;
+            }
+
+            /* ── Navbar container: anchor for absolute centering ── */
+            .navbar .container {
+                position: relative !important;
+            }
+
+            /* ── Center links: always at navbar horizontal midpoint ── */
+            .nav-center-links {
+                position: absolute !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 0 !important;
+                margin: 0 !important;
+                list-style: none !important;
+                padding: 0 !important;
+            }
+
+            /* ── Auth links: stay at the right end ── */
+            .nav-auth-links {
+                margin-left: auto !important;
+            }
+
+            .navbar-nav {
+                gap: 0 !important;
+                width: auto !important;
+            }
+
+            .navbar-nav .nav-item {
+                width: auto !important;
+            }
+
+            .navbar-nav .nav-link {
+                width: auto !important;
+                padding: 0.5rem 1.1rem !important;
+                margin: 0 0.3rem !important;
+                border-radius: 30px !important;
+                font-size: 0.97rem !important;
+                font-weight: 600 !important;
+                text-align: center !important;
+                position: relative !important;
+                /* needed for ::after */
+                transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                background: transparent !important;
+                color: rgba(255, 255, 255, 0.88) !important;
+                opacity: 1 !important;
+                display: inline-flex !important;
+                /* inline-flex keeps ::after working */
+                align-items: center !important;
+                gap: 0 !important;
+                letter-spacing: 0.1px !important;
+            }
+
+            /* Suppress Bootstrap's ::before shimmer on these nav links */
+            .navbar-nav .nav-link::before {
+                display: none !important;
+            }
+
+            /* Hover: subtle glass lift – NO underline on hover */
+            .navbar-nav .nav-link:hover:not(.nav-login):not(.nav-signup) {
+                background: rgba(255, 255, 255, 0.12) !important;
+                color: white !important;
+                transform: translateY(-2px) !important;
+                box-shadow: none !important;
+            }
+
+            .navbar-nav .nav-link.btn {
+                justify-content: center !important;
+                background: transparent !important;
+                border: 2px solid rgba(255, 255, 255, 0.5) !important;
+                margin-top: 0 !important;
+                font-weight: 600 !important;
+                letter-spacing: normal !important;
+            }
+
+            .navbar-nav .nav-link.btn:hover,
+            .navbar-nav .nav-link.btn:active {
+                background: white !important;
+                color: var(--primary-color) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+                border-color: white !important;
+            }
+
+            .navbar-toggler {
+                display: none !important;
+            }
+
+            /* Hide mobile drawer-close button on desktop */
+            .drawer-close-btn {
+                display: none !important;
+            }
+
+            /* ── Login button: ghost/outline pill ── */
+            .navbar-nav .nav-link.nav-login {
+                border: 2px solid rgba(255, 255, 255, 0.75) !important;
+                border-radius: 50px !important;
+                padding: 0.4rem 1.25rem !important;
+                color: white !important;
+                background: transparent !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.3px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .navbar-nav .nav-link.nav-login:hover {
+                background: rgba(255, 255, 255, 0.18) !important;
+                border-color: white !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* ── Sign Up button: solid glowing pill ── */
+            .navbar-nav .nav-link.nav-signup {
+                background: white !important;
+                color: #764ba2 !important;
+                -webkit-text-fill-color: #764ba2 !important;
+                border-radius: 50px !important;
+                padding: 0.4rem 1.4rem !important;
+                font-weight: 800 !important;
+                border: none !important;
+                box-shadow: 0 4px 18px rgba(255, 255, 255, 0.35) !important;
+                letter-spacing: 0.3px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .navbar-nav .nav-link.nav-signup:hover {
+                background: #f0e6ff !important;
+                color: #5a1a9e !important;
+                -webkit-text-fill-color: #5a1a9e !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 25px rgba(255, 255, 255, 0.5) !important;
+            }
+        }
+
+
+        /* ================================================
+           MOBILE NAVIGATION — show only Login/Sign Up in header
+           ================================================ */
+        @media (max-width: 991px) {
+
+            .navbar-toggler,
+            .navbar-collapse {
+                display: none !important;
+                pointer-events: none !important;
+            }
+
+            body::before {
+                display: none !important;
+            }
+
+            /* Brand left, auth buttons right */
+            .navbar .container {
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+
+            /* Mobile auth button group */
+            .mobile-auth-btns {
+                display: flex !important;
+                align-items: center;
+                gap: 0.45rem;
+            }
+
+            .mobile-auth-btns .mob-login {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.42rem 1rem;
+                border-radius: 50px;
+                border: 1.5px solid rgba(255, 255, 255, 0.7);
+                background: transparent;
+                color: white;
+                font-size: 0.85rem;
+                font-weight: 700;
+                text-decoration: none;
+                transition: all 0.25s ease;
+                white-space: nowrap;
+            }
+
+            .mobile-auth-btns .mob-login:hover {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: white;
+            }
+
+            .mobile-auth-btns .mob-signup {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.42rem 1rem;
+                border-radius: 50px;
+                background: white;
+                color: #764ba2 !important;
+                -webkit-text-fill-color: #764ba2 !important;
+                font-size: 0.85rem;
+                font-weight: 800;
+                text-decoration: none;
+                border: none;
+                box-shadow: 0 3px 12px rgba(255, 255, 255, 0.3);
+                transition: all 0.25s ease;
+                white-space: nowrap;
+            }
+
+            .mobile-auth-btns .mob-signup:hover {
+                background: #f0e6ff;
+                color: #5a1a9e;
+                box-shadow: 0 5px 18px rgba(255, 255, 255, 0.45);
+            }
+        }
+
+        /* Hide mobile auth group on desktop */
+        @media (min-width: 992px) {
+            .mobile-auth-btns {
+                display: none !important;
+            }
+        }
+
+        /* Hero Section with Enhanced Animations */
+        .hero-section {
+            background: var(--navbar-bg);
+            color: white;
+            padding: 8rem 0 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="rgba(255,255,255,0.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            margin-top: 0 !important;
+            /* ROOT CAUSE FIX: Ensure no top margin */
+            padding-top: 0 !important;
+            /* ROOT CAUSE FIX: Ensure no top padding */
+            animation: slideInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: slideInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Cards */
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--navbar-bg);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2.5rem;
+            height: 100%;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            background: var(--navbar-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Enhanced Buttons */
+        .btn {
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Learn More — keep outline-light style, never go white */
+        .btn-outline-light {
+            border: 2px solid rgba(255, 255, 255, 0.85) !important;
+            color: white !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-light:hover,
+        .btn-outline-light:focus,
+        .btn-outline-light:active {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: white !important;
+            border-color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .btn-primary {
+            background: var(--navbar-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            filter: brightness(1.1);
+        }
+
+        /* Enhanced Contact Section */
+        .contact-section {
+            background: var(--light-color);
+            padding: 5rem 0;
+        }
+
+        .contact-form {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-control {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 1rem 1.5rem;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 5rem 0;
+            background: var(--body-color);
+        }
+
+        .about-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            background: var(--navbar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+
+        /* Footer styles */
+        .footer {
+            background: var(--light-color);
+            padding: 3rem 0 2rem;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: inherit; /* controlled by Bootstrap responsive classes */
+        }
+
+        .social-row {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 1.4rem;
+            text-decoration: none !important;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+            background: var(--secondary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .hover-link {
+            position: relative;
+            transition: all 0.3s ease;
+            padding-left: 0;
+        }
+
+        .hover-link:hover {
+            color: var(--primary-color) !important;
+            padding-left: 5px;
+        }
+
+        /* Responsive Styles for Mobile/Tablet */
+        @media (max-width: 1024px) {
+            .navbar {
+                padding: clamp(0.5rem, 1.5vw, 0.75rem) 0 !important;
+                position: fixed !important;
+                z-index: 1060 !important;
+                margin-bottom: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+            }
+
+            .navbar-brand {
+                font-size: clamp(1.1rem, 4vw, 1.5rem);
+                z-index: 1061 !important;
+                position: relative !important;
+            }
+
+            .navbar-brand i {
+                font-size: clamp(1.2rem, 3.5vw, 1.5rem) !important;
+            }
+
+            /* Ensure header stays above backdrop */
+            .navbar .container {
+                position: relative !important;
+                z-index: 1061 !important;
+            }
+
+            .nav-link {
+                font-size: clamp(0.85rem, 2.5vw, 1rem);
+                padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.75rem, 2vw, 1rem) !important;
+                margin: 0 clamp(0.25rem, 1vw, 0.5rem);
+            }
+
+            /* Keeps hero content below the fixed navbar */
+            .hero-section {
+                padding-top: 5rem !important;
+                /* clears fixed navbar on tablet */
+                padding-bottom: clamp(3rem, 6vw, 4.5rem);
+            }
+
+            /* Mobile hero: center text and stack buttons */
+            @media (max-width: 991px) {
+                .hero-section {
+                    padding: 5rem 0 clamp(2.5rem, 6vw, 4rem) !important;
+                    /* 5rem top clears fixed navbar */
+                    text-align: center;
+                }
+
+                .hero-title {
+                    font-size: clamp(2rem, 8vw, 3rem);
+                }
+
+                .hero-subtitle {
+                    font-size: clamp(1rem, 3.5vw, 1.2rem);
+                    max-width: 500px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+
+                .hero-buttons {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.75rem;
+                    justify-content: center;
+                }
+
+                .hero-buttons .btn {
+                    min-width: 160px;
+                    margin: 0 !important;
+                }
+            }
+
+            .hero-section .row {
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+            }
+
+            .hero-section .col-lg-6 {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+            }
+
+            .hero-section h1 {
+                font-size: clamp(2rem, 8vw, 3.5rem);
+            }
+
+            .hero-section p {
+                font-size: clamp(1rem, 3vw, 1.25rem);
+            }
+
+            .feature-card {
+                padding: clamp(1.5rem, 4vw, 2rem);
+                margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            }
+
+            .feature-card h4 {
+                font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+            }
+
+            .feature-card p {
+                font-size: clamp(0.9rem, 2.5vw, 1rem);
+            }
+
+            .btn-lg {
+                padding: clamp(0.75rem, 2.5vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+                font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+                min-height: clamp(44px, 8vw, 48px);
+            }
+
+            .social-row {
+                flex-wrap: wrap !important;
+                gap: clamp(0.5rem, 2vw, 0.75rem) !important;
+                justify-content: center !important;
+            }
+
+            .social-links a {
+                width: clamp(40px, 10vw, 50px);
+                height: clamp(40px, 10vw, 50px);
+                font-size: clamp(1.1rem, 3vw, 1.4rem);
+            }
+
+            footer .row {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            footer .col-lg-3,
+            footer .col-lg-6,
+            footer .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            }
+
+            footer .text-md-end {
+                text-align: center !important;
+            }
+
+
+
+            .notification-container {
+                top: clamp(60px, 10vw, 80px);
+                right: clamp(10px, 3vw, 20px);
+                max-width: clamp(280px, 90vw, 400px);
+            }
+        }
+
+
+        @media (max-width: 767px) {
+            .navbar {
+                padding: clamp(0.5rem, 1.5vw, 0.75rem) 0 !important;
+                margin-bottom: 0 !important;
+            }
+
+            .navbar-brand {
+                font-size: clamp(1rem, 4.5vw, 1.3rem) !important;
+            }
+
+            .navbar-brand .brand-text {
+                font-size: clamp(0.95rem, 4vw, 1.2rem) !important;
+            }
+
+            .navbar-brand i {
+                font-size: clamp(1.1rem, 4vw, 1.4rem) !important;
+            }
+
+            /* Mobile-specific navigation panel adjustments */
+            .navbar-collapse {
+                margin-left: clamp(0.75rem, 3vw, 1.25rem) !important;
+                margin-right: clamp(0.75rem, 3vw, 1.25rem) !important;
+                max-height: calc(100vh - clamp(140px, 20vw, 160px)) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                border-radius: 20px !important;
+                margin-top: clamp(0.75rem, 2vw, 1rem) !important;
+            }
+
+            /* Enhanced glass effect for mobile */
+            .navbar-collapse::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+                border-radius: 20px;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            .navbar-nav {
+                gap: clamp(0.4rem, 1.5vw, 0.6rem) !important;
+            }
+
+            .navbar-nav .nav-link {
+                padding: clamp(0.875rem, 3vw, 1rem) clamp(1rem, 4vw, 1.5rem) !important;
+                font-size: clamp(0.95rem, 3vw, 1.05rem) !important;
+                min-height: clamp(46px, 11vw, 50px) !important;
+                border-radius: 12px !important;
+            }
+
+            .navbar-nav .nav-link::before {
+                width: 3px !important;
+            }
+
+            .navbar-nav .nav-link:hover,
+            .navbar-nav .nav-link.active {
+                transform: translateX(6px) !important;
+            }
+
+            .navbar-nav .nav-link.btn {
+                margin-top: clamp(0.5rem, 2vw, 0.75rem) !important;
+                padding: clamp(0.875rem, 3vw, 1rem) !important;
+                font-size: clamp(0.95rem, 3vw, 1.05rem) !important;
+            }
+
+            .navbar-toggler-icon::before,
+            .navbar-toggler-icon::after,
+            .navbar-toggler-icon span {
+                height: 2.5px !important;
+            }
+
+            /* Keeps hero content below the fixed navbar */
+            .hero-section {
+                padding-top: 5rem !important;
+                /* must match/exceed navbar height */
+                padding-bottom: clamp(2.5rem, 6vw, 4rem);
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            /* ROOT CAUSE FIX: Remove extra spacing from container and row in hero section */
+            .hero-section .container {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+                padding-left: clamp(1rem, 3vw, 1.5rem) !important;
+                padding-right: clamp(1rem, 3vw, 1.5rem) !important;
+            }
+
+            .hero-section .row {
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+                --bs-gutter-x: 0 !important;
+                --bs-gutter-y: 0 !important;
+            }
+
+            .hero-section .col-lg-6 {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            /* ROOT CAUSE FIX: Ensure hero title has no top margin to minimize gap */
+            .hero-section .hero-title {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+
+            /* ROOT CAUSE FIX: Ensure hero content has no extra spacing */
+            .hero-content {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+
+            .container {
+                padding-left: clamp(1rem, 3vw, 1.5rem);
+                padding-right: clamp(1rem, 3vw, 1.5rem);
+            }
+
+            .feature-card {
+                margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            }
+
+            /* ROOT CAUSE FIX: Notifications should appear on right side on mobile like desktop */
+            .notification-container {
+                top: 10px;
+                right: 10px;
+                left: auto !important;
+                max-width: calc(100% - 20px);
+                width: auto;
+                min-width: 280px;
+            }
+        }
+
+        /* Notification System */
+        .notification-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 1rem 1.5rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.hide {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .notification-success {
+            border-left-color: var(--success-color);
+        }
+
+        .notification-error {
+            border-left-color: var(--danger-color);
+        }
+
+        .notification-warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification-info {
+            border-left-color: var(--info-color);
+        }
+
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Fade in animation for sections */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/design-system.css">
+
+    <!-- landing-page-overrides: protect white text in hero, theme social icons -->
+    <style id="lp-overrides">
+        /* ── Hero section: ALL text must be white ── */
+        .hero-section,
+        .hero-section h1,
+        .hero-section h2,
+        .hero-section h3,
+        .hero-section p,
+        .hero-section a,
+        .hero-section span,
+        .hero-title,
+        .hero-subtitle {
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+        }
+
+        /* Hero graphic — visible gradient icon */
+        .hero-image i {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(0, 212, 170, 0.22) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 1 !important;
+            font-size: 10rem !important;
+            filter: drop-shadow(0 0 60px rgba(0, 212, 170, 0.3));
+        }
+
+        /* ── Navbar: always white text (exclude mobile auth buttons) ── */
+        .navbar .nav-link,
+        .navbar .navbar-brand,
+        .navbar .brand-text {
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+        }
+
+        /* Mobile Sign Up keeps purple text on white bg */
+        .navbar .mob-signup,
+        .navbar .mob-signup * {
+            color: #764ba2 !important;
+            -webkit-text-fill-color: #764ba2 !important;
+        }
+
+        .navbar .mob-login,
+        .navbar .mob-login * {
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+        }
+
+        /* ── Feature icons: indigo–teal gradient ── */
+        .feature-icon {
+            background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            animation: none !important;
+            /* remove unscheduled pulse */
+        }
+
+        /* Feature card headings */
+        .feature-card h5,
+        .feature-card h4 {
+            color: #1a1233 !important;
+            -webkit-text-fill-color: #1a1233 !important;
+            font-weight: 700 !important;
+        }
+
+        /* ── Section headings (light bg sections) ── */
+        section:not(.hero-section) h1,
+        section:not(.hero-section) h2,
+        section:not(.hero-section) h3,
+        section:not(.hero-section) h4,
+        section:not(.hero-section) h5 {
+            color: #1a1233 !important;
+            -webkit-text-fill-color: #1a1233 !important;
+        }
+
+        /* ── Social icons: gradient circles + white icons ── */
+        .social-links a {
+            background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%) !important;
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35) !important;
+        }
+
+        .social-links a:hover {
+            background: linear-gradient(135deg, #5A52D5 0%, #00b893 100%) !important;
+            transform: translateY(-4px) scale(1.1) !important;
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.45) !important;
+        }
+
+        .social-links a i {
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            background: #f8f9fc !important;
+        }
+
+        .footer h5 {
+            color: #1a1233 !important;
+            -webkit-text-fill-color: #1a1233 !important;
+        }
+
+        /* ── Profile img in about section ── */
+        .profile-img {
+            background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%) !important;
+        }
+
+        /* ── Card top bar — use theme gradient ── */
+        .card::before {
+            background: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%) !important;
+        }
+
+        /* ── About card icon ── */
+        .about-card>i,
+        .about-card .profile-img i {
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+        }
+
+        /* ── Learn More button: never turns white ── */
+        .hero-section .btn-outline-light,
+        a.btn-outline-light {
+            background: transparent !important;
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .hero-section .btn-outline-light:hover,
+        .hero-section .btn-outline-light:focus,
+        a.btn-outline-light:hover,
+        a.btn-outline-light:focus {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+            border-color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* ── btn-outline-primary (non-hero pages) ── */
+        .btn-outline-primary {
+            border: 2px solid #6C63FF !important;
+            color: #6C63FF !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #6C63FF, #8B85FF) !important;
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+            border-color: transparent !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-wallet me-2"></i><span class="brand-text">SplitWise</span>
+            </a>
+
+            <!-- Mobile-only auth buttons (hidden on desktop) -->
+            <div class="mobile-auth-btns d-lg-none ms-auto">
+                <a href="login.html" class="mob-login">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="signup.html" class="mob-signup">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <button class="drawer-close-btn"
+                    onclick="document.getElementById('navbarNav').classList.remove('show'); document.querySelector('.navbar-toggler').setAttribute('aria-expanded','false'); document.body.classList.remove('menu-open');"
+                    aria-label="Close menu">
+                    <i class="fas fa-times"></i>
+                </button>
+                <!-- Center nav links -->
+                <ul class="navbar-nav mx-auto nav-center-links">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+                <!-- Right auth buttons -->
+                <ul class="navbar-nav nav-auth-links ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link nav-login" href="login.html"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-signup" href="signup.html"><i class="fas fa-user-plus me-1"></i>Sign
+                            Up</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title">SplitWise</h1>
+                        <p class="hero-subtitle">Take control of your finances with our intelligent expense tracking
+                            system designed for everyone.</p>
+                        <div class="hero-buttons">
+                            <a href="signup.html" class="btn btn-primary btn-lg me-3">Get Started Free</a>
+                            <a href="#features" class="btn btn-outline-light btn-lg">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero-image text-center">
+                        <i class="fas fa-chart-line" style="font-size: 15rem; opacity: 0.1;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="display-4 fw-bold mb-3">Powerful Features</h2>
+                    <p class="lead text-muted">Everything you need to manage your expenses effectively</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card fade-in">
+                        <i class="fas fa-chart-pie feature-icon"></i>
+                        <h4>Expense Tracking</h4>
+                        <p class="text-muted">Track your daily expenses with detailed categorization and smart insights.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card fade-in">
+                        <i class="fas fa-users feature-icon"></i>
+                        <h4>Group Management</h4>
+                        <p class="text-muted">Split expenses with friends and roommates effortlessly.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card fade-in">
+                        <i class="fas fa-chart-bar feature-icon"></i>
+                        <h4>Smart Reports</h4>
+                        <p class="text-muted">Get detailed reports and analytics to understand your spending patterns.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card fade-in">
+                        <i class="fas fa-bell feature-icon"></i>
+                        <h4>Smart Notifications</h4>
+                        <p class="text-muted">Stay on top of your budget with intelligent alerts and reminders.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card fade-in">
+                        <i class="fas fa-mobile-alt feature-icon"></i>
+                        <h4>Mobile Friendly</h4>
+                        <p class="text-muted">Access your expenses anywhere with our responsive design.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card fade-in">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <h4>Secure & Private</h4>
+                        <p class="text-muted">Your financial data is protected with bank-level security.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="about-card fade-in">
+                        <div class="profile-img">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h2 class="mb-4">About the Developer</h2>
+                        <p class="lead mb-4">Hi! I'm Ashish, a passionate developer who created SplitWise to help people
+                            take control of their finances.</p>
+                        <p class="mb-4">I understand the challenges of managing expenses and tracking where money goes.
+                            SplitWise is designed for everyone — offering intuitive features that make expense tracking
+                            simple and effective.</p>
+                        <div class="contact-info">
+                            <h5 class="mb-3">Get in Touch</h5>
+                            <p><i class="fas fa-envelope me-2"></i> support@splitwise.space</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="display-4 fw-bold mb-3">Get in Touch</h2>
+                    <p class="lead text-muted">Have questions? We'd love to hear from you!</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="contact-form fade-in">
+                        <form id="contactForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="subject" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea class="form-control" id="message" rows="5" required></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="button" id="guestContactBtn" class="btn btn-primary btn-lg"
+                                    onclick="openTicketModal()">
+                                    <i class="fas fa-paper-plane me-2" id="guestBtnIcon"></i>
+                                    <span id="guestBtnText">Send Message</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="fw-bold mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#features"
+                                class="text-muted text-decoration-none hover-link">Features</a></li>
+                        <li class="mb-2"><a href="#about" class="text-muted text-decoration-none hover-link">About</a>
+                        </li>
+                        <li class="mb-2"><a href="#contact"
+                                class="text-muted text-decoration-none hover-link">Contact</a></li>
+                        <li class="mb-2"><a href="login.html"
+                                class="text-muted text-decoration-none hover-link">Login</a></li>
+                    </ul>
+                </div>
+                <!-- Staff Portal Column -->
+                <div class="col-lg-4 mb-4 text-center">
+                    <h5 class="fw-bold mb-3">Staff Portal</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="support-portal.html" class="text-muted text-decoration-none hover-link">
+                                <i class="fas fa-headset me-1" style="font-size:10px;color:#667eea;opacity:.8"></i>
+                                Support Panel
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="admin-login.html" class="text-muted text-decoration-none hover-link">
+                                <i class="fas fa-shield-halved me-1"
+                                    style="font-size:10px;color:#764ba2;opacity:.8"></i>
+                                Admin Login
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="support-login.html" class="text-muted text-decoration-none hover-link">
+                                <i class="fas fa-user-tie me-1" style="font-size:10px;color:#667eea;opacity:.8"></i>
+                                Agent Login
+                            </a>
+                        </li>
+                        <li class="mb-0 mt-3" style="padding-top:8px;border-top:1px solid rgba(0,0,0,.07)">
+                            <span
+                                style="font-size:10.5px;color:#b0aac8;font-weight:600;display:inline-flex;align-items:center;gap:5px">
+                                <i class="fas fa-lock" style="font-size:9px"></i>
+                                Authorized personnel only
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 mb-4 text-center text-lg-end">
+                    <div class="d-inline-flex flex-column align-items-center align-items-lg-start">
+                        <h5 class="fw-bold mb-3">Connect With Us</h5>
+                        <div class="social-links align-items-center align-items-lg-start">
+                        <div class="social-row">
+                            <a href="mailto:support@splitwise.space" title="Email us">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                            <a href="https://www.facebook.com/NotAshish7" title="Facebook" target="_blank">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://x.com/NotAshish7" title="Twitter / X" target="_blank" rel="noopener">
+                                <i class="fab fa-x-twitter"></i>
+                            </a>
+                        </div>
+                        <div class="social-row">
+                            <a href="https://github.com/NotAshish7" title="GitHub" target="_blank" rel="noopener">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://linkedin.com" title="LinkedIn">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="https://www.instagram.com/not_ashish7" title="Instagram" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0"><span id="__copy_sym" style="cursor:default" title="">&copy;</span> 2026
+                        SplitWise. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="javascript:void(0)" class="text-muted text-decoration-none me-3" onclick="showTermsModal()">Terms &
+                        Conditions</a>
+                    <a href="javascript:void(0)" class="text-muted text-decoration-none" onclick="showPrivacyModal()">Privacy Policy</a>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div id="ticketModal" aria-modal="true" role="dialog" aria-label="Create Support Ticket" style="display:none;position:fixed;inset:0;z-index:9990;
+                align-items:center;justify-content:center;padding:20px 16px;">
+                    <!-- Backdrop -->
+                    <div id="tm_backdrop" onclick="closeTicketModal()" style="position:absolute;inset:0;background:rgba(15,10,40,0.6);
+                  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);"></div>
+
+                    <!-- Card -->
+                    <div id="tm_card" style="position:relative;width:100%;max-width:540px;border-radius:28px;
+                  overflow:hidden;box-shadow:0 40px 100px rgba(102,126,234,0.45),
+                                             0 0 0 1px rgba(255,255,255,0.12);
+                  max-height:92vh;overflow-y:auto;will-change:transform,opacity;
+                  scrollbar-width:none;-ms-overflow-style:none;">
+
+                        <!-- ── HEADER ── -->
+                        <div style="background:linear-gradient(140deg,#667eea 0%,#764ba2 55%,#9b59b6 100%);
+                    padding:30px 28px 24px;text-align:center;position:relative;
+                    overflow:hidden;">
+                            <!-- decorative blobs -->
+                            <div style="position:absolute;top:-40px;left:-40px;width:140px;height:140px;
+                      background:rgba(255,255,255,0.06);border-radius:50%;pointer-events:none;"></div>
+                            <div style="position:absolute;bottom:-30px;right:-30px;width:110px;height:110px;
+                      background:rgba(255,255,255,0.06);border-radius:50%;pointer-events:none;"></div>
+
+                            <!-- Close button -->
+                            <button onclick="closeTicketModal()" id="tm_close_btn" aria-label="Close" style="position:absolute;top:14px;right:14px;
+                         background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);
+                         border-radius:50px;padding:5px 13px 5px 10px;
+                         color:#fff;font-size:13px;font-weight:700;cursor:pointer;
+                         display:flex;align-items:center;gap:5px;
+                         font-family:'Nunito',sans-serif;letter-spacing:0.2px;
+                         transition:all 0.2s ease;backdrop-filter:blur(6px);">
+                                <i class="fas fa-times" style="font-size:11px;"></i> Close
+                            </button>
+
+                            <!-- Icon: headset with glow ring (matching support theme) -->
+                            <div style="position:relative;display:inline-block;margin-bottom:14px;">
+                                <div style="width:68px;height:68px;background:rgba(255,255,255,0.18);
+                        border-radius:20px;border:2px solid rgba(255,255,255,0.35);
+                        margin:0 auto;display:flex;align-items:center;justify-content:center;
+                        position:relative;z-index:1;box-shadow:0 8px 28px rgba(0,0,0,0.2);">
+                                    <i class="fas fa-headset" style="font-size:28px;color:#fff;"></i>
+                                </div>
+                                <div style="position:absolute;inset:-5px;border-radius:25px;
+                        border:1.5px solid rgba(255,255,255,0.18);pointer-events:none;"></div>
+                            </div>
+
+                            <h2 style="margin:0 0 5px;color:#fff;font-size:21px;font-weight:900;
+                     font-family:'Nunito',sans-serif;letter-spacing:-0.3px;line-height:1.2;">
+                                Create a Support Ticket
+                            </h2>
+                            <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:2.5px;
+                    text-transform:uppercase;
+                    background:linear-gradient(90deg,rgba(255,255,255,0.95),rgba(200,190,255,0.95));
+                    -webkit-background-clip:text;background-clip:text;
+                    -webkit-text-fill-color:transparent;">
+                                Tracked &amp; Resolved Fast
+                            </p>
+                        </div>
+
+                        <!-- ── BODY ── -->
+                        <div style="background:#fff;padding:28px 28px 24px;">
+
+                            <!-- Step indicator -->
+                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:22px;">
+                                <div style="flex:1;height:3px;border-radius:3px;
+                        background:linear-gradient(90deg,#667eea,#764ba2);"></div>
+                                <span style="font-size:11px;font-weight:800;color:#667eea;
+                         letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">
+                                    Fill in your details
+                                </span>
+                                <div style="flex:1;height:3px;border-radius:3px;background:#ece9ff;"></div>
+                            </div>
+
+                            <!-- Name + Email grid -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;"
+                                id="tm_grid_row">
+                                <!-- Name -->
+                                <div>
+                                    <label for="tm_name" style="font-size:11.5px;font-weight:800;color:#64748b;
+                            text-transform:uppercase;letter-spacing:0.9px;
+                            display:flex;align-items:center;gap:5px;margin-bottom:7px;">
+                                        <i class="fas fa-user" style="color:#667eea;font-size:10px;"></i> Your Name
+                                    </label>
+                                    <div style="position:relative;">
+                                        <input id="tm_name" type="text" placeholder="Full name" autocomplete="name"
+                                            style="width:100%;padding:11px 14px 11px 38px;border-radius:12px;
+                              border:1.5px solid #e2e0f8;font-size:14px;
+                              font-family:'Nunito',sans-serif;background:#fafafe;
+                              color:#2c3e50;outline:none;transition:all 0.2s;">
+                                        <i class="fas fa-user" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);
+                          color:#c4bff0;font-size:13px;pointer-events:none;"></i>
+                                    </div>
+                                </div>
+                                <!-- Email -->
+                                <div>
+                                    <label for="tm_email" style="font-size:11.5px;font-weight:800;color:#64748b;
+                            text-transform:uppercase;letter-spacing:0.9px;
+                            display:flex;align-items:center;gap:5px;margin-bottom:7px;">
+                                        <i class="fas fa-envelope" style="color:#667eea;font-size:10px;"></i> Email
+                                    </label>
+                                    <div style="position:relative;">
+                                        <input id="tm_email" type="email" placeholder="Enter your email"
+                                            autocomplete="email" style="width:100%;padding:11px 14px 11px 38px;border-radius:12px;
+                              border:1.5px solid #e2e0f8;font-size:14px;
+                              font-family:'Nunito',sans-serif;background:#fafafe;
+                              color:#2c3e50;outline:none;transition:all 0.2s;">
+                                        <i class="fas fa-envelope" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);
+                          color:#c4bff0;font-size:13px;pointer-events:none;"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subject pills -->
+                            <label style="font-size:11.5px;font-weight:800;color:#64748b;
+                        text-transform:uppercase;letter-spacing:0.9px;
+                        display:flex;align-items:center;gap:5px;margin-bottom:10px;">
+                                <i class="fas fa-tag" style="color:#667eea;font-size:10px;"></i> Category
+                            </label>
+                            <div id="tm_pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+
+                            <!-- Custom subject input -->
+                            <div style="position:relative;margin-bottom:18px;">
+                                <input id="tm_subject_custom" type="text" placeholder="Or type a custom subject…" style="width:100%;padding:11px 14px 11px 38px;border-radius:12px;
+                          border:1.5px solid #e2e0f8;font-size:14px;
+                          font-family:'Nunito',sans-serif;color:#2c3e50;background:#fff;
+                          outline:none;transition:all 0.2s;">
+                                <i class="fas fa-pencil-alt" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);
+                      color:#c4bff0;font-size:12px;pointer-events:none;"></i>
+                            </div>
+
+                            <!-- Message -->
+                            <label for="tm_message" style="font-size:11.5px;font-weight:800;color:#64748b;
+                        text-transform:uppercase;letter-spacing:0.9px;
+                        display:flex;align-items:center;gap:5px;margin-bottom:7px;">
+                                <i class="fas fa-comment-alt" style="color:#667eea;font-size:10px;"></i> Message
+                            </label>
+                            <textarea id="tm_message" rows="4"
+                                placeholder="Describe your issue in detail — the more context, the faster we can help you!"
+                                style="width:100%;padding:12px 14px;border-radius:12px;
+                           border:1.5px solid #e2e0f8;font-size:14px;
+                           font-family:'Nunito',sans-serif;color:#2c3e50;
+                           resize:vertical;min-height:108px;background:#fff;
+                           outline:none;transition:all 0.2s;display:block;
+                           line-height:1.6;"></textarea>
+                            <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                                <span id="tm_char_count"
+                                    style="font-size:11px;color:#adb5bd;font-family:'Nunito',sans-serif;">
+                                    0 / 1000
+                                </span>
+                            </div>
+
+                            <!-- Submit button -->
+                            <button id="tm_submit" onclick="submitTicketModal()" style="margin-top:18px;width:100%;padding:16px;
+                         background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+                         color:#fff;border:none;border-radius:14px;
+                         font-size:15.5px;font-weight:900;font-family:'Nunito',sans-serif;
+                         cursor:pointer;letter-spacing:0.4px;
+                         box-shadow:0 8px 24px rgba(102,126,234,0.42);
+                         transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+                         display:flex;align-items:center;justify-content:center;gap:9px;
+                         position:relative;overflow:hidden;">
+                                <span id="tm_submit_inner" style="display:flex;align-items:center;gap:9px;">
+                                    <i class="fas fa-ticket-alt" style="font-size:15px;"></i>
+                                    Submit Support Ticket
+                                </span>
+                            </button>
+
+                            <!-- Footer note -->
+                            <p style="text-align:center;margin-top:14px;font-size:11.5px;
+                    color:#adb5bd;font-family:'Nunito',sans-serif;">
+                                <i class="fas fa-lock" style="font-size:10px;"></i>
+                                Your data is secure &nbsp;·&nbsp;
+                                Avg response within <strong style="color:#667eea;">24–48 hrs</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Modal Styles -->
+                <style>
+                    /* ── Hidden scrollbar (scroll still works on touch + mouse) ── */
+                    #tm_card::-webkit-scrollbar {
+                        display: none;
+                    }
+                    /* Prevent inner-scroll from chaining to background page */
+                    #tm_card {
+                        overscroll-behavior: contain;
+                        -webkit-overflow-scrolling: touch;
+                    }
+
+                    /* ── Ticket modal gradient header: force white text ──
+                       design-system.css h1-h6 { color:#1a1233 !important }
+                       wins over inline color:#fff — override it here with
+                       a higher-specificity rule on the card's header div. */
+                    #tm_card > div:first-child h2,
+                    #tm_card > div:first-child h3,
+                    #tm_card > div:first-child p,
+                    #tm_card > div:first-child span {
+                        color: #ffffff !important;
+                        -webkit-text-fill-color: #ffffff !important;
+                    }
+
+                    /* ── Animations ── */
+                    @keyframes tmBackdropIn {
+                        from {
+                            opacity: 0
+                        }
+
+                        to {
+                            opacity: 1
+                        }
+                    }
+
+                    @keyframes tmBackdropOut {
+                        from {
+                            opacity: 1
+                        }
+
+                        to {
+                            opacity: 0
+                        }
+                    }
+
+                    @keyframes tmCardIn {
+                        from {
+                            opacity: 0;
+                            transform: scale(0.88) translateY(28px)
+                        }
+
+                        to {
+                            opacity: 1;
+                            transform: scale(1) translateY(0)
+                        }
+                    }
+
+                    @keyframes tmCardOut {
+                        from {
+                            opacity: 1;
+                            transform: scale(1) translateY(0)
+                        }
+
+                        to {
+                            opacity: 0;
+                            transform: scale(0.92) translateY(16px)
+                        }
+                    }
+
+                    #ticketModal.tm-opening {
+                        display: flex !important;
+                    }
+
+                    #ticketModal.tm-opening #tm_backdrop {
+                        animation: tmBackdropIn 0.3s ease forwards;
+                    }
+
+                    #ticketModal.tm-opening #tm_card {
+                        animation: tmCardIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                    }
+
+                    #ticketModal.tm-closing #tm_backdrop {
+                        animation: tmBackdropOut 0.25s ease forwards;
+                    }
+
+                    #ticketModal.tm-closing #tm_card {
+                        animation: tmCardOut 0.25s ease forwards;
+                    }
+
+                    /* ── Inputs ── */
+                    #ticketModal input:focus,
+                    #ticketModal textarea:focus {
+                        border-color: #667eea !important;
+                        background: #fff !important;
+                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.14) !important;
+                    }
+
+                    #ticketModal input::placeholder,
+                    #ticketModal textarea::placeholder {
+                        color: #c0c8d8;
+                    }
+
+                    /* ── Pills ── */
+                    .tm-pill {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 5px;
+                        padding: 7px 14px;
+                        border-radius: 50px;
+                        font-size: 12.5px;
+                        font-weight: 700;
+                        cursor: pointer;
+                        border: 1.5px solid #ddd9ff;
+                        color: #667eea;
+                        background: #f5f4ff;
+                        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+                        font-family: 'Nunito', sans-serif;
+                        user-select: none;
+                        box-shadow: 0 1px 4px rgba(102, 126, 234, 0.08);
+                    }
+
+                    .tm-pill:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.18);
+                    }
+
+                    .tm-pill.selected {
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: #fff;
+                        border-color: transparent;
+                        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+                        transform: translateY(-2px);
+                    }
+
+                    /* ── Close btn hover ── */
+                    #tm_close_btn:hover {
+                        background: rgba(255, 255, 255, 0.32) !important;
+                        transform: scale(1.04);
+                        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+                    }
+
+                    /* ── Submit btn hover / loading ── */
+                    #tm_submit:hover:not(:disabled) {
+                        transform: translateY(-2px);
+                        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.55) !important;
+                        filter: brightness(1.06);
+                    }
+
+                    #tm_submit:active {
+                        transform: translateY(0);
+                    }
+
+                    #tm_submit:disabled {
+                        opacity: 0.7;
+                        cursor: not-allowed;
+                    }
+
+                    /* ── Scrollbar inside card ── */
+                    #tm_card::-webkit-scrollbar {
+                        width: 5px;
+                    }
+
+                    #tm_card::-webkit-scrollbar-thumb {
+                        background: #ddd9ff;
+                        border-radius: 10px;
+                    }
+
+                    /* ── Mobile ── */
+                    @media(max-width:520px) {
+                        #ticketModal {
+                            padding: 12px 8px !important;
+                        }
+
+                        #tm_card {
+                            border-radius: 22px !important;
+                        }
+
+                        #tm_grid_row {
+                            grid-template-columns: 1fr !important;
+                        }
+
+                        #tm_card>div:last-child {
+                            padding: 22px 18px 18px !important;
+                        }
+
+                        #tm_card>div:first-child {
+                            padding: 26px 18px 22px !important;
+                        }
+                    }
+                </style>
+
+                
+<!-- Bootstrap JS -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+                <script>
+                    // DOM Content Loaded Event
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // Navbar scroll animation
+                        window.addEventListener('scroll', function () {
+                            const navbar = document.querySelector('.navbar');
+                            if (window.scrollY > 50) {
+                                navbar.classList.add('scrolled');
+                            } else {
+                                navbar.classList.remove('scrolled');
+                            }
+                        });
+                    });
+
+                    // ── Smart button watcher: changes label when name+email are filled ────
+                    (function () {
+                        const nameEl = document.getElementById('name');
+                        const emailEl = document.getElementById('email');
+                        const btnEl = document.getElementById('guestContactBtn');
+                        const btnText = document.getElementById('guestBtnText');
+                        const btnIcon = document.getElementById('guestBtnIcon');
+
+                        function updateBtn() {
+                            const hasName = nameEl && nameEl.value.trim().length > 0;
+                            const hasEmail = emailEl && emailEl.value.trim().length > 1 && emailEl.value.includes('@');
+                            if (hasName && hasEmail) {
+                                btnText.textContent = 'Click here to create ticket';
+                                btnIcon.className = 'fas fa-ticket-alt me-2';
+                                btnEl.style.background = 'linear-gradient(135deg,#667eea,#764ba2)';
+                            } else {
+                                btnText.textContent = 'Send Message';
+                                btnIcon.className = 'fas fa-paper-plane me-2';
+                                btnEl.style.background = '';
+                            }
+                        }
+
+                        if (nameEl) nameEl.addEventListener('input', updateBtn);
+                        if (emailEl) emailEl.addEventListener('input', updateBtn);
+                    })();
+
+                    // ── Subject pills for the ticket modal ────────────────────────────────
+                    const TICKET_PILLS = [
+                        'Bug Report', 'Billing Issue', 'Account Access',
+                        'Feature Request', 'Payment Problem', 'Other'
+                    ];
+                    let _tmSelectedPill = '';
+
+                    function _buildPills(prefillSubject) {
+                        const container = document.getElementById('tm_pills');
+                        container.innerHTML = '';
+                        _tmSelectedPill = '';
+                        TICKET_PILLS.forEach(label => {
+                            const el = document.createElement('span');
+                            el.className = 'tm-pill';
+                            el.textContent = label;
+                            // Auto-select if the pre-filled subject matches loosely
+                            if (prefillSubject && prefillSubject.toLowerCase().includes(label.toLowerCase().split(' ')[0])) {
+                                el.classList.add('selected');
+                                _tmSelectedPill = label;
+                            }
+                            el.onclick = function () {
+                                container.querySelectorAll('.tm-pill').forEach(p => p.classList.remove('selected'));
+                                if (_tmSelectedPill === label) {
+                                    _tmSelectedPill = '';
+                                } else {
+                                    el.classList.add('selected');
+                                    _tmSelectedPill = label;
+                                }
+                            };
+                            container.appendChild(el);
+                        });
+                    }
+
+                    // ── Open modal + pre-fill ─────────────────────────────────────────────
+                    function openTicketModal() {
+                        const name = (document.getElementById('name')?.value || '').trim();
+                        const email = (document.getElementById('email')?.value || '').trim();
+                        const subject = (document.getElementById('subject')?.value || '').trim();
+                        const message = (document.getElementById('message')?.value || '').trim();
+
+                        document.getElementById('tm_name').value = name;
+                        document.getElementById('tm_email').value = email;
+                        document.getElementById('tm_subject_custom').value = subject;
+                        document.getElementById('tm_message').value = message;
+
+                        _buildPills(subject);
+
+                        // Update char counter for pre-filled message
+                        const msgEl = document.getElementById('tm_message');
+                        const ctr = document.getElementById('tm_char_count');
+                        if (ctr) ctr.textContent = `${msgEl.value.length} / 1000`;
+
+                        const modal = document.getElementById('ticketModal');
+                        modal.classList.remove('tm-closing');
+                        modal.classList.add('tm-opening');
+                        // Lock background scroll (iOS-safe: uses position:fixed trick)
+                        if (window.ModalScrollLock) {
+                            ModalScrollLock.lock();
+                        } else {
+                            document.body.style.overflow = 'hidden';
+                            document.documentElement.style.overflow = 'hidden';
+                        }
+
+                        // Focus first empty field after animation settles
+                        setTimeout(() => {
+                            const first = ['tm_name', 'tm_email', 'tm_subject_custom', 'tm_message']
+                                .map(id => document.getElementById(id))
+                                .find(el => !el.value.trim());
+                            if (first) first.focus();
+                        }, 380);
+                    }
+
+                    function closeTicketModal() {
+                        const modal = document.getElementById('ticketModal');
+                        modal.classList.remove('tm-opening');
+                        modal.classList.add('tm-closing');
+                        setTimeout(() => {
+                            modal.classList.remove('tm-closing');
+                            modal.style.display = 'none'; // reset after animation
+                            // Restore scroll (position:fixed trick restores scrollY)
+                            if (window.ModalScrollLock) {
+                                ModalScrollLock.unlock();
+                            } else {
+                                document.body.style.overflow = '';
+                                document.documentElement.style.overflow = '';
+                            }
+                        }, 270);
+                    }
+
+                    // Char counter for message field
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const msgEl = document.getElementById('tm_message');
+                        const ctr = document.getElementById('tm_char_count');
+                        if (msgEl && ctr) {
+                            msgEl.addEventListener('input', function () {
+                                const len = Math.min(this.value.length, 1000);
+                                ctr.textContent = `${len} / 1000`;
+                                ctr.style.color = len > 900 ? '#e74a3b' : len > 700 ? '#f6c23e' : '#adb5bd';
+                                if (this.value.length > 1000) this.value = this.value.slice(0, 1000);
+                            });
+                        }
+                    });
+
+                    // ── Submit ticket from modal ──────────────────────────────────────────
+                    async function submitTicketModal() {
+                        const name = document.getElementById('tm_name').value.trim();
+                        const email = document.getElementById('tm_email').value.trim();
+                        const custom = document.getElementById('tm_subject_custom').value.trim();
+                        const subject = _tmSelectedPill || custom;
+                        const message = document.getElementById('tm_message').value.trim();
+
+                        if (!name || !email) {
+                            showNotification('Please fill in your name and email.', 'warning'); return;
+                        }
+                        if (!subject) {
+                            showNotification('Please select or type a subject.', 'warning'); return;
+                        }
+                        if (!message) {
+                            showNotification('Please describe your issue in the message.', 'warning'); return;
+                        }
+
+                        const btn = document.getElementById('tm_submit');
+                        const inner = document.getElementById('tm_submit_inner');
+                        btn.disabled = true;
+                        inner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="font-size:15px;"></i> Checking account…';
+
+                        const API = (window.API_BASE || 'https://api.splitwise.space/api');
+
+                        try {
+                            // ── Step 1: Verify email belongs to a registered account ────────
+                            const checkRes = await fetch(`${API}/contact/check-email`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email }),
+                            });
+                            const checkData = await checkRes.json().catch(() => ({}));
+
+                            if (!checkRes.ok) {
+                                showNotification('Could not verify your account. Please try again.', 'error');
+                                return;
+                            }
+
+                            if (!checkData.data?.exists) {
+                                showNotification(
+                                    '❌ No account found for this email. Please sign up on SplitWise first to create a support ticket.',
+                                    'error'
+                                );
+                                return;
+                            }
+
+                            // ── Step 2: Submit the ticket ───────────────────────────────────
+                            inner.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="font-size:15px;"></i> Submitting…';
+
+                            const res = await fetch(`${API}/contact`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name: checkData.data.name || name, email, subject, message })
+                            });
+                            const data = await res.json().catch(() => ({}));
+
+                            if (res.ok && data.success) {
+                                closeTicketModal();
+                                document.getElementById('contactForm')?.reset();
+                                document.getElementById('guestBtnText').textContent = 'Send Message';
+                                document.getElementById('guestBtnIcon').className = 'fas fa-paper-plane me-2';
+
+                                if (data.data?.duplicate) {
+                                    showNotification(
+                                        `⏳ You already have open ticket ${data.data.ticketId} — check your email.`,
+                                        'warning'
+                                    );
+                                } else {
+                                    showNotification(
+                                        `🎫 Ticket ${data.data?.ticketId} created! Confirmation sent to ${email}.`,
+                                        'success'
+                                    );
+                                }
+                            } else {
+                                showNotification(data.error || 'Could not create ticket. Please try again.', 'error');
+                            }
+                        } catch (err) {
+                            console.error('Ticket submit error:', err);
+                            showNotification('Network error — please check your connection and try again.', 'error');
+                        } finally {
+                            btn.disabled = false;
+                            inner.innerHTML = '<i class="fas fa-ticket-alt" style="font-size:15px;"></i> Submit Support Ticket';
+                        }
+                    }
+                    // Expose to global scope so the inline onclick can reach it
+                    window.submitTicketModal = submitTicketModal;
+                    window.closeTicketModal = closeTicketModal;
+
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') closeTicketModal();
+                    });
+
+                    // Show Terms Modal
+                    function showTermsModal() {
+                        var savedScroll = window.scrollY;
+                        var modal = new bootstrap.Modal(document.getElementById('termsModal'));
+                        document.getElementById('termsModal').addEventListener('hidden.bs.modal', function () {
+                            requestAnimationFrame(function () {
+                                window.scrollTo({ top: savedScroll, behavior: 'instant' });
+                            });
+                        }, { once: true });
+                        modal.show();
+                    }
+
+                    // Show Privacy Modal
+                    function showPrivacyModal() {
+                        var savedScroll = window.scrollY;
+                        var modal = new bootstrap.Modal(document.getElementById('privacyModal'));
+                        document.getElementById('privacyModal').addEventListener('hidden.bs.modal', function () {
+                            requestAnimationFrame(function () {
+                                window.scrollTo({ top: savedScroll, behavior: 'instant' });
+                            });
+                        }, { once: true });
+                        modal.show();
+                    }
+
+                    // Expose modal helpers to global scope (needed by inline onclick attributes)
+                    window.showTermsModal = showTermsModal;
+                    window.showPrivacyModal = showPrivacyModal;
+
+                    // Enhanced Notification System
+                    function showNotification(message, type = 'info') {
+                        // Auto-create the container if it doesn't exist in the DOM
+                        let container = document.getElementById('notification-container');
+                        if (!container) {
+                            container = document.createElement('div');
+                            container.id = 'notification-container';
+                            container.className = 'notification-container';
+                            document.body.appendChild(container);
+                        }
+                        const notification = document.createElement('div');
+                        notification.className = `notification notification-${type}`;
+
+                        const icons = {
+                            success: 'fas fa-check-circle',
+                            error: 'fas fa-exclamation-circle',
+                            warning: 'fas fa-exclamation-triangle',
+                            info: 'fas fa-info-circle'
+                        };
+
+                        notification.innerHTML = `
+                <i class="${icons[type]} notification-icon me-2" style="color: var(--${type === 'error' ? 'danger' : type}-color);"></i>
+                <div class="notification-message">${message}</div>
+            `;
+
+                        container.appendChild(notification);
+
+                        // Show notification with animation
+                        setTimeout(() => {
+                            notification.classList.add('show');
+                        }, 100);
+
+                        // Auto hide after 5 seconds
+                        setTimeout(() => {
+                        }, 5000);
+                    }
+
+                    function closeNotification(button) {
+                        const notification = button.closest('.notification');
+                        notification.classList.add('hide');
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 400);
+                    }
+
+                    // Smooth scrolling for navigation links
+                    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                        anchor.addEventListener('click', function (e) {
+                            const href = this.getAttribute('href');
+                            if (!href || href === '#' || href.trim() === '#') return;
+                            const target = document.querySelector(href);
+                            if (target) {
+                                e.preventDefault();
+                                // Close mobile menu if open (with glass effect backdrop)
+                                if (window.innerWidth <= 991) {
+                                    const navbarCollapse = document.getElementById('navbarNav');
+                                    const navbarToggler = document.querySelector('.navbar-toggler');
+                                    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                                        const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                                        if (bsCollapse) {
+                                            bsCollapse.hide();
+                                        }
+                                        if (navbarToggler) {
+                                            navbarToggler.setAttribute('aria-expanded', 'false');
+                                        }
+                                        closeMenu();
+                                    }
+                                }
+
+                                // Update active state
+                                document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+                                    link.classList.remove('active');
+                                });
+                                this.classList.add('active');
+
+                                const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                                window.scrollTo({
+                                    top: offsetTop,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        });
+                    });
+
+                    // Update active state on scroll
+                    window.addEventListener('scroll', function () {
+                        const sections = document.querySelectorAll('section[id], div[id]');
+                        const navLinks = document.querySelectorAll('.navbar-nav .nav-link[href^="#"]');
+
+                        let current = '';
+                        sections.forEach(section => {
+                            const sectionTop = section.offsetTop;
+                            const sectionHeight = section.clientHeight;
+                            if (window.pageYOffset >= sectionTop - 100) {
+                                current = section.getAttribute('id');
+                            }
+                        });
+
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${current}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    });
+
+                    // ROOT CAUSE FIX: Handle menu open/close with smooth animations and glass effect backdrop
+                    const navbarCollapse = document.getElementById('navbarNav');
+                    const navbarToggler = document.querySelector('.navbar-toggler');
+                    let bodyScrollPosition = 0;
+                    let isAnimating = false;
+
+                    function openMenu() {
+                        if (navbarCollapse && window.innerWidth <= 991 && !isAnimating) {
+                            isAnimating = true;
+                            // Store scroll position
+                            bodyScrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                            // Lock body scroll and maintain position
+                            document.body.style.top = `-${bodyScrollPosition}px`;
+                            // Add menu-open class for backdrop glass effect with slight delay for smooth transition
+                            requestAnimationFrame(() => {
+                                document.body.classList.add('menu-open');
+                                // Reset animation flag after transition completes
+                                setTimeout(() => {
+                                    isAnimating = false;
+                                }, 350);
+                            });
+                        }
+                    }
+
+                    function closeMenu() {
+                        if (navbarCollapse && window.innerWidth <= 991 && !isAnimating) {
+                            isAnimating = true;
+                            // ROOT CAUSE FIX: Delay backdrop removal until panel animation starts
+                            // This ensures the backdrop stays visible during the closing animation
+                            const backdropDelay = 100; // Small delay to let panel start closing first
+
+                            // Start fading backdrop after panel starts closing
+                            setTimeout(() => {
+                                document.body.classList.remove('menu-open');
+                            }, backdropDelay);
+
+                            // Wait for both panel and backdrop animations to complete, then restore scroll
+                            setTimeout(() => {
+                                document.body.style.top = '';
+                                document.body.style.overflow = '';
+                                document.body.style.position = '';
+                                document.body.style.width = '';
+                                document.body.style.height = '';
+                                window.scrollTo({
+                                    top: bodyScrollPosition,
+                                    behavior: 'auto'
+                                });
+                                isAnimating = false;
+                            }, 350 + backdropDelay); // Total animation time + delay
+                        }
+                    }
+
+                    // Handle Bootstrap collapse events for smooth glass effect backdrop
+                    if (navbarCollapse) {
+                        navbarCollapse.addEventListener('show.bs.collapse', function () {
+                            openMenu();
+                        });
+
+                        navbarCollapse.addEventListener('shown.bs.collapse', function () {
+                            // Ensure backdrop is fully visible after panel opens
+                            if (document.body.classList.contains('menu-open')) {
+                                const backdrop = document.body;
+                                requestAnimationFrame(() => {
+                                    backdrop.style.setProperty('--backdrop-opacity', '1');
+                                });
+                            }
+                        });
+
+                        navbarCollapse.addEventListener('hide.bs.collapse', function () {
+                            // ROOT CAUSE FIX: Start closing animation immediately when hide event fires
+                            closeMenu();
+                        });
+
+                        navbarCollapse.addEventListener('hidden.bs.collapse', function () {
+                            // Cleanup after panel is fully closed
+                            // Ensure backdrop is removed
+                            document.body.classList.remove('menu-open');
+                            // Ensure all styles are reset
+                            document.body.style.top = '';
+                            document.body.style.overflow = '';
+                            document.body.style.position = '';
+                            document.body.style.width = '';
+                            document.body.style.height = '';
+                            // Restore scroll position
+                            if (bodyScrollPosition !== undefined) {
+                                window.scrollTo({
+                                    top: bodyScrollPosition,
+                                    behavior: 'auto'
+                                });
+                            }
+                            isAnimating = false;
+                        });
+
+                        // ROOT CAUSE FIX: Improved MutationObserver - only trigger on actual state changes
+                        let previousState = navbarCollapse.classList.contains('show');
+                        const observer = new MutationObserver(function (mutations) {
+                            mutations.forEach(function (mutation) {
+                                if (mutation.attributeName === 'class') {
+                                    const currentState = navbarCollapse.classList.contains('show');
+                                    const isCollapsing = navbarCollapse.classList.contains('collapsing');
+
+                                    // Only act on actual state changes
+                                    if (currentState !== previousState && !isAnimating) {
+                                        if (currentState && !isCollapsing) {
+                                            // Opening
+                                            openMenu();
+                                        } else if (!currentState && !isCollapsing) {
+                                            // Fully closed (not collapsing)
+                                            closeMenu();
+                                        }
+                                        previousState = currentState;
+                                    }
+                                }
+                            });
+                        });
+
+                        observer.observe(navbarCollapse, {
+                            attributes: true,
+                            attributeFilter: ['class']
+                        });
+                    }
+
+                    // Close mobile menu when clicking on backdrop or outside
+                    document.addEventListener('click', function (event) {
+                        if (window.innerWidth <= 991) {
+                            const navbar = document.querySelector('.navbar');
+                            const navbarCollapse = document.getElementById('navbarNav');
+                            const navbarToggler = document.querySelector('.navbar-toggler');
+
+                            if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                                // Check if clicking on backdrop (outside navbar) - closes menu
+                                if (!navbar.contains(event.target)) {
+                                    const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                                    if (bsCollapse) {
+                                        bsCollapse.hide();
+                                    }
+                                    if (navbarToggler) {
+                                        navbarToggler.setAttribute('aria-expanded', 'false');
+                                    }
+                                    closeMenu();
+                                }
+                            }
+                        }
+                    });
+
+                    // ── Fade-in scroll animations ──
+                    const fadeObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) entry.target.classList.add('visible');
+                        });
+                    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
+                        document.querySelectorAll('.feature-card').forEach((card, i) => {
+                            card.style.animationDelay = `${i * 0.1}s`;
+                        });
+                    });
+
+                    // ── Active section tracker (scroll-position based, most reliable) ──
+                    (function () {
+                        const sectionIds = ['home', 'features', 'about', 'contact'];
+                        const NAVBAR_H = 72; // px – navbar height offset
+
+                        function setActive(id) {
+                            document.querySelectorAll('.navbar-nav .nav-link:not(.nav-login):not(.nav-signup)').forEach(link => {
+                                link.classList.remove('nav-active');
+                            });
+                            const target = document.querySelector(`.navbar-nav .nav-link[href="#${id}"]`);
+                            if (target) target.classList.add('nav-active');
+                        }
+
+                        function getActiveId() {
+                            // A section becomes active when its top scrolls within NAVBAR_H + 80px of the viewport top
+                            const trigger = window.scrollY + NAVBAR_H + 80;
+                            let active = sectionIds[0];
+                            for (const id of sectionIds) {
+                                const el = document.getElementById(id);
+                                if (!el) continue;
+                                if (el.offsetTop <= trigger) active = id;
+                            }
+                            return active;
+                        }
+
+                        // Click nav link → smooth scroll + instant active mark
+                        document.querySelectorAll('.navbar-nav .nav-link[href^="#"]').forEach(link => {
+                            link.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                const id = this.getAttribute('href').slice(1);
+                                const el = document.getElementById(id);
+                                if (el) {
+                                    window.scrollTo({ top: el.offsetTop - NAVBAR_H + 1, behavior: 'smooth' });
+                                }
+                                setActive(id);
+                            });
+                        });
+
+                        // Scroll → update active
+                        let ticking = false;
+                        window.addEventListener('scroll', function () {
+                            if (!ticking) {
+                                requestAnimationFrame(() => {
+                                    setActive(getActiveId());
+                                    // Navbar shadow on scroll
+                                    const navbar = document.querySelector('.navbar');
+                                    navbar.classList.toggle('scrolled', window.scrollY > 50);
+                                    ticking = false;
+                                });
+                                ticking = true;
+                            }
+                        });
+
+                        // Set initial state on load
+                        const hash = window.location.hash;
+                        if (hash) {
+                            const el = document.getElementById(hash.slice(1));
+                            if (el) window.scrollTo({ top: el.offsetTop - NAVBAR_H + 1, behavior: 'auto' });
+                        }
+                        setActive(hash ? hash.slice(1) : getActiveId());
+                    })();
+                </script>
+                <script src="js/sw-engine.js" defer></script>
+                <!-- Hidden support portal access: not visible to users -->
+                <a href="support-login.html" aria-hidden="true" tabindex="-1"
+                    style="position:fixed;bottom:0;right:0;width:1px;height:1px;opacity:0;pointer-events:auto;z-index:0;font-size:1px;color:transparent;background:transparent;overflow:hidden"
+                    title="">&zwnj;</a>
+                <!-- Easter egg: triple-click © in footer → support portal -->
+                <script>(function () { let cc = 0, ct = 0; document.addEventListener('click', function (e) { if (e.target && e.target.id === '__copy_sym') { const now = Date.now(); cc = (now - ct < 600) ? cc + 1 : 1; ct = now; if (cc >= 3) { cc = 0; window.location.href = 'support-login.html'; } } }); })();</script>
+
+<style>
+  /* ── Modal fix: bypass navbar compositing (backdrop-filter creates GPU layer) ── */
+  #termsModal,
+  #privacyModal {
+    z-index: 9998 !important;
+  }
+  #termsModal .modal-dialog,
+  #privacyModal .modal-dialog {
+    z-index: 9999 !important;
+    /* Guarantee 16px margin on each side — makes rounded corners always visible */
+    --bs-modal-width: 720px;               /* override Bootstrap's CSS variable */
+    width: calc(100% - 2rem) !important;   /* 16px margin each side on any screen */
+    max-width: 720px !important;           /* cap at 720px on large screens */
+    margin: 1rem auto !important;
+  }
+  /* Backdrop must also be raised */
+  .modal-backdrop {
+    z-index: 9997 !important;
+  }
+
+  /* ── On mobile: keep rounded card + only body scrolls ── */
+  @media (max-width: 767.98px) {
+    #termsModal  .modal-content,
+    #privacyModal .modal-content {
+      border-radius: 20px !important; /* always visible — dialog now has margins */
+      display: flex !important;
+      flex-direction: column !important;
+      max-height: calc(100dvh - 2rem) !important;
+    }
+    /* Only modal-body scrolls; header and footer stay pinned */
+    #termsModal  .modal-body,
+    #privacyModal .modal-body {
+      flex: 1 1 auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      min-height: 0 !important;
+      overscroll-behavior: contain !important;
+    }
+    /* Footer always visible */
+    #termsModal  .modal-footer,
+    #privacyModal .modal-footer {
+      flex-shrink: 0 !important;
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+  }
+
+</style>
+
+
+
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel"
+                    aria-modal="true" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content"
+                            style="border:none;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.25);">
+                            <!-- Gradient Header -->
+                            <div class="modal-header"
+                                style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;padding:1.75rem 2rem;position:relative;">
+                                <div style="display:flex;align-items:center;gap:1rem;">
+                                    <div
+                                        style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+                                        <i class="fas fa-file-contract" style="color:white;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="modal-title mb-0" id="termsModalLabel"
+                                            style="color:white;font-weight:800;font-size:1.25rem;">Terms &amp;
+                                            Conditions</h5>
+                                        <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">Last updated:
+                                            March 2026</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    style="filter:brightness(0) invert(1);opacity:0.9;"></button>
+                            </div>
+
+                            <!-- Body -->
+                            <div class="modal-body" style="padding:0;background:#f8f9fc;">
+                                <!-- Intro banner -->
+                                <div style="background:linear-gradient(135deg,rgba(102,126,234,0.08),rgba(118,75,162,0.08));padding:clamp(1rem,4vw,1.25rem) clamp(1rem,5vw,2rem);border-bottom:1px solid #e9ecef;">
+                                    <p style="margin:0;color:#5a6a88;font-size:0.92rem;line-height:1.6;">Please read
+                                        these Terms and Conditions carefully before using SplitWise. By creating an
+                                        account or using our services, you agree to be legally bound by these terms.</p>
+                                </div>
+
+                                <div style="padding:clamp(1rem,4vw,1.5rem) clamp(1rem,5vw,2rem);">
+
+                                    <!-- Section 1 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#667eea;margin-right:0.5rem;">1.</span>Acceptance of Terms
+                                        </h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">By
+                                            accessing or using SplitWise, you confirm that you are at least 13 years old
+                                            and have the legal capacity to enter into these Terms. If you use SplitWise
+                                            on behalf of an organisation, you represent that you have authority to bind
+                                            that entity.</p>
+                                    </div>
+
+                                    <!-- Section 2 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#764ba2;margin-right:0.5rem;">2.</span>Account Registration
+                                            &amp; Security</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">You must
+                                            provide accurate, complete, and current information during registration. You
+                                            are responsible for maintaining the confidentiality of your account
+                                            credentials and for all activities that occur under your account. Notify us
+                                            immediately at <strong>support@splitwise.space</strong> of any
+                                            unauthorised use.</p>
+                                    </div>
+
+                                    <!-- Section 3 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#667eea;margin-right:0.5rem;">3.</span>Permitted Use of
+                                            Service</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">SplitWise
+                                            is a personal finance management tool for tracking, splitting, and settling
+                                            shared expenses. You agree to use the platform only for lawful purposes and
+                                            in a manner that does not infringe the rights of others or restrict their
+                                            use and enjoyment of the service.</p>
+                                    </div>
+
+                                    <!-- Section 4 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#764ba2;margin-right:0.5rem;">4.</span>Prohibited
+                                            Activities</h6>
+                                        <p
+                                            style="color:#6c757d;margin-bottom:0.5rem;font-size:0.9rem;line-height:1.65;">
+                                            You may not:</p>
+                                        <ul
+                                            style="color:#6c757d;font-size:0.9rem;line-height:1.65;padding-left:1.25rem;margin:0;">
+                                            <li>Use the service to commit fraud or any illegal activity</li>
+                                            <li>Attempt to gain unauthorised access to other accounts or systems</li>
+                                            <li>Upload malicious code, viruses, or harmful data</li>
+                                            <li>Scrape, crawl, or harvest data without express permission</li>
+                                        </ul>
+                                    </div>
+                                
+                                    <!-- Section 5 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#667eea;margin-right:0.5rem;">5.</span>Intellectual
+                                            Property</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">All
+                                            content, design, code, and trademarks within SplitWise are the exclusive
+                                            property of SplitWise and its licensors. You may not copy, reproduce,
+                                            distribute, or create derivative works without our prior written consent.
+                                        </p>
+                                    </div>
+
+                                    <!-- Section 6 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#764ba2;margin-right:0.5rem;">6.</span>Disclaimer of
+                                            Warranties</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">SplitWise
+                                            is provided on an "as is" and "as available" basis without warranties of any
+                                            kind — express or implied — including merchantability, fitness for a
+                                            particular purpose, or non-infringement. We do not guarantee uninterrupted
+                                            or error-free operation.</p>
+                                    </div>
+
+                                    <!-- Section 7 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#667eea;margin-right:0.5rem;">7.</span>Limitation of
+                                            Liability</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">To the
+                                            fullest extent permitted by law, SplitWise and its developers shall not be
+                                            liable for any indirect, incidental, special, consequential, or punitive
+                                            damages — including loss of data or profits — arising from your use of or
+                                            inability to use the service.</p>
+                                    </div>
+
+                                    <!-- Section 8 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#764ba2;margin-right:0.5rem;">8.</span>Termination</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">We reserve
+                                            the right to suspend or terminate your account at any time if you violate
+                                            these Terms. You may also delete your account at any time via the Settings
+                                            page. Upon termination, your right to use the service immediately ceases.
+                                        </p>
+                                    </div>
+
+                                    <!-- Section 9 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #667eea;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#667eea;margin-right:0.5rem;">9.</span>Changes to Terms
+                                        </h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">We may
+                                            update these Terms at any time. We will notify you of significant changes by
+                                            updating the "Last updated" date and, where appropriate, via email.
+                                            Continued use after changes constitutes acceptance of the revised Terms.</p>
+                                    </div>
+
+                                    <!-- Section 10 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:0;border-left:4px solid #764ba2;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><i
+                                                class="fas fa-envelope me-2" style="color:#764ba2;"></i>Contact Us</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">Questions
+                                            about these Terms? Email us at <a href="mailto:support@splitwise.space"
+                                                style="color:#667eea;font-weight:700;">support@splitwise.space</a> —
+                                            we aim to respond within 48 hours.</p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="modal-footer" style="border-top:1px solid #e9ecef;padding:1rem 2rem;">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                                    style="border-radius:12px;padding:0.6rem 1.75rem;font-weight:600;color:#5a6a88;border:1px solid #e9ecef;">Close</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                    style="border-radius:12px;padding:0.6rem 1.75rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;font-weight:700;">
+                                    <i class="fas fa-check me-2"></i>I Agree
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel"
+                    aria-modal="true" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content"
+                            style="border:none;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.25);">
+                            <!-- Gradient Header -->
+                            <div class="modal-header"
+                                style="background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);border:none;padding:1.75rem 2rem;">
+                                <div style="display:flex;align-items:center;gap:1rem;">
+                                    <div
+                                        style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+                                        <i class="fas fa-shield-alt" style="color:white;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="modal-title mb-0" id="privacyModalLabel"
+                                            style="color:white;font-weight:800;font-size:1.25rem;">Privacy Policy</h5>
+                                        <span style="color:rgba(255,255,255,0.8);font-size:0.78rem;">Last updated: March
+                                            2026</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    style="filter:brightness(0) invert(1);opacity:0.9;"></button>
+                            </div>
+
+                            <!-- Body -->
+                            <div class="modal-body" style="padding:0;background:#f8f9fc;">
+                                <!-- Intro banner -->
+                                <div style="background:linear-gradient(135deg,rgba(17,153,142,0.08),rgba(56,239,125,0.08));padding:clamp(1rem,4vw,1.25rem) clamp(1rem,5vw,2rem);border-bottom:1px solid #e9ecef;">
+                                    <p style="margin:0;color:#5a6a88;font-size:0.92rem;line-height:1.6;">Your privacy
+                                        matters to us. This policy explains what data we collect, why we collect it, how
+                                        we use it, and the choices you have regarding your information.</p>
+                                </div>
+
+                                <div style="padding:clamp(1rem,4vw,1.5rem) clamp(1rem,5vw,2rem);">
+
+                                    <!-- Section 1 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #11998e;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#11998e;margin-right:0.5rem;">1.</span>Information We
+                                            Collect</h6>
+                                        <p
+                                            style="color:#6c757d;margin-bottom:0.4rem;font-size:0.9rem;line-height:1.65;">
+                                            We collect the following categories of information:</p>
+                                        <ul
+                                            style="color:#6c757d;font-size:0.9rem;line-height:1.65;padding-left:1.25rem;margin:0;">
+                                            <li><strong>Account data</strong>: name, email address, and password (stored
+                                                hashed)</li>
+                                            <li><strong>Profile data</strong>: preferred currency, profile picture</li>
+                                            <li><strong>Usage data</strong>: expenses, groups, payments you create</li>
+                                            <li><strong>Technical data</strong>: IP address, browser type for security
+                                                purposes</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Section 2 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #38ef7d;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#38a169;margin-right:0.5rem;">2.</span>How We Use Your Data
+                                        </h6>
+                                        <ul
+                                            style="color:#6c757d;font-size:0.9rem;line-height:1.65;padding-left:1.25rem;margin:0;">
+                                            <li>To provide, operate, and maintain SplitWise services</li>
+                                            <li>To send transactional emails (OTP, payment notifications)</li>
+                                            <li>To improve performance, debug issues, and develop new features</li>
+                                            <li>To comply with legal obligations</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Section 3 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #11998e;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#11998e;margin-right:0.5rem;">3.</span>Third-Party Sharing
+                                        </h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">We do
+                                            <strong>not</strong> sell, rent, or trade your personal information. We may
+                                            share data with trusted service providers (e.g. email delivery, OAuth
+                                            providers like Google/Facebook) strictly to operate the service. These
+                                            providers are contractually obligated to keep your data secure.</p>
+                                    </div>
+
+                                    <!-- Section 4 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #38ef7d;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#38a169;margin-right:0.5rem;">4.</span>Cookies &amp; Local
+                                            Storage</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">SplitWise
+                                            uses browser <strong>localStorage</strong> to store your authentication
+                                            token and user preferences (e.g. preferred currency). We do not use
+                                            third-party tracking cookies. You can clear this data at any time by logging
+                                            out or clearing browser storage.</p>
+                                    </div>
+                                
+                                    <!-- Section 5 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #11998e;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#11998e;margin-right:0.5rem;">5.</span>Data Retention</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">We retain
+                                            your data for as long as your account is active. When you delete your
+                                            account via Settings, all associated data is permanently removed from our
+                                            systems within 30 days, except where required by law.</p>
+                                    </div>
+
+                                    <!-- Section 6 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #38ef7d;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#38a169;margin-right:0.5rem;">6.</span>Data Security</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">We
+                                            implement industry-standard security measures: passwords are hashed with
+                                            bcrypt, API communication uses HTTPS, JWTs expire after 7 days, and all
+                                            database access requires authentication. However, no system is 100% secure —
+                                            please use a strong, unique password.</p>
+                                    </div>
+
+                                    <!-- Section 7 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;border-left:4px solid #11998e;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><span
+                                                style="color:#11998e;margin-right:0.5rem;">7.</span>Your Rights</h6>
+                                        <ul
+                                            style="color:#6c757d;font-size:0.9rem;line-height:1.65;padding-left:1.25rem;margin:0;">
+                                            <li><strong>Access</strong>: request a copy of the personal data we hold
+                                                about you</li>
+                                            <li><strong>Correction</strong>: update inaccurate data via the Settings
+                                                page</li>
+                                            <li><strong>Deletion</strong>: delete your account and all data via Settings
+                                            </li>
+                                            <li><strong>Portability</strong>: export your expense data as CSV/PDF from
+                                                Reports</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Section 8 -->
+                                    <div
+                                        style="background:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:0;border-left:4px solid #38ef7d;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                                        <h6 style="color:#2c3e50;font-weight:800;margin-bottom:0.5rem;"><i
+                                                class="fas fa-envelope me-2" style="color:#11998e;"></i>Contact &amp;
+                                            Complaints</h6>
+                                        <p style="color:#6c757d;margin:0;font-size:0.9rem;line-height:1.65;">For any
+                                            privacy-related questions or to exercise your rights, contact our privacy
+                                            team at <a href="mailto:support@splitwise.space"
+                                                style="color:#11998e;font-weight:700;">support@splitwise.space</a>.
+                                            We will respond within 48 hours.</p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="modal-footer" style="border-top:1px solid #e9ecef;padding:1rem 2rem;">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                                    style="border-radius:12px;padding:0.6rem 1.75rem;font-weight:600;color:#5a6a88;border:1px solid #e9ecef;">Close</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                    style="border-radius:12px;padding:0.6rem 1.75rem;background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);border:none;font-weight:700;">
+                                    <i class="fas fa-check me-2"></i>I Understand
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+
+  <!-- Block iOS rubber-band overscroll at top and bottom -->
+  <script>
+    (function () {
+      var startY = 0;
+      document.addEventListener('touchstart', function (e) {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        if (!e.cancelable) return;
+        /* window.pageYOffset is the only reliable scroll position on iOS Safari */
+        var scrollY   = window.pageYOffset || 0;
+        var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        var movingDown = e.touches[0].clientY < startY; /* finger up = scroll toward bottom */
+        /* Only block at bottom — allows pull-to-refresh at top (CSS handles top bounce) */
+        if (scrollY >= maxScroll - 2 && movingDown) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    })();
+  </script>
+</body>
+
+</html>

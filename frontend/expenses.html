@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="theme-color" content="transparent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Expenses - SplitWise</title>
+    <!-- Favicon - High Quality Wallet Logo -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/performance.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/collapsible-sidebar.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- ROOT CAUSE FIX: Check authentication IMMEDIATELY before any content renders -->
+    <script>
+        (function () {
+            'use strict';
+
+            // Check authentication IMMEDIATELY (synchronous check)
+            function checkAuthImmediate() {
+                const token = localStorage.getItem('token');
+                const user = localStorage.getItem('user');
+                const justLoggedOut = localStorage.getItem('justLoggedOut');
+
+                // If user just logged out, redirect immediately
+                if (justLoggedOut === 'true') {
+                    window.location.replace('frontend.html');
+                    return false;
+                }
+
+                // If no authentication data, redirect immediately
+                if (!token || !user) {
+                    window.location.replace('frontend.html');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Run check immediately (before DOM is ready)
+            const isAuthenticated = checkAuthImmediate();
+
+            // If authenticated, wait for body and mark it
+            if (isAuthenticated) {
+                // Use DOMContentLoaded or immediate if body exists
+                function markAuthenticated() {
+                    if (document.body) {
+                        document.body.classList.remove('auth-checking');
+                        document.body.classList.add('authenticated');
+                    }
+                }
+
+                if (document.body) {
+                    markAuthenticated();
+                } else {
+                    // Body doesn't exist yet, wait for it
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', markAuthenticated);
+                    } else {
+                        // Use setTimeout as fallback
+                        setTimeout(markAuthenticated, 0);
+                    }
+                }
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="css/dashboard-layout.css">
+    <link rel="stylesheet" href="css/topnav.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style id="sw-topnav-override">
+        /* SplitWise TopNav Layout Overrides */
+        .sidebar, .sidebar-overlay, .page-header-fixed { display: none !important; }
+        .main-content {
+            margin-left: 0 !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+        }
+        footer {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+        body { padding-top: 0 !important; }
+        /* Ensure topnav stacks correctly */
+        body.sidebar-collapsed .main-content { margin-left: 0 !important; }
+        body.sidebar-collapsed .page-header-fixed { left: 0 !important; display: none !important; }
+    </style>
+</head>
+
+<body class="auth-checking">
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="fas fa-wallet"></i><span class="brand-text">SplitWise</span></h5>
+            <button class="sidebar-close-btn sw-sidebar-close" id="sidebarCloseBtn" aria-label="Close sidebar" title="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="nav flex-column">
+            <!-- ROOT CAUSE FIX: Reduced margin-top from mt-4 (1.5rem) to 0.5rem -->
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="expenses.html" class="nav-link active">
+                <i class="fas fa-receipt"></i> <span>Expenses</span>
+            </a>
+            <a href="groups.html" class="nav-link">
+                <i class="fas fa-users"></i> <span>Groups</span>
+            </a>
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-chart-bar"></i> <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Notification Button at Bottom -->
+        <div class="mt-auto">
+            <div class="nav-link notification-bell" id="notificationBellBtn">
+                <i class="fas fa-bell"></i> <span>Notifications</span>
+                <span class="notification-badge" id="notificationBadge"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Overlay -->
+    <div class="notification-overlay" id="notificationOverlay"></div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3><i class="fas fa-bell me-2"></i>Notifications</h3>
+            <button class="close-btn" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-actions-bar">
+            <button class="btn-mark-all" id="markAllReadBtn">
+                <i class="fas fa-check-double me-1"></i>Mark All Read
+            </button>
+            <button class="btn-clear-all" id="clearAllBtn">
+                <i class="fas fa-trash me-1"></i>Clear All
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Page header moved to main-content for visibility with new topnav -->
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+
+            <!-- Page Title Bar -->
+            <div class="sw-page-titlebar">
+                <div class="sw-page-titlebar-left">
+                    <h2><i class="fas fa-receipt"></i>Manage Expenses</h2>
+                </div>
+                <div class="sw-page-titlebar-right">
+                    <button class="btn btn-primary sw-action-btn" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                        <i class="fas fa-plus"></i>Add Expense
+                    </button>
+                </div>
+            </div>
+            <!-- Quick Stats Section -->
+            <div class="row mb-4" id="quickStats">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #667eea;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Total Expenses</h6>
+                        <h2 id="totalExpensesCount" class="mb-0">0</h2>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #1cc88a;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); color: white;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Total Amount</h6>
+                        <h2 id="totalAmount" class="mb-0"><span class="currency-symbol">?</span>0</h2>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #f6c23e;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%); color: white;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Average Expense</h6>
+                        <h2 id="avgExpense" class="mb-0"><span class="currency-symbol">?</span>0</h2>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card" style="border-top-color: #36b9cc;">
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Top Category</h6>
+                        <h2 id="topCategory" class="mb-0" style="font-size: 1.3rem;">-</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Month Selector & Actions -->
+            <div class="d-flex gap-2 mb-4 align-items-center flex-wrap">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="viewMode" id="viewAll" value="all" checked>
+                    <label class="btn btn-outline-primary" for="viewAll" style="border-radius: 15px 0 0 15px;">
+                        <i class="fas fa-list me-1"></i>All Expenses
+                    </label>
+
+                    <input type="radio" class="btn-check" name="viewMode" id="viewMonth" value="month">
+                    <label class="btn btn-outline-primary" for="viewMonth" style="border-radius: 0 15px 15px 0;">
+                        <i class="fas fa-calendar-alt me-1"></i>By Month
+                    </label>
+                </div>
+
+                <select class="form-select" id="monthSelector"
+                    style="max-width: 200px; border-radius: 15px; display: none;">
+                    <option value="">Select Month</option>
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+
+                <select class="form-select" id="yearSelector"
+                    style="max-width: 120px; border-radius: 15px; display: none;">
+                    <!-- Years will be populated dynamically -->
+                </select>
+
+                <button class="btn btn-info" onclick="openFilterModal()"
+                    style="border-radius: 15px; box-shadow: 0 4px 10px rgba(54, 185, 204, 0.3);">
+                    <i class="fas fa-filter me-2"></i>Filters
+                </button>
+
+                <div class="sw-search-bar ms-auto">
+                    <i class="fas fa-search sw-search-icon"></i>
+                    <input type="text" class="form-control sw-search-input" id="searchInput" placeholder="Search expenses...">
+                </div>
+            </div>
+
+            <!-- Month Summary Card (shown when By Month is selected) -->
+            <div id="monthSummaryCard" class="card mb-4"
+                style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h6 style="opacity: 0.9;">Total Expenses</h6>
+                            <h2 id="monthTotalExpenses">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h6 style="opacity: 0.9;">Total Amount</h6>
+                            <h2 id="monthTotalAmount">?0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h6 style="opacity: 0.9;">Average/Day</h6>
+                            <h2 id="monthAverage">?0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h6 style="opacity: 0.9;">Top Category</h6>
+                            <h2 id="monthTopCategory">-</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses Table -->
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0" style="text-align: left;"><i class="fas fa-list me-2"></i><span
+                            id="expenseListTitle">All Expenses</span></h5>
+                    <span class="badge bg-primary" id="expenseCount">0</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Title</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseTableBody">
+                            <!-- Expenses will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="mb-0">? 2026 SplitWise. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Add Expense Modal -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header"
+                    style="background: var(--navbar-bg); color: white; border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Add New Expense</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="expenseForm">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-heading me-2"></i>Title</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-money-bill-wave me-2"></i><span
+                                    id="addExpenseAmountLabel">Total Amount</span></label>
+                            <input type="number" class="form-control" id="amount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-tags me-2"></i>Category</label>
+                            <select class="form-select" id="category" required>
+                                <option value="">Choose a category...</option>
+                                <option value="Food">?? Food</option>
+                                <option value="Travel">?? Travel</option>
+                                <option value="Rent">?? Rent</option>
+                                <option value="Shopping">??? Shopping</option>
+                                <option value="Education">?? Education</option>
+                                <option value="Entertainment">?? Entertainment</option>
+                                <option value="Other">?? Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="customCategoryContainer" style="display: none;">
+                            <label class="form-label"><i class="fas fa-edit me-2"></i>Custom Category <span
+                                    class="text-muted">(Optional)</span></label>
+                            <input type="text" class="form-control" id="customCategory"
+                                placeholder="e.g., Medical, Gym, Utilities...">
+                            <small class="text-muted">Leave blank to use "Other" or enter a custom name</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Date</label>
+                            <input type="date" class="form-control" id="spentAt" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-sticky-note me-2"></i>Notes</label>
+                            <textarea class="form-control" id="notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="addBtn">Add Expense</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white; border: none;">
+                    <h5 class="modal-title"><i class="fas fa-filter me-2"></i>Filter Expenses</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fas fa-tag me-2"></i>Category</label>
+                        <select class="form-select" id="modalCategoryFilter" style="border-radius: 15px;">
+                            <option value="">All Categories</option>
+                            <option>Food</option>
+                            <option>Travel</option>
+                            <option>Rent</option>
+                            <option>Shopping</option>
+                            <option>Education</option>
+                            <option>Entertainment</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fas fa-calendar me-2"></i>Date Range</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="date" class="form-control" id="modalStartDate" placeholder="Start Date"
+                                    style="border-radius: 15px;">
+                                <small class="text-muted">From</small>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control" id="modalEndDate" placeholder="End Date"
+                                    style="border-radius: 15px;">
+                                <small class="text-muted">To</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fas fa-sort-amount-down me-2"></i>Sort By</label>
+                        <select class="form-select" id="modalSortBy" style="border-radius: 15px;">
+                            <option value="date-desc">Date (Newest First)</option>
+                            <option value="date-asc">Date (Oldest First)</option>
+                            <option value="amount-desc">Amount (High to Low)</option>
+                            <option value="amount-asc">Amount (Low to High)</option>
+                            <option value="title">Title (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border: none; justify-content: center;">
+                    <button type="button" class="btn btn-secondary" id="modalClearFiltersBtn"
+                        style="border-radius: 15px; min-width: 100px;">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </button>
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal" id="modalApplyFiltersBtn"
+                        style="border-radius: 15px; min-width: 100px;">
+                        <i class="fas fa-check me-2"></i>Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); color: white; border: none;">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-trash-alt" style="font-size: 3rem; color: #e74a3b;"></i>
+                    </div>
+                    <h5 class="mb-2">Delete Expense?</h5>
+                    <p class="text-muted mb-0">Are you sure you want to delete this expense? This action cannot be
+                        undone.</p>
+                </div>
+                <div class="modal-footer" style="border: none;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                        <i class="fas fa-trash me-2"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script>
+        const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+
+                notification.innerHTML = `
+                    <i class="fas fa-${icon} me-2"></i>
+                    <p class="mb-0 ms-1">${message}</p>
+                `;
+
+            container.appendChild(notification);
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, 3000);
+        }
+
+        // Store expenses in memory after fetching from API
+        let cachedExpenses = null;
+
+        // Fetch expenses from backend API
+        async function fetchExpensesFromAPI() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.warn('No auth token, using localStorage fallback');
+                    return getUserExpensesFromLocalStorage();
+                }
+
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success && data.data && data.data.items) {
+                    // Transform API expenses to match local format (only personal expenses)
+                    const personalExpenses = data.data.items
+                        .filter(exp => !exp.type || exp.type === 'personal')
+                        .map(exp => ({
+                            id: exp._id || exp.id,
+                            title: exp.title || exp.description || '',
+                            amount: parseFloat(exp.amount) || 0,
+                            currency: exp.currency || 'INR', // ROOT CAUSE FIX: Include currency field
+                            category: exp.category || 'Other',
+                            date: exp.spent_at || exp.date || new Date().toISOString(),
+                            spent_at: exp.spent_at || exp.date || new Date().toISOString(),
+                            notes: exp.notes || '',
+                            createdAt: exp.created_at || exp.createdAt || new Date().toISOString()
+                        }));
+
+                    console.log('? Fetched expenses from API:', personalExpenses.length);
+                    cachedExpenses = personalExpenses;
+                    return personalExpenses;
+                }
+
+                return [];
+            } catch (error) {
+                console.error('Error fetching expenses from API:', error);
+                // Fallback to localStorage
+                return getUserExpensesFromLocalStorage();
+            }
+        }
+
+        // Get or initialize user expenses from localStorage (fallback)
+        function getUserExpensesFromLocalStorage() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user.email || 'guest';
+            const storageKey = `expenses_${userId}`;
+
+            const storedExpenses = localStorage.getItem(storageKey);
+            if (storedExpenses) {
+                try {
+                    const expenses = JSON.parse(storedExpenses);
+                    // ROOT CAUSE FIX: Ensure all expenses have currency field
+                    return expenses.map(exp => ({
+                        ...exp,
+                        currency: exp.currency || 'INR'
+                    }));
+                } catch (e) {
+                    console.error('Error parsing expenses:', e);
+                    return [];
+                }
+            }
+            return [];
+        }
+
+        // Get expenses (from cache if available, else localStorage)
+        function getUserExpenses() {
+            if (cachedExpenses !== null) {
+                return cachedExpenses;
+            }
+            return getUserExpensesFromLocalStorage();
+        }
+
+        // Note: Expenses are stored in backend only
+        // This function is kept for backward compatibility but does nothing
+        function saveUserExpenses(expenses) {
+            // Expenses are stored in backend - no localStorage writes
+            console.warn('saveUserExpenses called but expenses are stored in backend only');
+        }
+
+        // Add expense to backend API
+        async function addExpenseToAPI(expenseData) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No auth token');
+                }
+
+                const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: expenseData.title,
+                        amount: expenseData.amount,
+                        category: expenseData.category,
+                        spentAt: expenseData.date,
+                        notes: expenseData.notes || ''
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('? Expense added to API successfully');
+                    // Update cache
+                    cachedExpenses = null; // Force refresh on next load
+                    return { success: true, expense: data.data };
+                }
+
+                throw new Error(data.message || 'Failed to add expense');
+            } catch (error) {
+                console.error('Error adding expense to API:', error);
+                throw error;
+            }
+        }
+
+        // Delete expense from backend API
+        async function deleteExpenseFromAPI(expenseId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No auth token');
+                }
+
+                const API_BASE = window.API_BASE || 'https://api.splitwise.space/api';
+                const response = await fetch(`${API_BASE}/expenses/${expenseId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('? Expense deleted from API successfully');
+                    // Update cache
+                    cachedExpenses = null; // Force refresh on next load
+                    return { success: true };
+                }
+
+                throw new Error(data.message || 'Failed to delete expense');
+            } catch (error) {
+                console.error('Error deleting expense from API:', error);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // MONTH VIEW AND FILTER FUNCTIONS
+        // ============================================
+
+        function openFilterModal() {
+            const modal = new bootstrap.Modal(document.getElementById('filterModal'));
+            modal.show();
+        }
+
+        // Initialize year selector
+        function initializeYearSelector() {
+            const yearSelector = document.getElementById('yearSelector');
+            const currentYear = new Date().getFullYear();
+            yearSelector.innerHTML = '';
+
+            for (let year = currentYear; year >= currentYear - 5; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear) option.selected = true;
+                yearSelector.appendChild(option);
+            }
+        }
+
+        // View mode toggle
+        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const monthSelector = document.getElementById('monthSelector');
+                const yearSelector = document.getElementById('yearSelector');
+                const monthSummary = document.getElementById('monthSummaryCard');
+                const expenseListTitle = document.getElementById('expenseListTitle');
+
+                if (e.target.value === 'month') {
+                    monthSelector.style.display = 'block';
+                    yearSelector.style.display = 'block';
+                    monthSummary.style.display = 'block';
+                    expenseListTitle.textContent = 'Monthly Expenses';
+
+                    // Set current month and year
+                    const now = new Date();
+                    monthSelector.value = now.getMonth();
+                    updateMonthView();
+                } else {
+                    monthSelector.style.display = 'none';
+                    yearSelector.style.display = 'none';
+                    monthSummary.style.display = 'none';
+                    expenseListTitle.textContent = 'All Expenses';
+                    loadExpenses();
+                }
+            });
+        });
+
+        // Month/Year change handlers
+        document.getElementById('monthSelector').addEventListener('change', updateMonthView);
+        document.getElementById('yearSelector').addEventListener('change', updateMonthView);
+
+        function updateMonthView() {
+            const month = parseInt(document.getElementById('monthSelector').value);
+            const year = parseInt(document.getElementById('yearSelector').value);
+
+            if (isNaN(month) || isNaN(year)) {
+                loadExpenses();
+                return;
+            }
+
+            const allExpenses = getUserExpenses();
+            const monthExpenses = allExpenses.filter(expense => {
+                const expenseDate = new Date(expense.date || expense.spent_at);
+                return !isNaN(expenseDate.getTime()) && expenseDate.getMonth() === month && expenseDate.getFullYear() === year;
+            });
+
+            // Update month summary
+            updateMonthSummary(monthExpenses, year, month);
+
+            // Load filtered expenses
+            loadExpenses(monthExpenses);
+        }
+
+        function updateMonthSummary(expenses, year, month) {
+            // ROOT CAUSE FIX: Get currency symbol and conversion rates
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() : '?';
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            const totalExpenses = expenses.length;
+
+            // ROOT CAUSE FIX: Convert amounts with currency conversion
+            let totalAmount = 0;
+            expenses.forEach(exp => {
+                const amount = parseFloat(exp.amount || 0);
+                const expenseCurrency = exp.currency || 'INR';
+                totalAmount += convertAmount(amount, expenseCurrency, userCurrency);
+            });
+
+            // Calculate days in month
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const average = totalAmount / daysInMonth;
+
+            // Find top category
+            const categoryTotals = {};
+            expenses.forEach(exp => {
+                const cat = exp.category || 'Other';
+                const amount = parseFloat(exp.amount || 0);
+                const expenseCurrency = exp.currency || 'INR';
+                const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+                categoryTotals[cat] = (categoryTotals[cat] || 0) + convertedAmount;
+            });
+
+            const topCategory = Object.keys(categoryTotals).reduce((a, b) =>
+                categoryTotals[a] > categoryTotals[b] ? a : b, '-');
+
+            // Format amount with commas
+            const formatAmount = (num, decimals = 2) => {
+                return parseFloat(num).toLocaleString('en-IN', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            };
+
+            // ROOT CAUSE FIX: Update currency symbols
+            document.querySelectorAll('#monthSummary .currency-symbol').forEach(span => {
+                span.textContent = currencySymbol;
+            });
+
+            // Update UI with converted amounts and proper decimals
+            document.getElementById('monthTotalExpenses').textContent = totalExpenses;
+            document.getElementById('monthTotalAmount').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(totalAmount, 2)}`;
+            document.getElementById('monthAverage').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(average, 2)}`;
+            document.getElementById('monthTopCategory').textContent = topCategory;
+        }
+
+        // Filter modal handlers
+        document.getElementById('modalApplyFiltersBtn').addEventListener('click', () => {
+            applyFilters();
+        });
+
+        document.getElementById('modalClearFiltersBtn').addEventListener('click', () => {
+            document.getElementById('modalCategoryFilter').value = '';
+            document.getElementById('modalStartDate').value = '';
+            document.getElementById('modalEndDate').value = '';
+            document.getElementById('modalSortBy').value = 'date-desc';
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+            if (modal) modal.hide();
+
+            // Check if month view is active
+            if (document.getElementById('viewMonth').checked) {
+                updateMonthView();
+            } else {
+                loadExpenses();
+            }
+
+            showNotification('Filters cleared!', 'info');
+        });
+
+        // Category icons and colors
+        const categoryConfig = {
+            'Food': { icon: 'fa-utensils', color: '#e74a3b' },
+            'Travel': { icon: 'fa-plane', color: '#36b9cc' },
+            'Rent': { icon: 'fa-home', color: '#f6c23e' },
+            'Shopping': { icon: 'fa-shopping-bag', color: '#e83e8c' },
+            'Education': { icon: 'fa-graduation-cap', color: '#6610f2' },
+            'Entertainment': { icon: 'fa-film', color: '#fd7e14' },
+            'Other': { icon: 'fa-ellipsis-h', color: '#6c757d' }
+        };
+
+        function updateQuickStats(expenses) {
+            // ROOT CAUSE FIX: Get currency symbol and conversion rates
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() : '?';
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            // Total expenses count
+            document.getElementById('totalExpensesCount').textContent = expenses.length;
+
+            // Format amount with commas
+            const formatAmount = (num, decimals = 2) => {
+                return parseFloat(num).toLocaleString('en-IN', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            };
+
+            // ROOT CAUSE FIX: Total amount with currency conversion
+            let total = 0;
+            expenses.forEach(exp => {
+                const amount = parseFloat(exp.amount || 0);
+                const expenseCurrency = exp.currency || 'INR';
+                total += convertAmount(amount, expenseCurrency, userCurrency);
+            });
+            document.getElementById('totalAmount').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(total, 2)}`;
+
+            // Average expense with conversion
+            const avg = expenses.length > 0 ? total / expenses.length : 0;
+            document.getElementById('avgExpense').innerHTML = `<span class="currency-symbol">${currencySymbol}</span>${formatAmount(avg, 2)}`;
+
+            // Top category with conversion
+            const categoryTotals = {};
+            expenses.forEach(exp => {
+                const cat = exp.category || 'Other';
+                const amount = parseFloat(exp.amount || 0);
+                const expenseCurrency = exp.currency || 'INR';
+                const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+                categoryTotals[cat] = (categoryTotals[cat] || 0) + convertedAmount;
+            });
+
+            // ROOT CAUSE FIX: Update currency symbols
+            document.querySelectorAll('#quickStats .currency-symbol').forEach(span => {
+                span.textContent = currencySymbol;
+            });
+
+            const topCat = Object.keys(categoryTotals).reduce((a, b) =>
+                categoryTotals[a] > categoryTotals[b] ? a : b, '-');
+
+            const topCatConfig = categoryConfig[topCat] || categoryConfig['Other'];
+            document.getElementById('topCategory').innerHTML = topCat !== '-'
+                ? `<i class="fas ${topCatConfig.icon} me-2" style="color: ${topCatConfig.color};"></i>${topCat}`
+                : '-';
+        }
+
+        function loadExpenses(filteredExpenses = null) {
+            // ROOT CAUSE FIX: Get currency symbol and conversion rates
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() : '?';
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userCurrency = user.preferredCurrency || 'INR';
+            const exchangeRates = JSON.parse(localStorage.getItem('exchangeRates') || '{}');
+
+            // ROOT CAUSE FIX: Convert amount function
+            const convertAmount = (amount, fromCurrency, toCurrency) => {
+                if (fromCurrency === toCurrency || !exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                    return parseFloat(amount || 0);
+                }
+                const amountInUSD = parseFloat(amount || 0) / (exchangeRates[fromCurrency] || 1);
+                return amountInUSD * (exchangeRates[toCurrency] || 1);
+            };
+
+            const expenses = filteredExpenses || getUserExpenses();
+            const tbody = document.getElementById('expenseTableBody');
+
+            // ROOT CAUSE FIX: Update both stats AND table synchronously (like reports page)
+            // CRITICAL: Update quick stats FIRST and ensure it's fully rendered before table
+            updateQuickStats(expenses);
+
+            // Force DOM update for stats before proceeding to table
+            requestAnimationFrame(() => {
+                // Update expense count
+                const expenseCountEl = document.getElementById('expenseCount');
+                if (expenseCountEl) {
+                    expenseCountEl.textContent = expenses.length;
+                }
+
+                // CRITICAL: Restore table thead before populating table data
+                // This ensures column headers are visible when table loads
+                const table = tbody?.closest('table');
+                const tableThead = table?.querySelector('thead');
+                if (tableThead) {
+                    const originalHTML = tableThead.getAttribute('data-original-html');
+                    if (originalHTML) {
+                        tableThead.innerHTML = originalHTML;
+                        tableThead.removeAttribute('data-original-html');
+                    }
+                    // Make sure thead is visible
+                    tableThead.style.opacity = '1';
+                    tableThead.style.visibility = 'visible';
+                    tableThead.style.position = '';
+                    tableThead.style.left = '';
+                    tableThead.style.display = '';
+                }
+                // This ensures stats are rendered first
+                if (tbody) {
+                    tbody.innerHTML = '';
+                }
+
+                if (expenses.length === 0) {
+                    if (tbody) {
+                        tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3 mb-0">No expenses found</p>
+                            <p class="text-muted mt-2"><small>Click "Add Expense" to get started!</small></p>
+                        </td>
+                    </tr>
+                `;
+                    }
+                    return;
+                }
+
+                // Sort by date (newest first)
+                expenses.sort((a, b) => {
+                    const dateA = new Date(a.date || a.spent_at);
+                    const dateB = new Date(b.date || b.spent_at);
+                    return dateB - dateA;
+                });
+
+                expenses.forEach((expense, index) => {
+                    const row = document.createElement('tr');
+                    // Ensure body is visible before adding animation class
+                    if (!document.body.classList.contains('ready')) {
+                        document.body.classList.add('ready');
+                    }
+                    row.className = 'expense-row-animate';
+                    row.style.animationDelay = `${index * 0.05}s`;
+                    // Force animation to start
+                    void row.offsetWidth; // Trigger reflow
+
+                    const categoryInfo = categoryConfig[expense.category] || categoryConfig['Other'];
+                    const expenseDate = new Date(expense.date || expense.spent_at);
+                    const formattedDate = !isNaN(expenseDate.getTime())
+                        ? expenseDate.toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        })
+                        : 'Invalid Date';
+
+                    // ROOT CAUSE FIX: Convert amount to user's currency
+                    const amount = parseFloat(expense.amount) || 0;
+                    const expenseCurrency = expense.currency || 'INR';
+                    const convertedAmount = convertAmount(amount, expenseCurrency, userCurrency);
+
+                    row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-alt me-2" style="color: #667eea;"></i>
+                            <span>${formattedDate}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="category-badge" style="background-color: ${categoryInfo.color}15; color: ${categoryInfo.color};">
+                            <i class="fas ${categoryInfo.icon}"></i>
+                            ${expense.category}
+                        </span>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-bold">${expense.title}</div>
+                            ${expense.notes ? `<small class="text-muted"><i class="fas fa-sticky-note me-1"></i>${expense.notes}</small>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="amount-display"><span class="currency-symbol">${currencySymbol}</span>${convertedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteExpense('${expense.id || expense._id}')" style="border-radius: 10px; box-shadow: 0 2px 8px rgba(231, 74, 59, 0.3);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                    if (tbody) {
+                        tbody.appendChild(row);
+                    }
+                });
+            });
+        }
+
+        // Filter expenses
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('modalCategoryFilter').value;
+            const startDate = document.getElementById('modalStartDate').value;
+            const endDate = document.getElementById('modalEndDate').value;
+            const sortBy = document.getElementById('modalSortBy').value;
+
+            // Get base expenses (all or month-specific)
+            let expenses;
+            if (document.getElementById('viewMonth').checked) {
+                const month = parseInt(document.getElementById('monthSelector').value);
+                const year = parseInt(document.getElementById('yearSelector').value);
+                if (!isNaN(month) && !isNaN(year)) {
+                    const allExpenses = getUserExpenses();
+                    expenses = allExpenses.filter(expense => {
+                        const expenseDate = new Date(expense.date || expense.spent_at);
+                        return !isNaN(expenseDate.getTime()) && expenseDate.getMonth() === month && expenseDate.getFullYear() === year;
+                    });
+                } else {
+                    expenses = getUserExpenses();
+                }
+            } else {
+                expenses = getUserExpenses();
+            }
+
+            // Apply search filter
+            if (searchTerm) {
+                expenses = expenses.filter(expense =>
+                    expense.title.toLowerCase().includes(searchTerm) ||
+                    (expense.notes && expense.notes.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Apply category filter
+            if (categoryFilter) {
+                expenses = expenses.filter(expense => expense.category === categoryFilter);
+            }
+
+            // Apply date range filter
+            if (startDate) {
+                expenses = expenses.filter(expense => {
+                    const expenseDate = expense.date || expense.spent_at;
+                    return expenseDate >= startDate;
+                });
+            }
+
+            if (endDate) {
+                expenses = expenses.filter(expense => {
+                    const expenseDate = expense.date || expense.spent_at;
+                    return expenseDate <= endDate;
+                });
+            }
+
+            // Apply sorting
+            switch (sortBy) {
+                case 'date-desc':
+                    expenses.sort((a, b) => {
+                        const dateA = new Date(a.date || a.spent_at);
+                        const dateB = new Date(b.date || b.spent_at);
+                        return dateB - dateA;
+                    });
+                    break;
+                case 'date-asc':
+                    expenses.sort((a, b) => {
+                        const dateA = new Date(a.date || a.spent_at);
+                        const dateB = new Date(b.date || b.spent_at);
+                        return dateA - dateB;
+                    });
+                    break;
+                case 'amount-desc':
+                    expenses.sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
+                    break;
+                case 'amount-asc':
+                    expenses.sort((a, b) => parseFloat(a.amount) - parseFloat(b.amount));
+                    break;
+                case 'title':
+                    expenses.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+            }
+
+            loadExpenses(expenses);
+            showNotification('Filters applied!', 'info');
+        }
+
+        // Search input handler (real-time search)
+        document.getElementById('searchInput').addEventListener('input', () => {
+            if (document.getElementById('viewMonth').checked) {
+                updateMonthView();
+            } else {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+                if (searchTerm) {
+                    const expenses = getUserExpenses().filter(expense =>
+                        expense.title.toLowerCase().includes(searchTerm) ||
+                        (expense.notes && expense.notes.toLowerCase().includes(searchTerm))
+                    );
+                    loadExpenses(expenses);
+                } else {
+                    loadExpenses();
+                }
+            }
+        });
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('modalCategoryFilter').value = '';
+            document.getElementById('modalStartDate').value = '';
+            document.getElementById('modalEndDate').value = '';
+            document.getElementById('modalSortBy').value = 'date-desc';
+            loadExpenses();
+
+            // Show notification
+            const filterCount = [searchTerm, categoryFilter, startDate, endDate].filter(f => f).length;
+            if (filterCount > 0) {
+                showNotification(`Found ${expenses.length} expense(s) matching ${filterCount} filter(s)`, 'success');
+            } else {
+                showNotification('Showing all expenses', 'info');
+            }
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            loadExpenses();
+            showNotification('Filters cleared', 'info');
+        }
+
+        let expenseToDelete = null;
+
+        function deleteExpense(id) {
+            expenseToDelete = id;
+            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        async function confirmDelete() {
+            if (!expenseToDelete) return;
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            const deleteBtn = modal._element.querySelector('.btn-danger');
+            const originalHTML = deleteBtn.innerHTML;
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+
+            try {
+                // Try to delete from API first
+                try {
+                    // Check if expenseId is MongoDB ObjectId format (24 hex chars) or numeric
+                    const expenseId = expenseToDelete.toString();
+
+                    const result = await deleteExpenseFromAPI(expenseId);
+                    if (result.success) {
+                        // Refresh expenses from API
+                        cachedExpenses = null;
+                        await fetchExpensesFromAPI();
+                        loadExpenses();
+                        showNotification('Expense deleted successfully', 'success');
+                        expenseToDelete = null;
+                        modal.hide();
+                        deleteBtn.disabled = false;
+                        deleteBtn.innerHTML = originalHTML;
+                        return;
+                    }
+                } catch (apiError) {
+                    console.warn('API delete failed, using localStorage fallback:', apiError);
+                    // Fall through to localStorage fallback
+                }
+
+                // Note: Backend stores all expenses - no localStorage fallback for writes
+                // If backend API fails, show error message
+                showNotification('Failed to delete expense. Backend API unavailable.', 'error');
+                expenseToDelete = null;
+                modal.hide();
+            } catch (error) {
+                console.error('Error deleting expense:', error);
+                showNotification('Error deleting expense: ' + error.message, 'error');
+            } finally {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = originalHTML;
+            }
+        }
+
+        // ROOT CAUSE FIX: Function to update currency symbols dynamically
+        function updateCurrencySymbolsOnPage() {
+            const currencySymbol = typeof getCurrencySymbol === 'function' ? getCurrencySymbol() : '?';
+
+            // Update all .currency-symbol spans
+            document.querySelectorAll('.currency-symbol').forEach(span => {
+                span.textContent = currencySymbol;
+            });
+
+            // ROOT CAUSE FIX: Always show "Total Amount" without currency prefix
+            const addExpenseLabel = document.getElementById('addExpenseAmountLabel');
+            if (addExpenseLabel) {
+                addExpenseLabel.textContent = 'Total Amount';
+            }
+        }
+
+        // Update currency symbols on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateCurrencySymbolsOnPage);
+        } else {
+            updateCurrencySymbolsOnPage();
+        }
+
+        // Listen for currency changes (from settings page or localStorage updates)
+        window.addEventListener('storage', function (e) {
+            if (e.key === 'user' || e.key === 'preferredCurrency' || e.key === 'exchangeRates') {
+                updateCurrencySymbolsOnPage();
+                // Reload expenses to update amounts with new currency
+                cachedExpenses = null;
+                fetchExpensesFromAPI().then(() => {
+                    loadExpenses();
+                });
+            }
+        });
+
+        // Also update when localStorage is modified (same-page updates)
+        const originalSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function (key, value) {
+            originalSetItem.apply(this, [key, value]);
+            if (key === 'user' || key === 'exchangeRates') {
+                setTimeout(() => {
+                    updateCurrencySymbolsOnPage();
+                    cachedExpenses = null;
+                    fetchExpensesFromAPI().then(() => {
+                        loadExpenses();
+                    });
+                }, 100);
+            }
+        };
+
+        // Set today's date
+        document.getElementById('spentAt').valueAsDate = new Date();
+
+        // Show/hide custom category field based on selection
+        document.getElementById('category').addEventListener('change', function () {
+            const customCategoryContainer = document.getElementById('customCategoryContainer');
+            const customCategoryInput = document.getElementById('customCategory');
+
+            if (this.value === 'Other') {
+                customCategoryContainer.style.display = 'block';
+                customCategoryInput.focus();
+            } else {
+                customCategoryContainer.style.display = 'none';
+                customCategoryInput.value = '';
+            }
+        });
+
+        // Add expense
+        document.getElementById('addBtn').addEventListener('click', async () => {
+            const title = document.getElementById('title').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            let category = document.getElementById('category').value;
+            const customCategory = document.getElementById('customCategory').value.trim();
+            const date = document.getElementById('spentAt').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            // If "Other" is selected and custom category is provided, use custom category
+            // Otherwise, keep it as "Other"
+            if (category === 'Other' && customCategory) {
+                category = customCategory;
+            }
+
+            if (!title || !amount || !category || !date) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (amount <= 0) {
+                showNotification('Amount must be greater than 0', 'error');
+                return;
+            }
+
+            const addBtn = document.getElementById('addBtn');
+            const originalHTML = addBtn.innerHTML;
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+
+            try {
+                const newExpense = {
+                    title,
+                    amount,
+                    category,
+                    date,
+                    notes
+                };
+
+                // Try to add to API first
+                try {
+                    const result = await addExpenseToAPI(newExpense);
+                    if (result.success) {
+                        // Refresh expenses from API
+                        cachedExpenses = null;
+                        await fetchExpensesFromAPI();
+                        loadExpenses();
+
+                        // Close modal and reset form
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addExpenseModal'));
+                        modal.hide();
+                        document.getElementById('expenseForm').reset();
+                        document.getElementById('customCategoryContainer').style.display = 'none';
+                        document.getElementById('spentAt').valueAsDate = new Date();
+
+                        showNotification('Expense added successfully!', 'success');
+                        addBtn.disabled = false;
+                        addBtn.innerHTML = originalHTML;
+                        return;
+                    }
+                } catch (apiError) {
+                    console.warn('API add failed, using localStorage fallback:', apiError);
+                    // Fall through to localStorage fallback
+                }
+
+                // Fallback to localStorage
+                let expenses = getUserExpenses();
+
+                // Generate new ID
+                const newId = expenses.length > 0 ? Math.max(...expenses.map(e => e.id)) + 1 : 1;
+
+                // Note: Backend stores all expenses - no localStorage fallback for writes
+                // If backend API fails, show error message
+                showNotification('Failed to add expense. Backend API unavailable.', 'error');
+
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addExpenseModal'));
+                modal.hide();
+                document.getElementById('expenseForm').reset();
+                document.getElementById('customCategoryContainer').style.display = 'none';
+                document.getElementById('spentAt').valueAsDate = new Date();
+
+                showNotification('Expense added successfully! (saved locally)', 'success');
+            } catch (error) {
+                console.error('Error adding expense:', error);
+                showNotification('Error adding expense: ' + error.message, 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.innerHTML = originalHTML;
+            }
+        });
+
+        // Initialize - Single consolidated handler
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('?? Initializing Expenses page...');
+
+            // Show page immediately
+            document.body.classList.add('ready');
+
+            // Initialize year selector immediately
+            initializeYearSelector();
+
+            let hasCachedData = false;
+
+            // Load from localStorage first for instant display
+            try {
+                const cachedExpenses = getUserExpenses();
+                if (cachedExpenses && cachedExpenses.length > 0) {
+                    hasCachedData = true;
+                    loadExpenses();
+                } else {
+                }
+            } catch (e) {
+                console.warn('No cached expenses found');
+            }
+
+            try {
+                // Fetch expenses from API in background
+                const expenses = await fetchExpensesFromAPI();
+                console.log('? Loaded expenses from API:', expenses.length);
+
+                // ROOT CAUSE FIX: Update UI with fresh data (like reports page)
+                // Update both stats and table synchronously
+                loadExpenses();
+                        } else if (checkAttempts >= maxAttempts) {
+                            console.warn('Data load timeout. Stats:', statsUpdated, 'Table:', tableUpdated);
+                        } else {
+                            // Keep checking - ensure we wait for stats especially
+                        }
+                    };
+
+                    // Start checking after a brief delay to allow loadExpenses to execute
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                        });
+                    });
+                }
+
+                // Page loaded silently - no notification on refresh/tab switch
+            } catch (error) {
+                console.error('Error loading expenses from API:', error);
+
+                // Fallback to localStorage (already loaded above) - silent on refresh
+            }
+        });
+
+    </script>
+    <script src="js/prevent-auto-scroll.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="js/sidebar-toggle.js"></script>
+    <script src="js/currency.js"></script>
+    <script src="js/notifications-manager.js"></script>
+    <script src="js/notification-panel.js" defer></script>
+    <script>
+
+        // Trigger animations after page is ready
+        function initPageAnimations() {
+            // Force animation restart on rows that may have been created
+            setTimeout(() => {
+                const animatedRows = document.querySelectorAll('.expense-row-animate');
+                animatedRows.forEach((row, index) => {
+                    // Restart animation by removing and re-adding class
+                    row.classList.remove('expense-row-animate');
+                    // Force reflow
+                    void row.offsetWidth;
+                    row.classList.add('expense-row-animate');
+                    row.style.animationDelay = `${index * 0.05}s`;
+                });
+            }, 100);
+        }
+
+        // Initialize animations when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPageAnimations);
+        } else {
+            initPageAnimations();
+        }
+
+        // FIXED: Move header actions below header on mobile - prevent duplication
+        let resizeTimeout;
+        function moveHeaderActionsToMobile() {
+            // Clear any existing timeout
+            clearTimeout(resizeTimeout);
+
+            // Debounce resize events
+            resizeTimeout = setTimeout(function () {
+                const isMobile = window.innerWidth <= 1024;
+                const headerActions = document.querySelector('.page-header-fixed .header-actions');
+                const mobileContainer = document.querySelector('.header-actions-mobile');
+
+                if (isMobile) {
+                    // Mobile view: Hide in header, show below
+                    if (headerActions) {
+                        // Hide header actions in header
+                        headerActions.style.display = 'none';
+
+                        // Create mobile container if it doesn't exist
+                        if (!mobileContainer) {
+                            const newMobileContainer = document.createElement('div');
+                            newMobileContainer.className = 'header-actions-mobile';
+
+                            // FIXED: Clone and modify the buttons to ensure proper stacking and match tile width
+                            const buttons = headerActions.querySelectorAll('.btn');
+                            if (buttons.length > 0) {
+                                buttons.forEach(btn => {
+                                    const clonedBtn = btn.cloneNode(true);
+                                    clonedBtn.style.width = '100%';
+                                    clonedBtn.style.maxWidth = '100%';
+                                    clonedBtn.style.margin = '0';
+                                    clonedBtn.style.marginBottom = '0';
+                                    clonedBtn.style.flex = '1 1 100%';
+                                    clonedBtn.style.boxSizing = 'border-box';
+                                    newMobileContainer.appendChild(clonedBtn);
+                                });
+                            } else {
+                                newMobileContainer.innerHTML = headerActions.innerHTML;
+                            }
+
+                            // FIXED: Ensure container matches tile width
+                            newMobileContainer.style.width = '100%';
+                            newMobileContainer.style.maxWidth = '100%';
+                            newMobileContainer.style.boxSizing = 'border-box';
+
+                            // Insert before first child of main-content
+                            const mainContent = document.querySelector('.main-content');
+                            if (mainContent && mainContent.firstChild) {
+                                mainContent.insertBefore(newMobileContainer, mainContent.firstChild);
+                            } else if (mainContent) {
+                                mainContent.appendChild(newMobileContainer);
+                            }
+                        } else {
+                            // FIXED: Update existing container to ensure buttons are full width and match tile width
+                            const buttons = mobileContainer.querySelectorAll('.btn');
+                            buttons.forEach(btn => {
+                                btn.style.width = '100%';
+                                btn.style.maxWidth = '100%';
+                                btn.style.margin = '0';
+                                btn.style.marginBottom = '0';
+                                btn.style.flex = '1 1 100%';
+                                btn.style.boxSizing = 'border-box';
+                            });
+
+                            const containers = mobileContainer.querySelectorAll('.d-flex');
+                            containers.forEach(container => {
+                                container.style.flexDirection = 'column';
+                                container.style.width = '100%';
+                                container.style.maxWidth = '100%';
+                                container.style.boxSizing = 'border-box';
+                            });
+
+                            // FIXED: Ensure container matches tile width
+                            mobileContainer.style.width = '100%';
+                            mobileContainer.style.maxWidth = '100%';
+                            mobileContainer.style.boxSizing = 'border-box';
+                        }
+                    }
+                } else {
+                    // Desktop view: Show in header, remove mobile container
+                    if (headerActions) {
+                        headerActions.style.display = '';
+                        headerActions.style.visibility = 'visible';
+                        headerActions.style.opacity = '1';
+                    }
+
+                    // FIXED: Remove mobile container immediately to prevent buttons going behind header
+                    if (mobileContainer) {
+                        mobileContainer.style.display = 'none';
+                        mobileContainer.style.visibility = 'hidden';
+                        mobileContainer.style.opacity = '0';
+                        // Remove from DOM after a brief delay to ensure smooth transition
+                        setTimeout(() => {
+                            if (mobileContainer && mobileContainer.parentNode) {
+                                mobileContainer.remove();
+                            }
+                        }, 50);
+                    }
+                }
+            }, 100); // 100ms debounce
+        }
+
+        // Call on load and resize with debouncing
+        let resizeHandler;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeHandler);
+            resizeHandler = setTimeout(moveHeaderActionsToMobile, 150);
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', moveHeaderActionsToMobile);
+        } else {
+            moveHeaderActionsToMobile();
+        }
+
+        // ROOT CAUSE FIX: Desktop navigation toggle button handler
+        document.addEventListener('DOMContentLoaded', function () {
+            const desktopNavToggle = document.getElementById('desktopNavToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebar = document.querySelector('.sidebar');
+
+            // ROOT CAUSE FIX: Store scroll position before locking body
+            let bodyScrollPosition = 0;
+
+            // ROOT CAUSE FIX: Function to lock body scroll
+            function lockBodyScroll() {
+                bodyScrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${bodyScrollPosition}px`;
+                document.body.style.width = '100%';
+                document.body.style.height = '100%';
+                document.body.classList.add('sidebar-open');
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = 'hidden';
+                    mainContent.style.position = 'fixed';
+                }
+            }
+
+            // ROOT CAUSE FIX: Function to unlock body scroll
+            function unlockBodyScroll() {
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+                document.body.classList.remove('sidebar-open');
+                window.scrollTo(0, bodyScrollPosition);
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.overflow = '';
+                    mainContent.style.position = '';
+                }
+            }
+
+            // ROOT CAUSE FIX: Mobile menu toggle function with proper scroll locking
+            function toggleMobileMenu() {
+                if (!sidebar) return;
+                const isOpening = !sidebar.classList.contains('show');
+                sidebar.classList.toggle('show');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('show');
+                    if (isOpening) {
+                        sidebarOverlay.style.display = 'block';
+                    } else {
+                        sidebarOverlay.style.display = 'none';
+                    }
+                }
+                if (sidebar.classList.contains('show')) {
+                    lockBodyScroll();
+                } else {
+                    unlockBodyScroll();
+                }
+            }
+
+            // Mobile menu button handler
+            if (mobileMenuBtn) {
+                const newMobileBtn = mobileMenuBtn.cloneNode(true);
+                mobileMenuBtn.parentNode.replaceChild(newMobileBtn, mobileMenuBtn);
+                newMobileBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Close mobile menu when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleMobileMenu);
+            }
+
+            // Sidebar close button
+            const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+            if (sidebarCloseBtn) {
+                const newCloseBtn = sidebarCloseBtn.cloneNode(true);
+                sidebarCloseBtn.parentNode.replaceChild(newCloseBtn, sidebarCloseBtn);
+                newCloseBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    if (sidebar) {
+                        sidebar.classList.remove('show');
+                        if (sidebarOverlay) {
+                            sidebarOverlay.classList.remove('show');
+                            sidebarOverlay.style.display = 'none';
+                        }
+                        unlockBodyScroll();
+                    }
+                });
+            }
+
+            if (desktopNavToggle) {
+                desktopNavToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Check if mobile - use mobile menu toggle
+                    if (window.innerWidth <= 767) {
+                        toggleMobileMenu();
+                        return;
+                    }
+
+                    // Use the global toggleSidebar function if available
+                    if (typeof globalToggleSidebar === 'function') {
+                        globalToggleSidebar();
+                    } else {
+                        // Fallback: manually toggle sidebar
+                        document.body.classList.toggle('sidebar-collapsed');
+                        if (sidebar) {
+                            sidebar.classList.toggle('collapsed');
+                            // Save state
+                            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                        }
+                    }
+                });
+                console.log('? Desktop nav toggle button handler attached');
+            }
+        });
+    </script>
+    <script src="js/topnav.js" defer></script>
+    <script src="js/navigation-init.js" defer></script>
+    <script src="js/sw-engine.js" defer></script>
+
+    <!-- -- Real-time SSE: refresh expenses/notifications automatically -- -->
+    <script src="js/realtime.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        let _expTimer = null;
+        function refreshExpenses() {
+          clearTimeout(_expTimer);
+          _expTimer = setTimeout(async () => {
+            cachedExpenses = null; // force re-fetch
+            const exps = await fetchExpensesFromAPI();
+            loadExpenses(exps);
+          }, 400);
+        }
+        let _notifTimer = null;
+        function refreshNotifications() {
+          clearTimeout(_notifTimer);
+          _notifTimer = setTimeout(() => {
+            if (typeof loadNotifications === 'function') loadNotifications();
+          }, 400);
+        }
+        SWRealtime.on('expense:created', refreshExpenses);
+        SWRealtime.on('expense:updated', refreshExpenses);
+        SWRealtime.on('expense:deleted', refreshExpenses);
+        SWRealtime.on('notification:new', refreshNotifications);
+      });
+    </script>
+
+  <!-- Shared scroll lock for all Bootstrap modals (mobile iOS + Android fix) -->
+  <script src="js/modal-scroll-lock.js"></script>
+</body>
+
+
+</html>
+

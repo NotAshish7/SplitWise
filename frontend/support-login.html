@@ -1,0 +1,763 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Support Login â€” SplitWise</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+       SUPPORT AGENT LOGIN â€” Purple Split-Screen
+       Left: purpleâ†’violet gradient
+       Right: white card on light lavender bg
+    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    :root {
+      --p:       #667eea;
+      --v:       #764ba2;
+      --grad:    linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --right-bg:#f0f2ff;
+      --card-bg: #ffffff;
+      --text-d:  #1e1b4b;
+      --text-m:  #6b7280;
+      --border:  #e5e7eb;
+      --inp-h:   48px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { text-decoration: none; }
+    html { font-family: 'Inter', sans-serif; background-color: transparent; }
+    body { font-family: 'Inter', sans-serif; height: 100%; background: transparent; overscroll-behavior: none; /* block native PTR indicator; custom touchend handler reloads silently */ }
+
+    /* Desktop/trackpad: block ALL rubber-band */
+    @media (hover: hover) and (pointer: fine) {
+      html, body { overscroll-behavior: none; }
+    }
+
+    /* Fixed full-screen background â€” immune to content height & overscroll */
+    body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: env(safe-area-inset-bottom, 0px); background: var(--grad); z-index: -1; pointer-events: none; }
+
+    /* â”€â”€ WRAPPER â”€â”€ */
+    .auth-wrapper { display: flex; height: 100vh; height: 100dvh; width: 100%; overflow: hidden; }
+
+    /* â”€â”€ LEFT PANEL â”€â”€ */
+    .auth-left {
+      flex: 0 0 46%;
+      /* Layered: top-right sheen + bottom-left shadow + base purple gradient */
+      background:
+        linear-gradient(160deg, rgba(255,255,255,0.16) 0%, transparent 42%),
+        linear-gradient(340deg, rgba(30,0,60,0.32) 0%, transparent 42%),
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2.5rem 3rem 2.5rem 2.5rem;
+      position: relative; overflow: hidden; z-index: 2;
+    }
+    .auth-left::before {
+      content: ''; position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.22) 0%, transparent 70%);
+      border-radius: 50%; top: -80px; right: -80px;
+      pointer-events: none; z-index: 0;
+    }
+    .auth-left::after {
+      content: ''; position: absolute;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle at center, rgba(30,0,80,0.6) 0%, transparent 70%);
+      border-radius: 50%; bottom: -90px; left: -90px;
+      pointer-events: none; z-index: 0;
+    }
+    .left-shade {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 28% 18%, rgba(200,180,255,0.16) 0%, transparent 42%),
+        radial-gradient(ellipse at 72% 82%, rgba(0,0,0,0.3) 0%, transparent 42%);
+      pointer-events: none; z-index: 0;
+    }
+    .left-mesh {
+      position: absolute; inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg,  transparent, transparent 60px, rgba(255,255,255,0.05) 60px, rgba(255,255,255,0.05) 61px),
+        repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.05) 60px, rgba(255,255,255,0.05) 61px);
+      pointer-events: none; z-index: 0;
+    }
+    .float-shape { position: absolute; border-radius: 50%; pointer-events: none; z-index: 1; }
+    @keyframes floatAnim { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
+    .auth-left-inner { position: relative; z-index: 5; text-align: center; color: white; max-width: 420px; width: 100%; }
+
+    /* Brand logo */
+    .brand-logo {
+      width: 82px; height: 82px;
+      /* Solid purple gradient matching theme */
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      border: 2px solid rgba(255,255,255,0.28);
+      box-shadow: 0 0 0 8px rgba(102,126,234,0.2), 0 16px 40px rgba(0,0,0,0.38);
+      animation: popIn 0.7s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .brand-logo:hover { transform: scale(1.08) rotate(-3deg); }
+    @keyframes popIn { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
+    .brand-logo i { font-size: 2.3rem; color: white; }
+
+    /* Rainbow brand name */
+    .brand-name {
+      font-size: 2.5rem; font-weight: 900; letter-spacing: -0.5px;
+      margin-bottom: 0.45rem; line-height: 1.1;
+      background: linear-gradient(90deg, #fff 0%, #ffd6ff 15%, #c2e9fb 30%, #a1c4fd 45%, #ffecd2 60%, #fcb69f 75%, #ffd6ff 90%, #fff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      animation: rainbowShift 4s linear infinite, fadeInUp 0.7s 0.4s both;
+    }
+    @keyframes rainbowShift { 0%{background-position:0% center} 100%{background-position:200% center} }
+    @keyframes fadeInUp  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+
+    .brand-tagline {
+      font-size: 0.92rem; font-weight: 500; color: rgba(255,255,255,0.82);
+      margin-bottom: 1.4rem; line-height: 1.6;
+      animation: fadeInUp 0.7s 0.5s both;
+    }
+    .feature-list {
+      list-style: none; padding: 0; margin: 0 0 1.4rem; text-align: left;
+      animation: fadeInUp 0.7s 0.6s both;
+    }
+    .feature-list li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 14px; margin-bottom: 8px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px; font-size: 0.87rem; font-weight: 600; color: rgba(255,255,255,0.94);
+      backdrop-filter: blur(6px); transition: background 0.2s, transform 0.2s;
+    }
+    .feature-list li:hover { background: rgba(255,255,255,0.2); transform: translateX(4px); }
+    .feat-icon {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: rgba(255,255,255,0.2); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 0.88rem; color: white;
+    }
+
+    /* â”€â”€ RIGHT PANEL â”€â”€ */
+    .auth-right {
+      flex: 1; background: var(--right-bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 1.5rem; position: relative; overflow-y: auto;
+    }
+    .auth-right-inner {
+      width: 100%; max-width: 420px;
+      background: var(--card-bg); border-radius: 24px;
+      padding: 2rem 2rem 1.75rem;
+      box-shadow: 0 8px 40px rgba(102,126,234,0.14), 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid rgba(102,126,234,0.1);
+      animation: fadeIn 0.5s ease both;
+    }
+
+    /* Back to Panel */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #667eea;
+      background: #fff;
+      border-radius: 50px;
+      padding: 7px 18px;
+      margin-bottom: 1.25rem;
+      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(102,126,234,0.15);
+      transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    .back-link:hover {
+      background: #f0f0ff;
+      color: #4f46e5;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(102,126,234,0.22);
+    }
+
+    /* Form header */
+    .form-header { margin-bottom: 1.1rem; }
+    .form-header h2 { font-size: 1.5rem; font-weight: 800; color: var(--text-d); margin-bottom: 0.2rem; }
+    .form-header p { font-size: 0.84rem; color: var(--text-m); }
+
+    /* Step indicator */
+    .steps { display: flex; align-items: center; justify-content: center; gap: 0; margin: 0 0 1.2rem; }
+    .step-dot {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #f3f4f6; border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 800; color: var(--text-m); transition: 0.3s;
+    }
+    .step-dot.done  { background: var(--grad); border-color: transparent; color: #fff; }
+    .step-dot.active { background: rgba(102,126,234,0.15); border-color: var(--p); color: var(--p); }
+    .step-line { width: 32px; height: 2px; background: var(--border); transition: 0.3s; }
+    .step-line.done { background: var(--p); }
+
+    /* Panels */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: fadeIn 0.35s; }
+
+    /* Field */
+    .field-wrap { position: relative; margin-bottom: 14px; }
+    .field-label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-d); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .field-wrap i.prefix { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--p); font-size: 0.85rem; }
+    input.field, select.field {
+      width: 100%; height: var(--inp-h);
+      padding: 11px 14px 11px 38px;
+      background: #f8fafc; border: 2px solid var(--border);
+      border-radius: 11px; color: var(--text-d);
+      font-size: 0.92rem; font-family: 'Inter', sans-serif; font-weight: 500;
+      outline: none; transition: all 0.2s;
+    }
+    input.field::placeholder { color: #adb5d4; }
+    input.field:focus, select.field:focus { border-color: var(--p); background: #fff; box-shadow: 0 0 0 3px rgba(102,126,234,0.12); }
+    select.field { -webkit-appearance: none; appearance: none; cursor: pointer; }
+    .toggle-pw {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #adb5d4; cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;
+    }
+    .toggle-pw:hover { color: var(--p); }
+    /* Kill autofill */
+    input.field:-webkit-autofill,
+    input.field:-webkit-autofill:hover,
+    input.field:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 40px #f0f2ff inset !important;
+      -webkit-text-fill-color: var(--text-d) !important;
+      caret-color: var(--text-d);
+      transition: background-color 9999s ease-in-out 0s;
+    }
+    input[type='password']::-ms-reveal,
+    input[type='password']::-ms-clear,
+    input[type='password']::-webkit-contacts-auto-fill-button,
+    input[type='password']::-webkit-credentials-auto-fill-button { display: none !important; }
+
+    /* Pw strength */
+    .pw-strength { height: 3px; border-radius: 2px; margin-top: -8px; margin-bottom: 14px; background: #e5e7eb; overflow: hidden; }
+    .pw-strength-bar { height: 100%; width: 0%; transition: 0.3s; border-radius: 2px; }
+    .rule { font-size: 0.78rem; color: var(--text-m); display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+    .rule.ok { color: #059669; }
+    .rule i { font-size: 0.7rem; width: 12px; }
+
+    /* Info / error boxes */
+    .info-box {
+      background: rgba(102,126,234,0.08); border: 1px solid rgba(102,126,234,0.2);
+      border-radius: 9px; padding: 10px 13px; font-size: 0.82rem; color: var(--text-d);
+      margin-bottom: 14px; line-height: 1.6;
+    }
+    .info-box strong { color: var(--p); }
+    .err-box {
+      background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #ef4444;
+      border-radius: 9px; padding: 9px 13px; font-size: 0.82rem; color: #b91c1c;
+      margin-bottom: 12px; display: none; align-items: center; gap: 8px;
+    }
+    .err-box.show { display: flex; }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%; height: var(--inp-h);
+      border: none; background: var(--grad);
+      color: white; border-radius: 11px; font-family: 'Inter', sans-serif;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 4px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(102,126,234,0.28);
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 22px rgba(102,126,234,0.42); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-ghost {
+      width: 100%; height: 42px;
+      border: 2px solid var(--border); border-radius: 11px; background: none;
+      color: var(--text-m); font-family: 'Inter', sans-serif;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer; margin-top: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--p); color: var(--p); background: rgba(102,126,234,0.05); }
+    .link-btn {
+      background: none; border: none; color: var(--p); font-size: 0.82rem;
+      font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; padding: 0;
+      transition: color 0.2s;
+    }
+    .link-btn:hover { color: var(--v); }
+
+    /* â”€â”€ RESPONSIVE â”€â”€ */
+    @media (max-width: 992px) {
+      body { height: 100%; } /* no overflow:hidden — keeps PTR working */
+      .auth-wrapper { flex-direction: column; height: 100dvh; overflow: hidden; }
+      .auth-left { display: none; }
+      .auth-right {
+        flex: 1;
+        background:
+          linear-gradient(160deg, rgba(255,255,255,0.14) 0%, transparent 40%),
+          linear-gradient(340deg, rgba(30,0,60,0.3) 0%, transparent 40%),
+          linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem 1rem;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .auth-right-inner {
+        margin: 0 auto; height: auto; overflow: visible;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.28);
+        max-width: 460px; width: 100%;
+      }
+    }
+    @media (max-width: 480px) {
+      .auth-right { padding: 1rem 0.75rem; }
+      .auth-right-inner { padding: 1.5rem 1.25rem 1.25rem; border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+      <div class="left-mesh"></div>
+      <div class="left-shade"></div>
+      <div class="float-shape" style="width:180px;height:180px;top:3%;left:2%;background:radial-gradient(circle,rgba(255,255,255,0.15) 0%,transparent 70%);animation:floatAnim 8s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:110px;height:110px;top:62%;left:4%;background:radial-gradient(circle,rgba(99,102,241,0.25) 0%,transparent 70%);animation:floatAnim 10s 1.5s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:130px;height:130px;top:15%;right:4%;background:radial-gradient(circle,rgba(192,132,252,0.18) 0%,transparent 70%);animation:floatAnim 9s 2s ease-in-out infinite;"></div>
+      <div class="float-shape" style="width:75px;height:75px;top:80%;right:8%;background:radial-gradient(circle,rgba(255,255,255,0.14) 0%,transparent 70%);animation:floatAnim 7s 0.5s ease-in-out infinite;"></div>
+
+      <div class="auth-left-inner">
+        <div class="brand-logo"><i class="fas fa-headset"></i></div>
+        <h1 class="brand-name">SplitWise</h1>
+        <p class="brand-tagline">Support agent portal â€” helping users<br>manage expenses &amp; resolve issues</p>
+        <ul class="feature-list">
+          <li><div class="feat-icon"><i class="fas fa-ticket"></i></div> View &amp; manage support tickets</li>
+          <li><div class="feat-icon"><i class="fas fa-reply"></i></div> Reply to user inquiries in real-time</li>
+          <li><div class="feat-icon"><i class="fas fa-circle-check"></i></div> Close &amp; resolve tickets efficiently</li>
+          <li><div class="feat-icon"><i class="fas fa-bell"></i></div> Automated email notifications</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right" id="authRight">
+      <div class="auth-right-inner">
+        <!-- Back to Panel -->
+        <a class="back-link" id="backBtn" href="support-portal.html" onclick="handleBackBtn(event)">
+          <i class="fas fa-home" style="font-size:12px"></i> Back to Panel
+        </a>
+
+        <div class="form-header">
+          <h2>Support Portal</h2>
+          <p id="stepSubtitle">Sign in to access the support dashboard</p>
+        </div>
+
+        <!-- Step indicator -->
+        <div class="steps" id="stepsBar">
+          <div class="step-dot active" id="s1">1</div>
+          <div class="step-line" id="sl1"></div>
+          <div class="step-dot" id="s2">2</div>
+          <div class="step-line" id="sl2"></div>
+          <div class="step-dot" id="s3">3</div>
+        </div>
+
+        <!-- Error box -->
+        <div id="errBox" class="err-box"><i class="fas fa-circle-xmark"></i> <span id="errMsg"></span></div>
+
+        <!-- STEP 1: Login -->
+        <div class="step-panel active" id="step1">
+          <div class="info-box"><i class="fas fa-info-circle"></i> Enter the <strong>Access Token</strong> and <strong>Password</strong> provided by your admin.</div>
+          <!-- Dummy trap -->
+          <input type="text" style="display:none" tabindex="-1" aria-hidden="true">
+          <input type="password" style="display:none" tabindex="-1" aria-hidden="true">
+          <label class="field-label">Access Token</label>
+          <div class="field-wrap">
+            <i class="prefix fas fa-ticket-alt"></i>
+            <input class="field" id="accessToken" type="text" placeholder="e.g. SW-9939"
+                   autocomplete="off" spellcheck="false" data-lpignore="true" data-form-type="other"
+                   readonly style="text-transform:uppercase">
+          </div>
+          <label class="field-label">Password</label>
+          <div class="field-wrap">
+            <i class="prefix fas fa-lock"></i>
+            <input class="field" id="password" type="password" placeholder="Enter your password" autocomplete="new-password">
+            <button class="toggle-pw" type="button" onclick="togglePw('password',this)"><i class="fas fa-eye"></i></button>
+          </div>
+          <button class="btn-primary" id="loginBtn" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Sign In</button>
+          <div style="text-align:center;margin-top:12px">
+            <button class="link-btn" onclick="showForgot()"><i class="fas fa-key"></i> Forgot password? Receive OTP by email</button>
+          </div>
+        </div>
+
+        <!-- STEP Forgot â€” F1 -->
+        <div class="step-panel" id="step-forgot">
+          <div class="info-box"><i class="fas fa-key"></i> Enter your <strong>Access Token</strong>. A 6-digit OTP will be sent to your registered email.</div>
+          <input type="text" style="display:none" tabindex="-1">
+          <input type="password" style="display:none" tabindex="-1">
+          <label class="field-label">Your Access Token</label>
+          <div class="field-wrap">
+            <i class="prefix fas fa-ticket-alt"></i>
+            <input class="field" id="fToken" type="text" placeholder="e.g. SW-9939"
+                   autocomplete="off" readonly style="text-transform:uppercase">
+          </div>
+          <button class="btn-primary" id="fSendOtpBtn" onclick="doSendAgentOtp()"><i class="fas fa-paper-plane"></i> Send OTP to My Email</button>
+          <button class="btn-ghost" onclick="backToLogin()"><i class="fas fa-arrow-left"></i> Back to Login</button>
+        </div>
+
+        <!-- STEP Forgot â€” F2 -->
+        <div class="step-panel" id="step-forgot2">
+          <div class="info-box" id="fOtpInfoMsg"><i class="fas fa-envelope"></i> OTP sent! Expires in <strong id="fOtpTimer" style="color:#667eea">2:00</strong>.</div>
+          <input type="text" style="display:none" tabindex="-1">
+          <input type="password" style="display:none" tabindex="-1">
+          <label class="field-label">6-Digit OTP</label>
+          <div class="field-wrap">
+            <i class="prefix fas fa-shield-halved"></i>
+            <input class="field" id="fOtpCode" type="text" maxlength="6" placeholder="e.g. 483920"
+                   autocomplete="one-time-code" readonly inputmode="numeric">
+          </div>
+          <label class="field-label">New Password</label>
+          <div class="field-wrap">
+            <i class="prefix fas fa-lock"></i>
+            <input class="field" id="fNewPw" type="password" placeholder="Min 8 characters"
+                   autocomplete="new-password" readonly oninput="checkForgotPw(this.value)">
+            <button class="toggle-pw" type="button" id="fPwEye" onclick="togglePwById('fNewPw','fPwEye')"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="pw-strength"><div class="pw-strength-bar" id="fStrBar"></div></div>
+          <div class="field-wrap" style="margin-top:4px">
+            <i class="prefix fas fa-lock"></i>
+            <input class="field" id="fNewPw2" type="password" placeholder="Confirm new password"
+                   autocomplete="new-password" readonly>
+            <button class="toggle-pw" type="button" id="fPw2Eye" onclick="togglePwById('fNewPw2','fPw2Eye')"><i class="fas fa-eye"></i></button>
+          </div>
+          <div style="margin-bottom:14px">
+            <div class="rule" id="f-len"><i class="fas fa-xmark"></i> At least 8 characters</div>
+            <div class="rule" id="f-sym"><i class="fas fa-xmark"></i> Contains a number or symbol</div>
+          </div>
+          <button class="btn-primary" id="fVerifyBtn" onclick="doVerifyAgentOtp()"><i class="fas fa-check-circle"></i> Verify OTP &amp; Reset Password</button>
+          <button class="btn-ghost" onclick="showForgot()"><i class="fas fa-rotate"></i> Request New OTP</button>
+        </div>
+
+        <!-- STEP 2: Change Password (first login) -->
+        <div class="step-panel" id="step2">
+          <div class="info-box"><i class="fas fa-key"></i> This is your <strong>first login</strong>. You must set a new permanent password before continuing.</div>
+          <div class="field-wrap">
+            <label class="field-label">New Password</label>
+            <i class="prefix fas fa-lock"></i>
+            <input class="field" id="newPass" type="password" placeholder="Min 8 characters"
+                   autocomplete="new-password" oninput="checkStrength(this.value)">
+            <button class="toggle-pw" type="button" onclick="togglePw('newPass',this)"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="pw-strength"><div class="pw-strength-bar" id="strengthBar"></div></div>
+          <div class="field-wrap" style="margin-top:4px">
+            <i class="prefix fas fa-lock"></i>
+            <input class="field" id="confirmPass" type="password" placeholder="Confirm new password" autocomplete="new-password">
+            <button class="toggle-pw" type="button" onclick="togglePw('confirmPass',this)"><i class="fas fa-eye"></i></button>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="rule" id="r-len"><i class="fas fa-xmark"></i> At least 8 characters</div>
+            <div class="rule" id="r-upper"><i class="fas fa-xmark"></i> Contains a number or symbol</div>
+          </div>
+          <button class="btn-primary" id="changePwBtn" onclick="doChangePassword()"><i class="fas fa-shield-halved"></i> Set New Password</button>
+        </div>
+
+        <!-- STEP 3: Profile Setup -->
+        <div class="step-panel" id="step3">
+          <div class="info-box"><i class="fas fa-user"></i> Almost done! Set up your <strong>agent profile</strong> to complete onboarding.</div>
+          <div class="field-wrap">
+            <label class="field-label">Full Name</label>
+            <i class="prefix fas fa-user"></i>
+            <input class="field" id="profileName" type="text" placeholder="Your full name">
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Email Address</label>
+            <i class="prefix fas fa-envelope"></i>
+            <input class="field" id="profileEmail" type="email" placeholder="your@email.com">
+          </div>
+          <div class="field-wrap">
+            <label class="field-label">Role</label>
+            <i class="prefix fas fa-id-badge"></i>
+            <select class="field" id="profileRole">
+              <option value="support_agent">Support Agent</option>
+              <option value="senior_agent">Senior Agent</option>
+              <option value="team_lead">Team Lead</option>
+            </select>
+          </div>
+          <button class="btn-primary" id="profileBtn" onclick="doProfileSetup()"><i class="fas fa-check-circle"></i> Complete Setup &amp; Enter Dashboard</button>
+        </div>
+
+      </div><!-- /auth-right-inner -->
+    </div><!-- /auth-right -->
+  </div><!-- /auth-wrapper -->
+
+  <script>
+    const API = (() => {
+      const h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:4000/api';
+      if (h.includes('splitwise.space')) return 'https://api.splitwise.space/api'; return `${window.location.protocol}//${h.replace('5500', '4000')}/api`; })();
+
+    let agentJwt = null;
+
+    // Check existing session
+    const stored = sessionStorage.getItem('support_jwt');
+    if (stored) { agentJwt = stored; window.location.href = 'agent-dashboard.html'; }
+
+    // Remove readonly after load to prevent autofill
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const at = document.getElementById('accessToken');
+        const pw = document.getElementById('password');
+        at.removeAttribute('readonly');
+        pw.removeAttribute('readonly');
+        if (at.value && !at.value.match(/^[A-Z0-9-]+$/)) at.value = '';
+      }, 200);
+    });
+
+    function setLoading(btnId, loading, label = '', icon = '') {
+      const b = document.getElementById(btnId);
+      b.disabled = loading;
+      b.innerHTML = loading ? '<i class="fas fa-circle-notch fa-spin"></i> Please waitâ€¦' : `<i class="fas fa-${icon}"></i> ${label}`;
+    }
+    function showErr(msg) {
+      const e = document.getElementById('errBox'), s = document.getElementById('errMsg');
+      s.textContent = msg; e.classList.add('show');
+      setTimeout(() => e.classList.remove('show'), 4500);
+    }
+    function togglePw(id, btn) {
+      const i = document.getElementById(id);
+      const show = i.type === 'password';
+      i.type = show ? 'text' : 'password';
+      btn.querySelector('i').className = `fas fa-eye${show ? '-slash' : ''}`;
+    }
+    function togglePwById(inputId, btnId) {
+      const inp = document.getElementById(inputId);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      document.getElementById(btnId).querySelector('i').className = `fas fa-eye${show ? '-slash' : ''}`;
+    }
+    function setStep(n) {
+      document.querySelectorAll('.step-panel').forEach((p, i) => p.classList.toggle('active', i === n - 1));
+      document.getElementById('step-forgot').classList.remove('active');
+      document.getElementById('step-forgot2').classList.remove('active');
+      [1, 2, 3].forEach(i => {
+        document.getElementById(`s${i}`).className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+        if (i < 3) document.getElementById(`sl${i}`).className = 'step-line' + (i < n ? ' done' : '');
+      });
+      const subs = ['Sign in to access the support dashboard', 'Set your permanent password', 'Complete your agent profile'];
+      document.getElementById('stepSubtitle').textContent = subs[n - 1];
+      document.getElementById('errBox').classList.remove('show');
+    }
+    function checkStrength(pw) {
+      const bar = document.getElementById('strengthBar');
+      const len = document.getElementById('r-len'), up = document.getElementById('r-upper');
+      const hasLen = pw.length >= 8, hasExtra = /[0-9!@#$%^&*]/.test(pw);
+      len.className = 'rule ' + (hasLen ? 'ok' : '');
+      len.querySelector('i').className = `fas fa-${hasLen ? 'check' : 'xmark'}`;
+      up.className = 'rule ' + (hasExtra ? 'ok' : '');
+      up.querySelector('i').className = `fas fa-${hasExtra ? 'check' : 'xmark'}`;
+      const score = (hasLen ? 1 : 0) + (hasExtra ? 1 : 0) + (pw.length >= 12 ? 1 : 0);
+      const colors = ['#ef4444', '#f59e0b', '#10b981', '#10b981'];
+      bar.style.width = `${score * 33.4}%`; bar.style.background = colors[score];
+    }
+    function checkForgotPw(pw) {
+      const bar = document.getElementById('fStrBar'), l = document.getElementById('f-len'), s = document.getElementById('f-sym');
+      const hL = pw.length >= 8, hS = /[0-9!@#$%^&*]/.test(pw);
+      l.className = 'rule' + (hL ? ' ok' : ''); l.querySelector('i').className = `fas fa-${hL ? 'check' : 'xmark'}`;
+      s.className = 'rule' + (hS ? ' ok' : ''); s.querySelector('i').className = `fas fa-${hS ? 'check' : 'xmark'}`;
+      const sc = (hL ? 1 : 0) + (hS ? 1 : 0) + (pw.length >= 12 ? 1 : 0);
+      bar.style.width = `${sc * 33.4}%`; bar.style.background = ['', '#ef4444', '#f59e0b', '#10b981'][sc] || '#ef4444';
+    }
+
+    // OTP timer
+    let fOtpInterval = null;
+    function startFOtpCountdown(secs = 120) {
+      clearInterval(fOtpInterval);
+      const el = document.getElementById('fOtpTimer');
+      let rem = secs; el.textContent = '2:00'; el.style.color = '#667eea';
+      fOtpInterval = setInterval(() => {
+        rem--;
+        const m = Math.floor(rem / 60), s = rem % 60;
+        el.textContent = `${m}:${String(s).padStart(2, '0')}`;
+        if (rem <= 0) { clearInterval(fOtpInterval); el.textContent = 'EXPIRED'; el.style.color = '#ef4444'; }
+      }, 1000);
+    }
+
+    function showForgot() {
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('step-forgot').classList.add('active');
+      document.getElementById('stepsBar').style.display = 'none';
+      document.getElementById('stepSubtitle').textContent = 'Reset your password â€” OTP will be emailed to you';
+      setTimeout(() => { const el = document.getElementById('fToken'); if (el) { el.removeAttribute('readonly'); el.value = ''; } }, 80);
+    }
+    function backToLogin() {
+      document.getElementById('stepsBar').style.display = '';
+      setStep(1);
+      document.getElementById('stepSubtitle').textContent = 'Sign in to access the support dashboard';
+    }
+
+    async function doSendAgentOtp() {
+      const tok = document.getElementById('fToken').value.trim().toUpperCase();
+      if (!tok) { showErr('Enter your access token'); return; }
+      const btn = document.getElementById('fSendOtpBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending OTPâ€¦';
+      try {
+        const r = await fetch(`${API}/support/auth/request-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accessToken: tok }) });
+        const d = await r.json();
+        if (!d.success) { showErr(d.error || 'Failed. Check your access token.'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP to My Email'; return; }
+        sessionStorage.setItem('_fAgentTok', tok);
+        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('step-forgot2').classList.add('active');
+        document.getElementById('fOtpInfoMsg').innerHTML = `<i class="fas fa-envelope"></i> OTP sent to <strong style="color:#667eea">${d.data.email}</strong>. Expires in <strong id="fOtpTimer" style="color:#667eea">2:00</strong>.`;
+        startFOtpCountdown(120);
+        setTimeout(() => { ['fOtpCode', 'fNewPw', 'fNewPw2'].forEach(id => { const e = document.getElementById(id); if (e) { e.removeAttribute('readonly'); e.value = ''; } }); }, 80);
+      } catch { showErr('Server error â€” is backend running?'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP to My Email'; }
+    }
+
+    async function doVerifyAgentOtp() {
+      const tok = sessionStorage.getItem('_fAgentTok') || '';
+      const otp = document.getElementById('fOtpCode').value.trim();
+      const np = document.getElementById('fNewPw').value;
+      const np2 = document.getElementById('fNewPw2').value;
+      if (!otp) { showErr('Enter the 6-digit OTP'); return; }
+      if (np.length < 8) { showErr('Password must be at least 8 characters'); return; }
+      if (np !== np2) { showErr('Passwords do not match'); return; }
+      const btn = document.getElementById('fVerifyBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifyingâ€¦';
+      try {
+        const r = await fetch(`${API}/support/auth/verify-otp-reset`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accessToken: tok, otp, newPassword: np }) });
+        const d = await r.json();
+        if (!d.success) { showErr(d.error || 'Invalid or expired OTP'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP & Reset Password'; return; }
+        clearInterval(fOtpInterval); sessionStorage.removeItem('_fAgentTok');
+        document.getElementById('step-forgot2').innerHTML = `<div style="text-align:center;padding:10px 0"><div style="font-size:48px;margin-bottom:14px">âœ…</div><h3 style="color:#1e1b4b;margin-bottom:8px">Password Reset!</h3><p style="color:#6b7280;font-size:0.84rem;margin-bottom:20px">You can now log in with your new password.</p><button class="btn-primary" onclick="backToLogin()" style="max-width:260px;margin:0 auto"><i class="fas fa-arrow-right-to-bracket"></i> Go to Login</button></div>`;
+      } catch { showErr('Server error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP & Reset Password'; }
+    }
+
+    async function doLogin() {
+      const tok = document.getElementById('accessToken').value.trim().toUpperCase();
+      const pw  = document.getElementById('password').value;
+      if (!tok || !pw) { showErr('Please fill in all fields'); return; }
+      setLoading('loginBtn', true);
+      try {
+        const r = await fetch(`${API}/support/auth/login`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: tok, password: pw }),
+        });
+        const d = await r.json();
+        if (!d.success) { showErr(d.error || 'Invalid credentials'); setLoading('loginBtn', false, 'Sign In', 'arrow-right-to-bracket'); return; }
+        agentJwt = d.data.token;
+        sessionStorage.setItem('support_jwt', agentJwt);
+        if (d.data.needsPasswordChange) { setStep(2); return; }
+        if (d.data.needsProfileSetup)   { setStep(3); return; }
+        window.location.href = 'agent-dashboard.html';
+      } catch { showErr('Cannot connect to server. Is the backend running?'); setLoading('loginBtn', false, 'Sign In', 'arrow-right-to-bracket'); }
+    }
+
+    async function doChangePassword() {
+      const np = document.getElementById('newPass').value;
+      const cp = document.getElementById('confirmPass').value;
+      if (np.length < 8) { showErr('Password must be at least 8 characters'); return; }
+      if (np !== cp)     { showErr('Passwords do not match'); return; }
+      setLoading('changePwBtn', true);
+      try {
+        const r = await fetch(`${API}/support/auth/change-password`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${agentJwt}` },
+          body: JSON.stringify({ newPassword: np }),
+        });
+        const d = await r.json();
+        if (!d.success) { showErr(d.error || 'Failed'); setLoading('changePwBtn', false, 'Set New Password', 'shield-halved'); return; }
+        agentJwt = d.data.token; sessionStorage.setItem('support_jwt', agentJwt);
+        if (d.data.needsProfileSetup) { setStep(3); return; }
+        window.location.href = 'agent-dashboard.html';
+      } catch { showErr('Server error'); setLoading('changePwBtn', false, 'Set New Password', 'shield-halved'); }
+    }
+
+    async function doProfileSetup() {
+      const name  = document.getElementById('profileName').value.trim();
+      const email = document.getElementById('profileEmail').value.trim();
+      const role  = document.getElementById('profileRole').value;
+      if (!name || !email) { showErr('Name and email are required'); return; }
+      setLoading('profileBtn', true);
+      try {
+        const r = await fetch(`${API}/support/auth/setup-profile`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${agentJwt}` },
+          body: JSON.stringify({ name, email, role }),
+        });
+        const d = await r.json();
+        if (!d.success) { showErr(d.error || 'Failed'); setLoading('profileBtn', false, 'Complete Setup & Enter Dashboard', 'check-circle'); return; }
+        agentJwt = d.data.token; sessionStorage.setItem('support_jwt', agentJwt);
+        window.location.href = 'agent-dashboard.html';
+      } catch { showErr('Server error'); setLoading('profileBtn', false, 'Complete Setup & Enter Dashboard', 'check-circle'); }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const active = document.querySelector('.step-panel.active');
+        if (active?.id === 'step1') doLogin();
+        else if (active?.id === 'step2') doChangePassword();
+        else if (active?.id === 'step3') doProfileSetup();
+        else if (active?.id === 'step-forgot') doSendAgentOtp();
+        else if (active?.id === 'step-forgot2') doVerifyAgentOtp();
+      }
+    });
+
+    function handleBackBtn(e) {
+      e.preventDefault();
+      const jwt = sessionStorage.getItem('support_jwt');
+      window.location.href = jwt ? 'agent-dashboard.html' : 'support-portal.html';
+    }
+
+
+  <!-- Pull-to-Refresh -->
+  <style>
+    #ptr-ind {
+      position: fixed; top: -56px; left: 50%;
+      transform: translateX(-50%);
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(255,255,255,0.25); backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.5);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; z-index: 99999; pointer-events: none;
+      transition: top 0.15s ease, opacity 0.15s ease;
+    }
+    #ptr-ind svg { width: 22px; height: 22px; }
+    #ptr-ind.spinning svg { animation: ptrspin 0.7s linear infinite; }
+    @keyframes ptrspin { to { transform: rotate(360deg); } }
+  </style>
+  <div id="ptr-ind">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4"></path>
+    </svg>
+  </div>
+  <script>
+    (function () {
+      var THRESHOLD = 72, startY = 0, dy = 0, active = false;
+      var ind = document.getElementById('ptr-ind');
+      var panel = document.getElementById('authRight') || document.documentElement;
+      function onStart(e) {
+        startY = e.touches[0].clientY; dy = 0;
+        var s = document.getElementById('authRight');
+        active = !s || s.scrollTop <= 1;
+      }
+      function onMove(e) {
+        if (!active) return;
+        dy = e.touches[0].clientY - startY;
+        if (dy > 8) {
+          if (e.cancelable) e.preventDefault();
+          ind.style.top = Math.min(8, dy * 0.55 - 48) + 'px';
+          ind.style.opacity = Math.min(dy / THRESHOLD * 1.4, 1).toString();
+          ind.classList.toggle('spinning', dy >= THRESHOLD);
+        } else { ind.style.top = '-56px'; ind.style.opacity = '0'; ind.classList.remove('spinning'); }
+      }
+      function onEnd() {
+        if (active && dy >= THRESHOLD) {
+          ind.style.top = '10px'; ind.style.opacity = '1'; ind.classList.add('spinning');
+          setTimeout(function () { location.reload(); }, 350);
+        } else { ind.style.top = '-56px'; ind.style.opacity = '0'; ind.classList.remove('spinning'); }
+        active = false; dy = 0;
+      }
+      [document, panel].forEach(function(el) {
+        el.addEventListener('touchstart', onStart, { passive: true });
+        el.addEventListener('touchmove',  onMove,  { passive: false });
+        el.addEventListener('touchend',   onEnd,   { passive: true });
+      });
+    })();
+  </script>
+</body>
+</html>

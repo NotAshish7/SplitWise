@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Support Portal — SplitWise</title>
+  <meta name="description" content="SplitWise Support Team Portal — Admin and Agent access to ticket management dashboard.">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Nunito (matches frontend) -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Root — matches frontend.html exactly ── */
+    :root {
+      --primary-color: #667eea;
+      --secondary-color: #764ba2;
+      --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+      --body-color: #ffffff;
+      --text-color: #2c3e50;
+      --card-bg: #ffffff;
+      --light-bg: #f8f9fc;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      background: #667eea; /* matches navbar — top rubber-band invisible */
+      overscroll-behavior-x: none;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--body-color);
+      color: var(--text-color);
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+    }
+
+    /* Desktop/trackpad: block ALL rubber-band */
+    @media (hover: hover) and (pointer: fine) {
+      html, body { overscroll-behavior: none; }
+    }
+
+    /* ── NAVBAR — exact match to frontend.html ── */
+    .navbar {
+      background: var(--navbar-bg);
+      box-shadow: var(--shadow);
+      padding: 1rem 0;
+      backdrop-filter: blur(10px);
+      z-index: 1030;
+      position: sticky;
+      top: 0;
+    }
+
+    .navbar-brand {
+      color: white !important;
+      font-weight: 900;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      transition: transform 0.3s ease;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .navbar-brand:hover { transform: scale(1.05); }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: transparent; /* no whitish box behind logo */
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    /* SplitWise: wrap in one flex item so gap doesn't split the word */
+    .brand-text { display: inline-block; }
+    .brand-split { color: white; }
+    .brand-wise  { color: white; } /* plain white — no gradient */
+
+    .nav-link-item {
+      color: rgba(255,255,255,0.88) !important;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem !important;
+      border-radius: 30px;
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.97rem;
+    }
+    .nav-link-item:hover {
+      background: rgba(255,255,255,0.12);
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .nav-btn-outline {
+      border: 2px solid rgba(255,255,255,0.75);
+      border-radius: 50px;
+      padding: 0.4rem 1.25rem;
+      color: white !important;
+      background: transparent;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.3s ease;
+    }
+    .nav-btn-outline:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+      color: white !important;
+    }
+
+    /* ── HERO — gradient bg, white text, animated ── */
+    .hero-section {
+      background: var(--navbar-bg);
+      color: white;
+      padding: 3rem 0 3rem;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .hero-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="rgba(255,255,255,0.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+      animation: bgFloat 20s ease-in-out infinite;
+    }
+    @keyframes bgFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 50px; padding: 7px 22px;
+      font-size: 0.78rem; font-weight: 800;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: rgba(255,255,255,0.95);
+      margin-bottom: 1.75rem;
+      animation: slideInUp 0.7s ease-out both;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900; line-height: 1.15;
+      margin-bottom: 0.75rem;
+      animation: slideInUp 0.7s ease-out 0.1s both;
+    }
+    .hero-title .grad-text {
+      background: linear-gradient(90deg, #ffd6ff, #a1c4fd, #ffecd2);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbowShift 4s linear infinite;
+    }
+    @keyframes rainbowShift { 0%{background-position:0% center} 100%{background-position:200% center} }
+    .hero-sub {
+      font-size: 0.97rem; color: rgba(255,255,255,0.78);
+      max-width: 500px; margin: 0 auto 0; line-height: 1.7;
+      animation: slideInUp 0.7s ease-out 0.2s both;
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3rem; flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+      animation: slideInUp 0.7s ease-out 0.3s both;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-size: 2rem; font-weight: 900; color: white; line-height: 1;
+      display: block;
+    }
+    .stat-lbl {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); margin-top: 4px;
+    }
+    .stat-div { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
+
+    /* ── CARDS SECTION — white background, cards ── */
+    .cards-section {
+      background: var(--light-bg);
+      padding: 5rem 0;
+    }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(102,126,234,0.1);
+      border: 1px solid rgba(102,126,234,0.25);
+      border-radius: 50px; padding: 5px 18px;
+      font-size: 0.78rem; font-weight: 800;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      color: #667eea; margin-bottom: 1.25rem;
+    }
+    .section-title {
+      font-size: 2.2rem; font-weight: 900;
+      color: var(--text-color); margin-bottom: 0.6rem;
+    }
+    .section-sub {
+      font-size: 1rem; color: #6b7280; max-width: 480px; margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+
+    /* Portal cards */
+    .portal-card {
+      background: var(--card-bg);
+      border: none;
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      box-shadow: var(--shadow);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text-color);
+      display: block;
+      height: 100%;
+    }
+    .portal-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 4px;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      border-radius: 24px 24px 0 0;
+    }
+    .portal-card-admin::before { background: linear-gradient(90deg, #e53e3e, #c05621); }
+    .portal-card-agent::before { background: var(--navbar-bg); }
+    .portal-card:hover::before { transform: scaleX(1); }
+    .portal-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    /* Card icon */
+    .card-icon-wrap {
+      width: 68px; height: 68px;
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: white;
+      margin-bottom: 1.25rem;
+      position: relative; z-index: 1;
+    }
+    .card-icon-admin { background: linear-gradient(135deg, #e53e3e, #c05621); box-shadow: 0 8px 24px rgba(197,48,48,0.35); }
+    .card-icon-agent { background: var(--navbar-bg); box-shadow: 0 8px 24px rgba(102,126,234,0.35); }
+
+    /* Shimmer top-right on card */
+    .card-shine {
+      position: absolute; top: -60px; right: -60px;
+      width: 170px; height: 170px; border-radius: 50%;
+      opacity: 0.07; filter: blur(28px); pointer-events: none;
+    }
+    .card-shine-admin { background: #c53030; }
+    .card-shine-agent { background: #667eea; }
+
+    .card-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; font-weight: 800;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      border-radius: 50px; padding: 3px 12px;
+      margin-bottom: 0.75rem; position: relative; z-index: 1;
+    }
+    .card-tag-admin { background: rgba(197,48,48,0.1); border: 1px solid rgba(197,48,48,0.25); color: #c53030; }
+    .card-tag-agent { background: rgba(102,126,234,0.1); border: 1px solid rgba(102,126,234,0.25); color: #667eea; }
+
+    .card-title-text {
+      font-size: 1.45rem; font-weight: 900;
+      color: var(--text-color); margin-bottom: 0.6rem;
+      position: relative; z-index: 1;
+    }
+    .card-desc-text {
+      font-size: 0.9rem; color: #6b7280;
+      line-height: 1.65; margin-bottom: 1.5rem;
+      position: relative; z-index: 1;
+    }
+
+    .card-features-list {
+      list-style: none; padding: 0; margin: 0 0 1.75rem;
+      position: relative; z-index: 1;
+    }
+    .card-features-list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; color: #4b5563;
+      padding: 5px 0;
+      font-weight: 600;
+    }
+    .card-features-list li i {
+      font-size: 0.8rem; width: 18px; text-align: center;
+      flex-shrink: 0;
+    }
+    .feat-icon-admin { color: #e53e3e; }
+    .feat-icon-agent { color: #667eea; }
+
+    .card-cta {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 0.8rem;
+      border: none; border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem; font-weight: 800;
+      cursor: pointer; color: white;
+      position: relative; overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+    .card-cta::before {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .card-cta:hover::before { left: 100%; }
+    .card-cta:hover { transform: translateY(-2px); filter: brightness(1.08); }
+
+    .cta-admin { background: linear-gradient(135deg, #e53e3e, #c05621); box-shadow: 0 6px 20px rgba(197,48,48,0.35); }
+    .cta-agent { background: var(--navbar-bg); box-shadow: 0 6px 20px rgba(102,126,234,0.35); }
+
+    /* ── FEATURES STRIP — white cards ── */
+    .features-section {
+      background: var(--body-color);
+      padding: 5rem 0;
+    }
+    .feature-card {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      border: none;
+      height: 100%;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 4px; background: var(--navbar-bg);
+      transform: scaleX(0); transition: transform 0.3s ease;
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+    }
+    .feature-icon {
+      font-size: 2.8rem;
+      background: var(--navbar-bg);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      display: block;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .feature-card h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-color); margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.88rem; color: #6b7280; line-height: 1.6; }
+
+    /* ── FOOTER — exact match to frontend.html .footer ── */
+    footer {
+      background: #f8f9fc;
+      color: #6b7280;
+      text-align: center;
+      padding: 1rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+    }
+    footer strong { color: var(--text-color); }
+    footer a {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--primary-color);
+      font-weight: 700;
+      text-decoration: none;
+      padding: 4px 14px;
+      border-radius: 50px;
+      transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    footer a:hover {
+      background: rgba(102,126,234,0.08);
+      color: var(--secondary-color);
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+
+    /* Scroll-reveal animation class */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stat-div { display: none; }
+      .stats-row { gap: 1.5rem; }
+      .hero-section { padding: 3rem 0 3.5rem; }
+      .cards-section, .features-section { padding: 3rem 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <!-- Brand -->
+      <a class="navbar-brand" href="frontend.html">
+        <div class="brand-icon"><i class="fas fa-wallet" style="color:white"></i></div>
+        <span class="brand-text"><span class="brand-split">Split</span><span class="brand-wise">Wise</span></span>
+      </a>
+      <!-- Admin + Agent buttons -->
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <a class="nav-btn-outline" href="support-login.html"><i class="fas fa-headset"></i> Agent</a>
+        <a class="nav-btn-outline" href="admin-login.html" style="border-color:rgba(255,180,180,0.75);background:rgba(197,48,48,0.15);"><i class="fas fa-shield-halved"></i> Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero-section">
+    <div class="container position-relative" style="z-index:2">
+      <div class="hero-badge"><i class="fas fa-headset"></i> Support Operations Center</div>
+      <h1 class="hero-title">
+        <span style="color:white">SplitWise</span><br>
+        <span class="grad-text">Support Portal</span>
+      </h1>
+      <p class="hero-sub">Centralised ticket management for the SplitWise support team. Select your access level below to sign in to the dashboard.</p>
+    </div>
+  </section>
+
+  <!-- ── PORTAL CARDS ── -->
+  <section class="cards-section">
+    <div class="container">
+      <div class="text-center">
+        <div class="section-label"><i class="fas fa-lock"></i> Select Access Level</div>
+        <h2 class="section-title">Choose Your Portal</h2>
+        <p class="section-sub">Sign in with your credentials to access your designated dashboard.</p>
+      </div>
+
+      <div class="row g-4 justify-content-center reveal" id="cardsRow">
+        <!-- Admin Card -->
+        <div class="col-12 col-md-6 col-lg-5">
+          <a class="portal-card portal-card-admin" href="admin-login.html">
+            <div class="card-shine card-shine-admin"></div>
+            <div class="card-icon-wrap card-icon-admin">
+              <i class="fas fa-shield-halved"></i>
+            </div>
+            <div class="card-tag card-tag-admin"><i class="fas fa-shield-halved"></i> Restricted</div>
+            <h3 class="card-title-text">Admin Portal</h3>
+            <p class="card-desc-text">Full control over the support system. Manage agents, access tokens, and oversee all operations.</p>
+            <ul class="card-features-list">
+              <li><i class="fas fa-check-circle feat-icon-admin"></i> Create &amp; manage agent tokens</li>
+              <li><i class="fas fa-check-circle feat-icon-admin"></i> Full ticket oversight</li>
+              <li><i class="fas fa-check-circle feat-icon-admin"></i> Dashboard statistics &amp; reports</li>
+              <li><i class="fas fa-check-circle feat-icon-admin"></i> System configuration</li>
+            </ul>
+            <button class="card-cta cta-admin"><i class="fas fa-arrow-right-to-bracket"></i> Admin Sign In</button>
+          </a>
+        </div>
+
+        <!-- Agent Card -->
+        <div class="col-12 col-md-6 col-lg-5">
+          <a class="portal-card portal-card-agent" href="support-login.html">
+            <div class="card-shine card-shine-agent"></div>
+            <div class="card-icon-wrap card-icon-agent">
+              <i class="fas fa-headset"></i>
+            </div>
+            <div class="card-tag card-tag-agent"><i class="fas fa-users"></i> Support Team</div>
+            <h3 class="card-title-text">Agent Portal</h3>
+            <p class="card-desc-text">Handle customer support tickets, reply to users, add notes, and collaborate with the team.</p>
+            <ul class="card-features-list">
+              <li><i class="fas fa-check-circle feat-icon-agent"></i> View &amp; manage tickets</li>
+              <li><i class="fas fa-check-circle feat-icon-agent"></i> Reply directly to users</li>
+              <li><i class="fas fa-check-circle feat-icon-agent"></i> Internal team notes</li>
+              <li><i class="fas fa-check-circle feat-icon-agent"></i> Real-time ticket tracking</li>
+            </ul>
+            <button class="card-cta cta-agent"><i class="fas fa-arrow-right-to-bracket"></i> Agent Sign In</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES STRIP — white cards like frontend.html ── -->
+  <section class="features-section">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <div class="section-label"><i class="fas fa-star"></i> Platform Features</div>
+        <h2 class="section-title">Everything You Need</h2>
+        <p class="section-sub">Powerful tools built for efficient support operations.</p>
+      </div>
+      <div class="row g-4 reveal">
+        <div class="col-12 col-md-4">
+          <div class="feature-card">
+            <i class="fas fa-ticket feature-icon"></i>
+            <h4>Smart Ticketing</h4>
+            <p>Automated ticket IDs, priority queuing, and real-time status updates keep your team organised.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="feature-card">
+            <i class="fas fa-envelope-open-text feature-icon"></i>
+            <h4>Email Integration</h4>
+            <p>Automated notifications via branded emails for every ticket action, keeping users informed.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="feature-card">
+            <i class="fas fa-chart-bar feature-icon"></i>
+            <h4>Analytics &amp; Reports</h4>
+            <p>Track response times, resolution rates, and agent performance from the admin dashboard.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p>&copy; 2026 <strong>SplitWise</strong> &mdash; Support Portal</p>
+    <p style="margin-top:5px"><a href="frontend.html"><i class="fas fa-home"></i> Back to Website</a></p>
+  </footer>
+
+  <script>
+    const API = (() => {
+      const h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:4000/api';
+      if (h.includes('splitwise.space')) return 'https://api.splitwise.space/api'; return `${window.location.protocol}//${h.replace('5500', '4000')}/api`; })();
+
+    // Load live stats
+    (async () => {
+      try {
+        const r = await fetch(`${API}/support/stats`);
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.success) {
+          const ts = document.getElementById('statTickets');
+          const ag = document.getElementById('statAgents');
+          if (ts && d.data.openTickets !== undefined) ts.textContent = d.data.openTickets;
+          if (ag && d.data.activeAgents !== undefined) ag.textContent = d.data.activeAgents;
+        }
+      } catch { /* silent — stats are cosmetic */ }
+    })();
+
+    // Scroll-reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 120);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Block iOS rubber-band overscroll at top and bottom -->
+  <script>
+    (function () {
+      var startY = 0;
+      document.addEventListener('touchstart', function (e) {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        if (!e.cancelable) return;
+        /* window.pageYOffset is the only reliable scroll position on iOS Safari */
+        var scrollY   = window.pageYOffset || 0;
+        var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        var movingDown = e.touches[0].clientY < startY; /* finger up = scroll toward bottom */
+        /* Only block at bottom — allows pull-to-refresh at top (CSS handles top bounce) */
+        if (scrollY >= maxScroll - 2 && movingDown) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    })();
+  </script>
+</body>
+
+</html>
